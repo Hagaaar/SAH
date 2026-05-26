@@ -302,7 +302,7 @@ function updateDots() {
 
 async function syncLoad(){
   if (!S.pin) { S.authenticated = false; render(); return; }
-  setSyncStatus('Sync...', '#888', 'var(--gold)');
+  setSyncStatus('En cours de synchronisation', '#888', 'var(--gold)');
   try{
     const resp = await fetch(SCRIPT_URL + '?pin=' + encodeURIComponent(S.pin), {cache:'no-store'});
     const remote = await resp.json();
@@ -335,7 +335,7 @@ async function syncLoad(){
   }catch(e){
     S.pinLoading = false;
     if (localStorage.getItem('getfit_auth') === 'true') {
-      S.authenticated = true; render(); setSyncStatus('Hors ligne', '#888', 'var(--loss)');
+      S.authenticated = true; render(); setSyncStatus('Échec synchronisation', '#888', 'var(--loss)');
     } else {
       S.authenticated = false; S.pinEntry = ''; render();
       const dots = document.getElementById('pin-dots');
@@ -348,13 +348,13 @@ async function syncLoad(){
 }
 
 async function syncSave(changes){
-  setSyncStatus('Sync...', '#888', 'var(--gold)');
+  setSyncStatus('En cours de synchronisation', '#888', 'var(--gold)');
   try{
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
       body:JSON.stringify({pin: S.pin, state:{config:S.config,data:S.data,manual:S.manual},changes:changes||[]})});
     setSyncStatus('Synchronisé', '#888', 'var(--win)');
   }catch(e){
-    setSyncStatus('Hors ligne', '#888', 'var(--loss)');
+    setSyncStatus('Échec synchronisation', '#888', 'var(--loss)');
   }
 }
 
@@ -461,22 +461,23 @@ function renderSuivi(){
   if (curP === 'anas') blocRadius = '0 16px 16px 16px';
   if (curP === 'saad') blocRadius = '16px 0 16px 16px';
 
-  h+='<div class="saisie-wrapper" style="--tab-color: '+activeColor+';">';
-  h+='<div class="saisie-onglets">';
+  // ── Sélecteur personne
+  h+='<div style="display:flex;gap:4px;margin-bottom:6px">';
   PERSONS.forEach(p=>{
-    const sel = p === curP;
-    const cls = sel ? 'class="active-tab"' : '';
-    h+='<button data-act="fperson" data-val="'+p+'" '+cls+'>'+S.config.persons[p].name+'</button>';
+    const sel=p===curP;
+    h+='<button data-act="fperson" data-val="'+p+'" style="flex:1;padding:9px 0;border-radius:8px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;background:'+(sel?P_BG[p]:'transparent')+';border:1px solid '+(sel?P_BORD[p]:'#1f1f1f')+';color:'+(sel?P_COLOR[p]:'#444')+'">'+S.config.persons[p].name+'</button>';
   });
   h+='</div>';
-  
-  h+='<div class="saisie-bloc" style="background-color: var(--tab-color); border-radius: '+blocRadius+';">';
+
+  // ── Bloc saisie (même style que les cartes caisse)
+  h+='<div style="background:'+P_BG[curP]+';border:1px solid '+P_BORD[curP]+';border-radius:12px;padding:16px;margin-bottom:6px;display:flex;flex-direction:column;gap:12px">';
+
+  // Mois picker
   h+='<div style="position:relative;">';
-  h+='<button data-act="picker" class="inp-color" style="text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>'+mLbl(S.formMonth).toUpperCase()+'</span><span>'+(S.pickerOpen?'▲':'▼')+'</span></button>';
-  
+  h+='<button data-act="picker" style="width:100%;padding:10px 14px;background:#0a0a0a;border:1px solid #252525;border-radius:9px;color:#e8e8e8;font-family:var(--mono);font-size:12px;text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>'+mLbl(S.formMonth).toUpperCase()+'</span><span style="color:'+P_COLOR[curP]+'">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
   if(S.pickerOpen){
     h+='<div data-act="picker-bg" style="position:fixed;inset:0;z-index:98"></div>';
-    h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:var(--card-bg);border:1px solid #2a2a2a;border-radius:12px;max-height:220px;overflow-y:auto;box-shadow:0 8px 28px rgba(0,0,0,.6)">';
+    h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#141414;border:1px solid #2a2a2a;border-radius:12px;max-height:220px;overflow-y:auto;box-shadow:0 8px 28px rgba(0,0,0,.6)">';
     FORM_MONTHS.forEach(m=>{
       const on=m===S.formMonth;
       h+='<div data-act="pick" data-val="'+m+'"'+(on?' data-sel="1"':'')+' style="padding:12px 14px;cursor:pointer;font-family:var(--mono);font-size:12px;border-bottom:1px solid #1a1a1a;background:'+(on?'rgba(240,192,64,.07)':'transparent')+';color:'+(on?'var(--gold)':'#888')+'">'+mLbl(m).toUpperCase()+'</div>';
@@ -484,22 +485,22 @@ function renderSuivi(){
     h+='</div>';
   }
   h+='</div>';
-  
-  h+='<div class="saisie-row">';
-  h+='<div style="flex:1;"><input id="f-kg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" class="inp-color"></div>';
-  h+='<div style="flex:1;"><input id="f-kcal" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" class="inp-color"></div>';
-  h+='<button data-act="add" class="btn-pure-plus"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"></line><line x1="2" y1="8" x2="14" y2="8"></line></svg></button>';
-  h+='</div>';
+
+  // Champs kg + kcal + bouton
+  h+='<div style="display:flex;gap:8px;align-items:center">';
+  h+='<input id="f-kg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;padding:10px 12px;background:#0a0a0a;border:1px solid #252525;border-radius:9px;color:#e8e8e8;font-family:var(--mono);font-size:13px;outline:none;">';
+  h+='<input id="f-kcal" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;padding:10px 12px;background:#0a0a0a;border:1px solid #252525;border-radius:9px;color:#e8e8e8;font-family:var(--mono);font-size:13px;outline:none;">';
+  h+='<button data-act="add" style="width:40px;height:40px;background:'+P_BG[curP]+';border:1px solid '+P_BORD[curP]+';border-radius:9px;color:'+P_COLOR[curP]+';font-size:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;">+</button>';
   h+='</div>';
 
-  h+='<div id="preview" style="font-family:var(--mono);font-size:11px;text-align:center;height:0;overflow:visible;margin-top:2px;pointer-events:none;"></div>';
   h+='</div>';
+  h+='<div id="preview" style="font-family:var(--mono);font-size:11px;text-align:center;height:0;overflow:visible;margin-top:2px;pointer-events:none;"></div>';
 
   const keys=displayKeys();
   let total=0;const per={};PERSONS.forEach(p=>per[p]={total:0,w:0,l:0});
   keys.forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(!e)return;per[p].total+=e.amount;total+=e.amount;e.pass?per[p].w++:per[p].l++;}));
   h+='<div style="background:rgba(240,192,64,.05);border:1px solid rgba(240,192,64,.15);border-radius:12px;padding:16px;margin-bottom:8px">';
-  h+='<div class="mono" style="font-size:9px;letter-spacing:.18em;color:rgba(240,192,64,.45);text-transform:uppercase;margin-bottom:4px">Caisse commune</div>';
+  h+='<div class="mono" style="font-size:13px;font-weight:700;letter-spacing:.12em;color:#ffffff;text-transform:uppercase;margin-bottom:8px">Caisse commune</div>';
   h+='<div class="mono" style="font-size:38px;color:var(--gold);line-height:1;margin-bottom:16px">'+total+'€</div>';
   h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
   PERSONS.forEach(p=>{
@@ -608,6 +609,8 @@ function renderEvolution(){
 
 function renderObjectifs(){
   let h='<div style="display:flex;flex-direction:column;gap:8px">';
+
+  // ── Enjeux financiers
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
   [['Objectif atteint','var(--win)','stakes.success',S.config.stakes.success],
    ['Objectif non atteint','var(--loss)','stakes.failure',S.config.stakes.failure]].forEach(([lbl,c,path,val]) => {
@@ -618,30 +621,33 @@ function renderObjectifs(){
   });
   h+='</div>';
 
+  // ── Cartes individuelles (même style que caisse commune)
   h+='<div style="display:flex;flex-direction:column;gap:8px">';
   PERSONS.forEach(p=>{
     const pc=S.config.persons[p];
-    const RuleTxt = p === 'saad' ? 'Calories strictes (poids ignoré)' : 'Poids obligatoire (Kcal acceptées jusqu\'en nov. 2025)';
-    
-    h+='<div class="card" style="padding:16px;border-color:'+P_BORD[p]+';background:'+P_BG[p]+'">';
-    h+='<div class="mono" style="font-size:12px;text-transform:uppercase;color:'+P_COLOR[p]+';margin-bottom:12px">'+pc.name+'</div>';
-    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">';
-    [['persons.'+p+'.startKg',pc.startKg,'2','kg',''],
-     ['persons.'+p+'.targetLoss',pc.targetLoss,'2','kg','−'],
-     ['persons.'+p+'.kcalMin',pc.kcalMin,'0','','']].forEach(([path,val,dec,unit,pre])=>{
-      h+='<div><div class="mono" style="font-size:14px;color:#e8e8e8;display:flex;align-items:center">'+
-         (pre?'<span style="color:#555;margin-right:2px">'+pre+'</span>':'')+
-         '<span class="edt" data-act="editnum" data-path="'+path+'" data-dec="'+dec+'">'+val+'</span>'+
-         (unit?'<span style="font-size:9px;color:#555;margin-left:3px">'+unit+'</span>':'')+
-         '</div></div>';
+    // Anas & Hicham : kcal puis perte kg | Saad : kcal seulement
+    const fields = p==='saad'
+      ? [['persons.'+p+'.kcalMin', pc.kcalMin, '0', 'kcal / jour', '']]
+      : [['persons.'+p+'.kcalMin', pc.kcalMin, '0', 'kcal / jour', ''],
+         ['persons.'+p+'.targetLoss', pc.targetLoss, '1', 'kg / mois', '−']];
+
+    h+='<div style="background:'+P_BG[p]+';border:1px solid '+P_BORD[p]+';border-radius:12px;padding:18px">';
+    h+='<div class="mono" style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:'+P_COLOR[p]+';margin-bottom:16px">'+pc.name+'</div>';
+    h+='<div style="display:flex;gap:10px">';
+    fields.forEach(([path,val,dec,unit,pre])=>{
+      h+='<div style="flex:1;background:#0b0b0b;border-radius:10px;padding:14px 14px 12px">';
+      h+='<div class="mono" style="font-size:8px;color:#444;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">'+unit+'</div>';
+      h+='<div class="mono" style="display:flex;align-items:baseline;gap:4px;line-height:1">';
+      if(pre) h+='<span style="font-size:24px;font-weight:400;color:'+P_COLOR[p]+'">'+pre+'</span>';
+      h+='<span class="edt" data-act="editnum" data-path="'+path+'" data-dec="'+dec+'" style="font-size:40px;font-weight:500;color:'+P_COLOR[p]+'">'+val+'</span>';
+      h+='</div></div>';
     });
-    h+='</div>';
-    h+='<div class="mono" style="font-size:9px;color:#555;text-transform:uppercase;border-top:1px dashed #222;padding-top:8px;letter-spacing:.02em">'+RuleTxt+'</div>';
-    h+='</div>';
+    h+='</div></div>';
   });
   h+='</div>';
   return h;
 }
+
 
 function render(){
   if (!S.authenticated) {
