@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>Get Fit</title>
+<title>S.A.H</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght=300;400;500&family=DM+Sans:wght=300;400;500&display=swap');
   
@@ -55,19 +55,18 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    padding: 6px 10px;
-    border-radius: 20px;
+    background: transparent;
+    border: none;
+    padding: 6px 0;
     font-family: var(--mono);
     font-size: 9px;
     text-transform: uppercase;
     color: #888;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: opacity 0.2s ease;
   }
-  .sync-badge:active { transform: scale(0.95); }
-  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #444; transition: background 0.3s ease; box-shadow: 0 0 4px rgba(0,0,0,0.5); }
+  .sync-badge:active { opacity: 0.6; }
+  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #444; transition: background 0.3s ease; box-shadow: 0 0 4px rgba(0,0,0,0.3); }
   
   /* ════ NAVIGATION ════ */
   .tabs { display: flex; gap: 3px; background: #111; padding: 3px; border-radius: 10px; border: 1px solid #1c1c1c; margin-bottom: 8px; }
@@ -204,7 +203,6 @@ const mLbl=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mShrt=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mStep=(k,d)=>{let[y,m]=k.split('-').map(Number);const n=m+d;return n>12?mKey(y+1,n-12):n<1?mKey(y-1,n+12):mKey(y,n);};
 
-/* La période d'observation s'arrête en Octobre pour que Novembre soit le premier vrai mois scoré */
 const START_KEY='2025-08', OBS_END='2025-10', CURR_KEY='2026-05';
 const PERSONS=['anas','hicham','saad'];
 
@@ -230,7 +228,6 @@ const DEF_CFG={
   }
 };
 
-/* Tableau répliqué avec exactitude depuis la capture d'écran */
 const DEF_DATA={
   '2025-08':{anas:{kg:88.5,kcal:null},hicham:{kg:114.9,kcal:null},saad:{kg:94.9,kcal:null}},
   '2025-09':{anas:{kg:86.4,kcal:771},hicham:{kg:112.0,kcal:760},saad:{kg:null,kcal:null}},
@@ -243,7 +240,6 @@ const DEF_DATA={
   '2026-04':{anas:{kg:89.3,kcal:656},hicham:{kg:112.9,kcal:891},saad:{kg:null,kcal:796}},
 };
 
-/* Override manuel pour sauver Saad en Janvier malgré ses 542 kcal */
 const DEF_MANUAL={'2026-01':{saad:20}};
 
 /* ════ ETAT GLOBAL ════ */
@@ -293,7 +289,7 @@ function updateDots() {
 
 async function syncLoad(){
   if (!S.pin) { S.authenticated = false; render(); return; }
-  setSyncStatus('Sync...', '#aaa', 'var(--gold)');
+  setSyncStatus('Sync...', '#888', 'var(--gold)');
   try{
     const resp = await fetch(SCRIPT_URL + '?pin=' + encodeURIComponent(S.pin), {cache:'no-store'});
     const remote = await resp.json();
@@ -320,11 +316,11 @@ async function syncLoad(){
     }
     
     S.authenticated = true; localStorage.setItem('getfit_auth', 'true');
-    setSyncStatus('À Jour', '#aaa', 'var(--win)');
+    setSyncStatus('Synchronisé', '#888', 'var(--win)');
     render();
   }catch(e){
     if (localStorage.getItem('getfit_auth') === 'true') {
-      S.authenticated = true; render(); setSyncStatus('Hors Ligne', '#ff4545', 'var(--loss)');
+      S.authenticated = true; render(); setSyncStatus('Hors ligne', '#888', 'var(--loss)');
     } else {
       S.authenticated = false; render();
       const dots = document.getElementById('pin-dots');
@@ -337,13 +333,13 @@ async function syncLoad(){
 }
 
 async function syncSave(changes){
-  setSyncStatus('Sauvegarde...', '#aaa', 'var(--gold)');
+  setSyncStatus('Sync...', '#888', 'var(--gold)');
   try{
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
       body:JSON.stringify({pin: S.pin, state:{config:S.config,data:S.data,manual:S.manual},changes:changes||[]})});
-    setSyncStatus('À Jour', '#aaa', 'var(--win)');
+    setSyncStatus('Synchronisé', '#888', 'var(--win)');
   }catch(e){
-    setSyncStatus('Hors Ligne', '#ff4545', 'var(--loss)');
+    setSyncStatus('Hors ligne', '#888', 'var(--loss)');
   }
 }
 
@@ -354,7 +350,6 @@ function makeChange(person,monthKey,kg,kcal,note){
   const lk=kg!=null?+(prevKg2-kg).toFixed(2):null;
   const wOk=lk!=null&&lk>=pc.targetLoss; const kOk=kcal!=null&&kcal>=pc.kcalMin;
   
-  // Simulation de la même logique que computeEntry pour la variable 'pass'
   let pass;
   if (person === 'saad') {
     pass = kOk; 
@@ -381,13 +376,11 @@ function prevKgFor(person,key){
 
 function computeEntry(person,key){
   const pc = S.config.persons[person];
-  // Mois d'observation (jusqu'à octobre inclus, donc Nov est comptabilisé)
   if(key <= OBS_END) return {pass:true, amount:S.config.stakes.success, reason:'obs'};
   
   const d = (S.data[key] && S.data[key][person]) || {};
   const prevKg = prevKgFor(person,key);
   
-  // Utilisation de toFixed(2) pour respecter les décimales de Saad
   const lossKg = d.kg != null ? +(prevKg - d.kg).toFixed(2) : null; 
   const wOk = lossKg != null && lossKg >= pc.targetLoss;
   const kOk = d.kcal != null && d.kcal >= pc.kcalMin;
@@ -395,17 +388,13 @@ function computeEntry(person,key){
   let pass, reason;
 
   if (person === 'saad') {
-    // Règle 1 : Saad ne compte QUE les calories, jamais le poids.
     pass = kOk;
     reason = pass ? (d.kcal + ' kcal ✓') : ((d.kcal != null ? d.kcal : '—') + ' kcal < ' + pc.kcalMin);
   } else {
-    // Règle 2 : Pour Hicham & Anas
     if (key < '2025-12') {
-      // Avant décembre 2025 (càd Novembre) : Les Kcal valident le mois si le poids n'y est pas
       pass = wOk || kOk;
       reason = pass ? (wOk ? '−'+lossKg+' kg ✓' : d.kcal+' kcal ✓') : 'Échec global';
     } else {
-      // A partir de décembre 2025 : Poids impératif
       pass = wOk;
       reason = pass ? '−'+lossKg+' kg ✓' : (lossKg != null ? '−'+lossKg+' kg < '+pc.targetLoss : 'Poids manquant');
     }
@@ -638,7 +627,6 @@ function renderObjectifs(){
 function render(){
   if (!S.authenticated) {
     let h = '<div style="position:fixed;inset:0;background:var(--bg-dark);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3rem;">';
-    h += '<div style="font-family:var(--mono);font-size:14px;color:#777;letter-spacing:.05em;text-transform:uppercase;">GET FIT — Code d\'accès</div>';
     
     h += '<div class="pin-dots" id="pin-dots" style="display:flex;gap:14px;">';
     for(let i=0; i<5; i++) {
@@ -661,8 +649,8 @@ function render(){
   }
 
   let h='<div class="header-container">';
-  h+='<header><h1>GET FIT</h1></header>';
-  h+='<div class="sync-badge" onclick="syncLoad()"><div id="sync-dot" class="sync-dot"></div><span id="sync-text">Vérification...</span></div>';
+  h+='<header><h1>S.A.H</h1></header>';
+  h+='<div class="sync-badge" onclick="syncLoad()"><div id="sync-dot" class="sync-dot"></div><span id="sync-text">Synchronisé</span></div>';
   h+='</div>';
 
   h+='<div class="tabs">';
@@ -673,7 +661,7 @@ function render(){
 
   h+=(S.tab==='suivi')?renderSuivi():(S.tab==='evolution')?renderEvolution():renderObjectifs();
   
-  h+='<footer style="margin-top:24px;text-align:center;font-family:var(--mono);font-size:10px;color:#333;letter-spacing:.15em;text-transform:uppercase">GetFit · 2025–2030</footer>';
+  h+='<footer style="margin-top:24px;text-align:center;font-family:var(--mono);font-size:10px;color:#333;letter-spacing:.15em;text-transform:uppercase">S.A.H · 2025–2030</footer>';
   document.getElementById('root').innerHTML=h;
   
   bindForm();
