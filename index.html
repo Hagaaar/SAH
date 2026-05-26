@@ -203,7 +203,7 @@ const mLbl=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mShrt=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mStep=(k,d)=>{let[y,m]=k.split('-').map(Number);const n=m+d;return n>12?mKey(y+1,n-12):n<1?mKey(y-1,n+12):mKey(y,n);};
 
-const START_KEY='2025-08', OBS_END='2025-10', CURR_KEY='2026-05';
+const START_KEY='2025-09', OBS_END='2025-10', CURR_KEY='2026-05';
 const PERSONS=['anas','hicham','saad'];
 
 const P_COLOR={anas:'#7eb8f7',hicham:'#c084fc',saad:'#fb923c'};
@@ -229,7 +229,6 @@ const DEF_CFG={
 };
 
 const DEF_DATA={
-  '2025-08':{anas:{kg:88.5,kcal:null},hicham:{kg:114.9,kcal:null},saad:{kg:94.9,kcal:null}},
   '2025-09':{anas:{kg:86.4,kcal:771},hicham:{kg:112.0,kcal:760},saad:{kg:null,kcal:null}},
   '2025-10':{anas:{kg:86.2,kcal:674},hicham:{kg:109.5,kcal:780},saad:{kg:91.55,kcal:877}},
   '2025-11':{anas:{kg:null,kcal:699},hicham:{kg:109.8,kcal:859},saad:{kg:90.45,kcal:714}},
@@ -605,7 +604,7 @@ function renderObjectifs(){
     const RuleTxt = p === 'saad' ? 'Calories strictes (poids ignoré)' : 'Poids obligatoire (Kcal acceptées jusqu\'en nov. 2025)';
     
     h+='<div class="card" style="padding:16px">';
-    h+='<div class="mono" style="font-size:12px;text-transform:uppercase;color:'+P_COLOR[p]+';margin-bottom:12px">'+pc.name+'</div>';
+    h+='<div class="mono" style="font-size:12px;text-transform:uppercase;color:'+P_COLOR[p]+margin-bottom:12px">'+pc.name+'</div>';
     h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">';
     [['persons.'+p+'.startKg',pc.startKg,'2','kg',''],
      ['persons.'+p+'.targetLoss',pc.targetLoss,'2','kg','−'],
@@ -650,7 +649,7 @@ function render(){
 
   let h='<div class="header-container">';
   h+='<header><h1>S.A.H</h1></header>';
-  h+='<div class="sync-badge" onclick="syncLoad()"><div id="sync-dot" class="sync-dot"></div><span id="sync-text">Synchronisé</span></div>';
+  h+='<button class="sync-badge" onclick="syncLoad()"><div id="sync-dot" class="sync-dot"></div><span id="sync-text">Synchronisé</span></button>';
   h+='</div>';
 
   h+='<div class="tabs">';
