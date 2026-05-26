@@ -178,6 +178,18 @@
   }
   .btn-pure-plus:active { transform: scale(0.9); }
   .btn-pure-plus svg { width: 24px; height: 24px; stroke-width: 3; }
+
+  /* ════ LOCK SCREEN (Pavé Numérique) ════ */
+  .pin-dot { width:14px; height:14px; border-radius:50%; border:1.5px solid #555; background:transparent; transition:background 0.1s, border-color 0.1s; }
+  .pin-dot.filled { background:#e8e8e8; border-color:#e8e8e8; }
+  .pin-dot.error { background:var(--loss); border-color:var(--loss); }
+  
+  .pin-key { width:72px; height:72px; border-radius:50%; border:1px solid #2a2a2a; background:#141414; color:#e8e8e8; font-size:24px; font-family:var(--mono); cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; user-select:none; }
+  .pin-key:active { background:#242424; }
+  .pin-key.del { font-size:22px; color:#888; }
+  
+  @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
+  .shake { animation:shake 0.35s ease; }
 </style>
 </head>
 <body>
@@ -242,6 +254,7 @@ let S={
   manual:saved?saved.manual:JSON.parse(JSON.stringify(DEF_MANUAL)),
   formPerson:'anas', formMonth:CURR_KEY, pickerOpen:false, fKg:'', fKcal:'',
   pin: localStorage.getItem('getfit_pin') || '',
+  pinEntry: '',
   authenticated: localStorage.getItem('getfit_auth') === 'true'
 };
 
@@ -264,6 +277,16 @@ function setSyncStatus(msg, color, dotColor) {
   if (elDot) { elDot.style.background = dotColor; }
 }
 
+function updateDots() {
+  for (let i = 0; i < 5; i++) {
+    const dot = document.getElementById('d'+i);
+    if(dot) {
+      if (i < S.pinEntry.length) dot.classList.add('filled');
+      else dot.classList.remove('filled');
+    }
+  }
+}
+
 async function syncLoad(){
   if (!S.pin) {
     S.authenticated = false;
@@ -272,32 +295,45 @@ async function syncLoad(){
   }
   setSyncStatus('Sync...', '#aaa', 'var(--gold)');
   try{
-    const resp=await fetch(SCRIPT_URL + '?pin=' + encodeURIComponent(S.pin), {cache:'no-store'});
-    const remote=await resp.json();
+    const resp = await fetch(SCRIPT_URL + '?pin=' + encodeURIComponent(S.pin), {cache:'no-store'});
+    const remote = await resp.json();
     
+    // Le serveur (Apps Script) refuse l'accès
     if (remote && remote.status === 'error') {
       S.pin = '';
       S.authenticated = false;
       localStorage.removeItem('getfit_pin');
       localStorage.removeItem('getfit_auth');
-      render();
-      const errEl = document.getElementById('auth-error');
-      if (errEl) errEl.textContent = 'Code incorrect';
-      setSyncStatus('Erreur Code', '#ff4545', 'var(--loss)');
+      
+      // Animation d'erreur sur le pavé
+      const dots = document.getElementById('pin-dots');
+      if (dots) {
+        dots.classList.add('shake');
+        document.querySelectorAll('.pin-dot').forEach(d => d.classList.add('error'));
+        setTimeout(() => {
+          dots.classList.remove('shake');
+          document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('error', 'filled'));
+          S.pinEntry = '';
+        }, 600);
+      } else {
+        render();
+      }
       return;
     }
     
     if(remote && remote.data && Object.keys(remote.data).length > 0){
-      S.config=remote.config||S.config;
-      S.data=remote.data;
-      S.manual=remote.manual||S.manual;
+      S.config = remote.config || S.config;
+      S.data = remote.data;
+      S.manual = remote.manual || S.manual;
       persist();
     }
+    
     S.authenticated = true;
     localStorage.setItem('getfit_auth', 'true');
     setSyncStatus('À Jour', '#aaa', 'var(--win)');
     render();
   }catch(e){
+    // Erreur réseau (hors ligne)
     if (localStorage.getItem('getfit_auth') === 'true') {
       S.authenticated = true;
       render();
@@ -305,8 +341,11 @@ async function syncLoad(){
     } else {
       S.authenticated = false;
       render();
-      const errEl = document.getElementById('auth-error');
-      if (errEl) errEl.textContent = 'Connexion internet requise';
+      const dots = document.getElementById('pin-dots');
+      if (dots) {
+        dots.classList.add('shake');
+        setTimeout(() => { dots.classList.remove('shake'); S.pinEntry = ''; updateDots(); }, 600);
+      }
     }
   }
 }
@@ -595,20 +634,32 @@ function renderObjectifs(){
 
 /* ════ GÉNÉRATEUR PRINCIPAL & ÉVÉNEMENTS ════ */
 function render(){
-  // Cas non authentifié : Affichage strict d'un écran de verrouillage géométrique
+  // --- Écran de verrouillage (Pavé numérique) ---
   if (!S.authenticated) {
-    let h = '<div style="max-width:390px; margin: 100px auto 0; padding: 0 14px; text-align: center;">';
-    h += '<h1 style="font-family:var(--mono); font-size:24px; margin-bottom:24px; letter-spacing:-.02em;">GET FIT</h1>';
-    h += '<div class="card" style="padding:24px; display:flex; flex-direction:column; gap:16px;">';
-    h += '<div class="mono" style="font-size:10px; color:#555; text-transform:uppercase; letter-spacing:.1em;">Code d\'accès requis</div>';
-    h += '<input id="auth-pin" type="password" inputmode="numeric" placeholder="••••" style="width:100%; height:44px; text-align:center; background:#0a0a0a; border:1px solid #252525; border-radius:12px; color:#e8e8e8; font-family:var(--mono); font-size:20px; outline:none; letter-spacing: 4px;">';
-    h += '<button data-act="login" style="background:#242424; color:#e8e8e8; height:40px; border-radius:12px; font-size:12px; font-weight:500; letter-spacing:.06em; text-transform:uppercase; width:100%;">Valider</button>';
-    h += '<div id="auth-error" style="font-family:var(--mono); font-size:10px; color:var(--loss); min-height:14px;"></div>';
+    let h = '<div style="position:fixed;inset:0;background:var(--bg-dark);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3rem;">';
+    h += '<div style="font-family:var(--mono);font-size:14px;color:#777;letter-spacing:.05em;text-transform:uppercase;">GET FIT — Code d\'accès</div>';
+    
+    h += '<div class="pin-dots" id="pin-dots" style="display:flex;gap:14px;">';
+    for(let i=0; i<5; i++) {
+      const filled = (S.pinEntry && i < S.pinEntry.length) ? ' filled' : '';
+      h += `<div class="pin-dot${filled}" id="d${i}"></div>`;
+    }
+    h += '</div>';
+    
+    h += '<div class="pin-pad" style="display:grid;grid-template-columns:repeat(3,72px);gap:16px;">';
+    [1,2,3,4,5,6,7,8,9].forEach(n => {
+      h += `<div class="pin-key" data-act="pin-key" data-val="${n}">${n}</div>`;
+    });
+    h += `<div class="pin-key empty" style="border:none;background:transparent;cursor:default;"></div>`;
+    h += `<div class="pin-key" data-act="pin-key" data-val="0">0</div>`;
+    h += `<div class="pin-key del" data-act="pin-del">⌫</div>`;
     h += '</div></div>';
+    
     document.getElementById('root').innerHTML = h;
     return;
   }
 
+  // --- Application principale ---
   let h='<div class="header-container">';
   h+='<header><h1>GET FIT</h1></header>';
   h+='<div class="sync-badge" onclick="syncLoad()"><div id="sync-dot" class="sync-dot"></div><span id="sync-text">Vérification...</span></div>';
@@ -678,16 +729,30 @@ document.addEventListener('click',ev=>{
   if(!t)return;
   const act=t.getAttribute('data-act');
 
-  if(act==='login') {
-    const pinEl = document.getElementById('auth-pin');
-    if (pinEl) {
-      S.pin = pinEl.value.trim();
-      localStorage.setItem('getfit_pin', S.pin);
-      syncLoad();
+  // --- Gestion du Pavé Numérique ---
+  if(act === 'pin-key') {
+    if(!S.pinEntry) S.pinEntry = '';
+    if(S.pinEntry.length < 5) {
+      S.pinEntry += t.getAttribute('data-val');
+      updateDots();
+      if(S.pinEntry.length === 5) {
+        S.pin = S.pinEntry;
+        localStorage.setItem('getfit_pin', S.pin);
+        syncLoad();
+      }
+    }
+    return;
+  }
+  
+  if(act === 'pin-del') {
+    if(S.pinEntry && S.pinEntry.length > 0) {
+      S.pinEntry = S.pinEntry.slice(0, -1);
+      updateDots();
     }
     return;
   }
 
+  // --- Reste de l'application ---
   if(act==='tab'){S.tab=t.getAttribute('data-val');S.pickerOpen=false;render();return;}
   if(act==='fperson'){S.formPerson=t.getAttribute('data-val');render();return;}
   if(act==='picker'){S.pickerOpen=!S.pickerOpen;if(S.pickerOpen)S.formMonth=lastSaisieMonth();render();return;}
