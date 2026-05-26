@@ -110,7 +110,6 @@
     color: #000000 !important;
   }
 
-  /* --- Congés inverses --- */
   .saisie-onglets button.active-tab::before,
   .saisie-onglets button.active-tab::after {
     content: "";
@@ -134,7 +133,6 @@
   .saisie-onglets button:first-child.active-tab::before { display: none; }
   .saisie-onglets button:last-child.active-tab::after { display: none; }
   
-  /* --- BLOC PRINCIPAL --- */
   .saisie-bloc {
     padding: 24px 20px; 
     display: flex;
@@ -179,7 +177,7 @@
   .btn-pure-plus:active { transform: scale(0.9); }
   .btn-pure-plus svg { width: 24px; height: 24px; stroke-width: 3; }
 
-  /* ════ LOCK SCREEN (Pavé Numérique) ════ */
+  /* ════ LOCK SCREEN ════ */
   .pin-dot { width:14px; height:14px; border-radius:50%; border:1.5px solid #555; background:transparent; transition:background 0.1s, border-color 0.1s; }
   .pin-dot.filled { background:#e8e8e8; border-color:#e8e8e8; }
   .pin-dot.error { background:var(--loss); border-color:var(--loss); }
@@ -205,7 +203,9 @@ const mKey=(y,m)=>y+'-'+String(m).padStart(2,'0');
 const mLbl=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mShrt=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mStep=(k,d)=>{let[y,m]=k.split('-').map(Number);const n=m+d;return n>12?mKey(y+1,n-12):n<1?mKey(y-1,n+12):mKey(y,n);};
-const START_KEY='2025-08', OBS_END='2025-11', CURR_KEY='2026-05';
+
+/* La période d'observation s'arrête en Octobre pour que Novembre soit le premier vrai mois scoré */
+const START_KEY='2025-08', OBS_END='2025-10', CURR_KEY='2026-05';
 const PERSONS=['anas','hicham','saad'];
 
 const P_COLOR={anas:'#7eb8f7',hicham:'#c084fc',saad:'#fb923c'};
@@ -229,18 +229,22 @@ const DEF_CFG={
     saad:{name:'Saad',startKg:94.5,targetLoss:1.5,kcalMin:830,mandat:'kcal'},
   }
 };
+
+/* Tableau répliqué avec exactitude depuis la capture d'écran */
 const DEF_DATA={
   '2025-08':{anas:{kg:88.5,kcal:null},hicham:{kg:114.9,kcal:null},saad:{kg:94.9,kcal:null}},
   '2025-09':{anas:{kg:86.4,kcal:771},hicham:{kg:112.0,kcal:760},saad:{kg:null,kcal:null}},
-  '2025-10':{anas:{kg:86.2,kcal:674},hicham:{kg:109.5,kcal:780},saad:{kg:91.6,kcal:877}},
-  '2025-11':{anas:{kg:null,kcal:699},hicham:{kg:109.8,kcal:859},saad:{kg:90.5,kcal:714}},
-  '2025-12':{anas:{kg:89.0,kcal:574},hicham:{kg:111.6,kcal:769},saad:{kg:93.6,kcal:486}},
-  '2026-01':{anas:{kg:null,kcal:631},hicham:{kg:109.2,kcal:847},saad:{kg:92.2,kcal:542}},
+  '2025-10':{anas:{kg:86.2,kcal:674},hicham:{kg:109.5,kcal:780},saad:{kg:91.55,kcal:877}},
+  '2025-11':{anas:{kg:null,kcal:699},hicham:{kg:109.8,kcal:859},saad:{kg:90.45,kcal:714}},
+  '2025-12':{anas:{kg:89.0,kcal:574},hicham:{kg:111.6,kcal:769},saad:{kg:93.55,kcal:486}},
+  '2026-01':{anas:{kg:null,kcal:631},hicham:{kg:109.2,kcal:847},saad:{kg:92.15,kcal:542}},
   '2026-02':{anas:{kg:null,kcal:648},hicham:{kg:111.3,kcal:786},saad:{kg:null,kcal:849}},
   '2026-03':{anas:{kg:null,kcal:null},hicham:{kg:112.9,kcal:769},saad:{kg:null,kcal:777}},
   '2026-04':{anas:{kg:89.3,kcal:656},hicham:{kg:112.9,kcal:891},saad:{kg:null,kcal:796}},
 };
-const DEF_MANUAL={'2025-11':{saad:100},'2026-01':{saad:20}};
+
+/* Override manuel pour sauver Saad en Janvier malgré ses 542 kcal */
+const DEF_MANUAL={'2026-01':{saad:20}};
 
 /* ════ ETAT GLOBAL ════ */
 const LS='getfit_v2';
@@ -267,7 +271,7 @@ function lastSaisieMonth(){
   return allKeys.sort().pop();
 }
 
-/* ════ SYNCHRONISATION & SECURITÉ ════ */
+/* ════ SYNCHRONISATION ════ */
 let syncTimer=null;
 
 function setSyncStatus(msg, color, dotColor) {
@@ -288,24 +292,15 @@ function updateDots() {
 }
 
 async function syncLoad(){
-  if (!S.pin) {
-    S.authenticated = false;
-    render();
-    return;
-  }
+  if (!S.pin) { S.authenticated = false; render(); return; }
   setSyncStatus('Sync...', '#aaa', 'var(--gold)');
   try{
     const resp = await fetch(SCRIPT_URL + '?pin=' + encodeURIComponent(S.pin), {cache:'no-store'});
     const remote = await resp.json();
     
-    // Le serveur (Apps Script) refuse l'accès
     if (remote && remote.status === 'error') {
-      S.pin = '';
-      S.authenticated = false;
-      localStorage.removeItem('getfit_pin');
-      localStorage.removeItem('getfit_auth');
-      
-      // Animation d'erreur sur le pavé
+      S.pin = ''; S.authenticated = false;
+      localStorage.removeItem('getfit_pin'); localStorage.removeItem('getfit_auth');
       const dots = document.getElementById('pin-dots');
       if (dots) {
         dots.classList.add('shake');
@@ -315,32 +310,23 @@ async function syncLoad(){
           document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('error', 'filled'));
           S.pinEntry = '';
         }, 600);
-      } else {
-        render();
-      }
+      } else { render(); }
       return;
     }
     
     if(remote && remote.data && Object.keys(remote.data).length > 0){
-      S.config = remote.config || S.config;
-      S.data = remote.data;
-      S.manual = remote.manual || S.manual;
+      S.config = remote.config || S.config; S.data = remote.data; S.manual = remote.manual || S.manual;
       persist();
     }
     
-    S.authenticated = true;
-    localStorage.setItem('getfit_auth', 'true');
+    S.authenticated = true; localStorage.setItem('getfit_auth', 'true');
     setSyncStatus('À Jour', '#aaa', 'var(--win)');
     render();
   }catch(e){
-    // Erreur réseau (hors ligne)
     if (localStorage.getItem('getfit_auth') === 'true') {
-      S.authenticated = true;
-      render();
-      setSyncStatus('Hors Ligne', '#ff4545', 'var(--loss)');
+      S.authenticated = true; render(); setSyncStatus('Hors Ligne', '#ff4545', 'var(--loss)');
     } else {
-      S.authenticated = false;
-      render();
+      S.authenticated = false; render();
       const dots = document.getElementById('pin-dots');
       if (dots) {
         dots.classList.add('shake');
@@ -363,19 +349,25 @@ async function syncSave(changes){
 
 function makeChange(person,monthKey,kg,kcal,note){
   const pc=S.config.persons[person];
-  let k2=mStep(monthKey,-1);
-  let prevKg2=pc.startKg;
+  let k2=mStep(monthKey,-1); let prevKg2=pc.startKg;
   for(let i=0;i<80;i++){if(k2<START_KEY)break;const d2=S.data[k2]&&S.data[k2][person];if(d2&&d2.kg!=null){prevKg2=d2.kg;break;}k2=mStep(k2,-1);}
-  const lk=kg!=null?+(prevKg2-kg).toFixed(1):null;
-  const wOk=lk!=null&&lk>=pc.targetLoss;
-  const kOk=kcal!=null&&kcal>=pc.kcalMin;
-  const pass=pc.mandat==='kcal'?(kOk||wOk):wOk;
+  const lk=kg!=null?+(prevKg2-kg).toFixed(2):null;
+  const wOk=lk!=null&&lk>=pc.targetLoss; const kOk=kcal!=null&&kcal>=pc.kcalMin;
+  
+  // Simulation de la même logique que computeEntry pour la variable 'pass'
+  let pass;
+  if (person === 'saad') {
+    pass = kOk; 
+  } else {
+    pass = (monthKey < '2025-12') ? (wOk || kOk) : wOk;
+  }
+  
   return{month:monthKey,person,kg:kg??null,kcal:kcal??null,pass,amount:pass?S.config.stakes.success:S.config.stakes.failure,note:note||'saisie'};
 }
 
 function scheduleSave(changes){persist();clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncSave(changes),800);}
 
-/* ════ LOGIQUE MÉTIER ════ */
+/* ════ LOGIQUE MÉTIER & RÈGLES SPÉCIFIQUES ════ */
 function prevKgFor(person,key){
   let k=mStep(key,-1);
   for(let i=0;i<80;i++){
@@ -388,22 +380,38 @@ function prevKgFor(person,key){
 }
 
 function computeEntry(person,key){
-  const pc=S.config.persons[person];
-  if(key<=OBS_END)return{pass:true,amount:S.config.stakes.success,reason:'obs'};
-  const d=(S.data[key]&&S.data[key][person])||{};
-  const prevKg=prevKgFor(person,key);
-  const lossKg=d.kg!=null?+(prevKg-d.kg).toFixed(1):null;
-  const wOk=lossKg!=null&&lossKg>=pc.targetLoss;
-  const kOk=d.kcal!=null&&d.kcal>=pc.kcalMin;
-  let pass,reason;
-  if(pc.mandat==='kcal'){
-    pass=kOk||wOk;
-    reason=pass?(kOk?d.kcal+' kcal ✓':'−'+lossKg+' kg ✓'):((d.kcal!=null?d.kcal:'—')+' kcal < '+pc.kcalMin);
-  }else{
-    pass=wOk;
-    reason=pass?'−'+lossKg+' kg ✓':(lossKg!=null?'−'+lossKg+' kg < '+pc.targetLoss:'poids manquant');
+  const pc = S.config.persons[person];
+  // Mois d'observation (jusqu'à octobre inclus, donc Nov est comptabilisé)
+  if(key <= OBS_END) return {pass:true, amount:S.config.stakes.success, reason:'obs'};
+  
+  const d = (S.data[key] && S.data[key][person]) || {};
+  const prevKg = prevKgFor(person,key);
+  
+  // Utilisation de toFixed(2) pour respecter les décimales de Saad
+  const lossKg = d.kg != null ? +(prevKg - d.kg).toFixed(2) : null; 
+  const wOk = lossKg != null && lossKg >= pc.targetLoss;
+  const kOk = d.kcal != null && d.kcal >= pc.kcalMin;
+  
+  let pass, reason;
+
+  if (person === 'saad') {
+    // Règle 1 : Saad ne compte QUE les calories, jamais le poids.
+    pass = kOk;
+    reason = pass ? (d.kcal + ' kcal ✓') : ((d.kcal != null ? d.kcal : '—') + ' kcal < ' + pc.kcalMin);
+  } else {
+    // Règle 2 : Pour Hicham & Anas
+    if (key < '2025-12') {
+      // Avant décembre 2025 (càd Novembre) : Les Kcal valident le mois si le poids n'y est pas
+      pass = wOk || kOk;
+      reason = pass ? (wOk ? '−'+lossKg+' kg ✓' : d.kcal+' kcal ✓') : 'Échec global';
+    } else {
+      // A partir de décembre 2025 : Poids impératif
+      pass = wOk;
+      reason = pass ? '−'+lossKg+' kg ✓' : (lossKg != null ? '−'+lossKg+' kg < '+pc.targetLoss : 'Poids manquant');
+    }
   }
-  return{pass,amount:pass?S.config.stakes.success:S.config.stakes.failure,reason};
+
+  return {pass, amount: pass ? S.config.stakes.success : S.config.stakes.failure, reason};
 }
 
 function amountFor(person,key){
@@ -439,7 +447,7 @@ function editCell(key,person,field,value){
   return '<span class="edt" data-act="editcell" data-month="'+esc(key)+'" data-person="'+person+'" data-field="'+field+'" data-val="'+(value!=null?esc(value):'')+'" style="color:'+col+';font-size:10px">'+lbl+'</span>';
 }
 
-/* ════ RENDU HTML : SUIVI ════ */
+/* ════ RENDU HTML ════ */
 function renderSuivi(){
   let h = '';
   const curP = S.formPerson;
@@ -449,7 +457,6 @@ function renderSuivi(){
   if (curP === 'anas') blocRadius = '0 16px 16px 16px';
   if (curP === 'saad') blocRadius = '16px 0 16px 16px';
 
-  /* --- Zone de Saisie --- */
   h+='<div class="saisie-wrapper" style="--tab-color: '+activeColor+';">';
   h+='<div class="saisie-onglets">';
   PERSONS.forEach(p=>{
@@ -484,7 +491,6 @@ function renderSuivi(){
   h+='<div id="preview" style="font-family:var(--mono);font-size:11px;text-align:center;height:0;overflow:visible;margin-top:2px;pointer-events:none;"></div>';
   h+='</div>';
 
-  /* --- Caisse Commune --- */
   const keys=displayKeys();
   let total=0;const per={};PERSONS.forEach(p=>per[p]={total:0,w:0,l:0});
   keys.forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(!e)return;per[p].total+=e.amount;total+=e.amount;e.pass?per[p].w++:per[p].l++;}));
@@ -500,7 +506,6 @@ function renderSuivi(){
   });
   h+='</div></div>';
 
-  /* --- Historique --- */
   if(keys.length===0){h+='<div style="text-align:center;color:#333;font-family:var(--mono);font-size:10px;padding:30px 0">Aucune saisie pour l\'instant</div>';}
   keys.forEach(key=>{
     const isObs=key<=OBS_END;
@@ -527,7 +532,6 @@ function renderSuivi(){
   return h;
 }
 
-/* ════ RENDU HTML : ÉVOLUTION ════ */
 function renderLegend(){
   let h='<div style="display:flex;gap:16px;margin-bottom:14px;flex-wrap:wrap">';
   PERSONS.forEach(p=>{
@@ -594,7 +598,6 @@ function renderEvolution(){
   return h+'</div>';
 }
 
-/* ════ RENDU HTML : OBJECTIFS ════ */
 function renderObjectifs(){
   let h='<div style="display:flex;flex-direction:column;gap:8px">';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
@@ -610,13 +613,13 @@ function renderObjectifs(){
   h+='<div style="display:flex;flex-direction:column;gap:8px">';
   PERSONS.forEach(p=>{
     const pc=S.config.persons[p];
-    const RuleTxt = p === 'saad' ? 'Poids optionnel / calorie obligatoire' : 'Poids obligatoire / calories optionnel';
+    const RuleTxt = p === 'saad' ? 'Calories strictes (poids ignoré)' : 'Poids obligatoire (Kcal acceptées jusqu\'en nov. 2025)';
     
     h+='<div class="card" style="padding:16px">';
     h+='<div class="mono" style="font-size:12px;text-transform:uppercase;color:'+P_COLOR[p]+';margin-bottom:12px">'+pc.name+'</div>';
     h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">';
-    [['persons.'+p+'.startKg',pc.startKg,'1','kg',''],
-     ['persons.'+p+'.targetLoss',pc.targetLoss,'1','kg','−'],
+    [['persons.'+p+'.startKg',pc.startKg,'2','kg',''],
+     ['persons.'+p+'.targetLoss',pc.targetLoss,'2','kg','−'],
      ['persons.'+p+'.kcalMin',pc.kcalMin,'0','','']].forEach(([path,val,dec,unit,pre])=>{
       h+='<div><div class="mono" style="font-size:14px;color:#e8e8e8;display:flex;align-items:center">'+
          (pre?'<span style="color:#555;margin-right:2px">'+pre+'</span>':'')+
@@ -632,9 +635,7 @@ function renderObjectifs(){
   return h;
 }
 
-/* ════ GÉNÉRATEUR PRINCIPAL & ÉVÉNEMENTS ════ */
 function render(){
-  // --- Écran de verrouillage (Pavé numérique) ---
   if (!S.authenticated) {
     let h = '<div style="position:fixed;inset:0;background:var(--bg-dark);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3rem;">';
     h += '<div style="font-family:var(--mono);font-size:14px;color:#777;letter-spacing:.05em;text-transform:uppercase;">GET FIT — Code d\'accès</div>';
@@ -659,7 +660,6 @@ function render(){
     return;
   }
 
-  // --- Application principale ---
   let h='<div class="header-container">';
   h+='<header><h1>GET FIT</h1></header>';
   h+='<div class="sync-badge" onclick="syncLoad()"><div id="sync-dot" class="sync-dot"></div><span id="sync-text">Vérification...</span></div>';
@@ -729,7 +729,6 @@ document.addEventListener('click',ev=>{
   if(!t)return;
   const act=t.getAttribute('data-act');
 
-  // --- Gestion du Pavé Numérique ---
   if(act === 'pin-key') {
     if(!S.pinEntry) S.pinEntry = '';
     if(S.pinEntry.length < 5) {
@@ -752,7 +751,6 @@ document.addEventListener('click',ev=>{
     return;
   }
 
-  // --- Reste de l'application ---
   if(act==='tab'){S.tab=t.getAttribute('data-val');S.pickerOpen=false;render();return;}
   if(act==='fperson'){S.formPerson=t.getAttribute('data-val');render();return;}
   if(act==='picker'){S.pickerOpen=!S.pickerOpen;if(S.pickerOpen)S.formMonth=lastSaisieMonth();render();return;}
@@ -791,7 +789,7 @@ document.addEventListener('click',ev=>{
     const key=t.getAttribute('data-month'),p=t.getAttribute('data-person'),field=t.getAttribute('data-field');
     const curStr=t.getAttribute('data-val');
     const cur=curStr!==''?parseFloat(curStr):null;
-    openInlineEdit(t,cur,field==='kg'?1:0,field==='kcal',(val)=>{
+    openInlineEdit(t,cur,field==='kg'?2:0,field==='kcal',(val)=>{
       if(!S.data[key])S.data[key]={};
       if(!S.data[key][p])S.data[key][p]={kg:null,kcal:null};
       S.data[key][p][field]=val;
