@@ -199,7 +199,7 @@ const mLbl=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mShrt=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mStep=(k,d)=>{let[y,m]=k.split('-').map(Number);const n=m+d;return n>12?mKey(y+1,n-12):n<1?mKey(y-1,n+12):mKey(y,n);};
 
-const START_KEY='2025-09', OBS_END='2025-10', CURR_KEY='2026-12';
+const START_KEY='2025-09', OBS_END='2025-10', CURR_KEY='2026-05';
 const PERSONS=['anas','hicham','saad'];
 
 const P_COLOR={anas:'#7eb8f7',hicham:'#c084fc',saad:'#fb923c'};
@@ -208,8 +208,7 @@ const FORM_MONTHS=(()=>{
   const a=[];
   let k = START_KEY;
   while(k <= CURR_KEY) {
-    const m = parseInt(k.split('-')[1]);
-    if (m !== 6 && m !== 8) a.push(k); // skip Juin et Août
+    a.push(k);
     k = mStep(k, 1);
   }
   return a;
@@ -796,6 +795,12 @@ document.addEventListener('click',ev=>{
     });
     return;
   }
+});
+
+/* ════ NETTOYAGE MOIS SUPPRIMÉS ════ */
+["2025-08","2026-06"].forEach(k=>{
+  if(S.data[k]){delete S.data[k];persist();}
+  if(S.manual[k]){delete S.manual[k];persist();}
 });
 
 /* ════ INITIALISATION ════ */
