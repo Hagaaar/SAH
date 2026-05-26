@@ -10,9 +10,9 @@
   :root {
     --mono: 'DM Mono', ui-monospace, monospace;
     --sans: 'DM Sans', -apple-system, system-ui, sans-serif;
-    --anas: #7eb8f7;
-    --hicham: #c084fc;
-    --saad: #fb923c;
+    --anas: #ffb347;
+    --hicham: #7ed9a0;
+    --saad: #93c5fd;
     --win: #3ddc84;
     --loss: #ff4545;
     --gold: #f0c040;
@@ -217,7 +217,9 @@ const mStep=(k,d)=>{let[y,m]=k.split('-').map(Number);const n=m+d;return n>12?mK
 const START_KEY='2025-09', OBS_END='2025-10', CURR_KEY='2026-05';
 const PERSONS=['anas','hicham','saad'];
 
-const P_COLOR={anas:'#7eb8f7',hicham:'#c084fc',saad:'#fb923c'};
+const P_COLOR={anas:'#ffb347',hicham:'#7ed9a0',saad:'#93c5fd'};
+const P_BG={anas:'rgba(255,179,71,.1)',hicham:'rgba(126,217,160,.1)',saad:'rgba(147,197,253,.1)'};
+const P_BORD={anas:'rgba(255,179,71,.3)',hicham:'rgba(126,217,160,.3)',saad:'rgba(147,197,253,.3)'};
 
 const FORM_MONTHS=(()=>{
   const a=[];
@@ -501,10 +503,10 @@ function renderSuivi(){
   h+='<div class="mono" style="font-size:38px;color:var(--gold);line-height:1;margin-bottom:16px">'+total+'€</div>';
   h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
   PERSONS.forEach(p=>{
-    h+='<div style="background:#0e0e0e;border-radius:8px;padding:10px;border:1px solid '+(per[p].l>0?'rgba(255,69,69,.15)':'#1a1a1a')+'">'+
+    h+='<div style="background:'+P_BG[p]+';border-radius:8px;padding:10px;border:1px solid '+P_BORD[p]+'">'+
        '<div class="mono" style="font-size:9px;color:'+P_COLOR[p]+';margin-bottom:4px;text-transform:uppercase">'+S.config.persons[p].name+'</div>'+
-       '<div class="mono" style="font-size:18px;color:#e8e8e8">'+per[p].total+'€</div>'+
-       '<div class="mono" style="font-size:8px;color:#555;margin-top:4px"><span style="color:var(--win)">'+per[p].w+'×20</span> · <span style="color:var(--loss)">'+per[p].l+'×100</span></div></div>';
+       '<div class="mono" style="font-size:18px;color:'+P_COLOR[p]+'">'+per[p].total+'€</div>'+
+       '<div class="mono" style="font-size:8px;color:#555;margin-top:4px"><span>'+per[p].w+'×20</span> · <span>'+per[p].l+'×100</span></div></div>';
   });
   h+='</div></div>';
 
@@ -580,12 +582,16 @@ function renderChart(field){
     pts.forEach(pt=>{if(pt.y!=null){path+=(pr?'L':'M')+pt.x.toFixed(1)+' '+pt.y.toFixed(1)+' ';pr=true;}else pr=false;});
     if(path)s+='<path d="'+path+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
     const lastIdx=pts.reduce((li,pt,i)=>pt.y!=null?i:li,-1);
+    const firstIdx=pts.findIndex(pt=>pt.y!=null);
     pts.forEach((pt,i)=>{
       if(pt.y==null)return;
       s+='<circle cx="'+pt.x.toFixed(1)+'" cy="'+pt.y.toFixed(1)+'" r="3" fill="'+col+'"/>';
       if(i===lastIdx){
         const tx=(pt.x+6).toFixed(1), ty=(pt.y+3).toFixed(1);
         s+='<text x="'+tx+'" y="'+ty+'" font-family="DM Mono,monospace" font-size="8" fill="'+col+'">'+pt.v+'</text>';
+      } else if(i===firstIdx && firstIdx!==lastIdx){
+        const tx=(pt.x+6).toFixed(1), ty=(pt.y+3).toFixed(1);
+        s+='<text x="'+tx+'" y="'+ty+'" font-family="DM Mono,monospace" font-size="8" fill="'+col+'" opacity="0.7">'+pt.v+'</text>';
       }
     });
   });
@@ -617,8 +623,7 @@ function renderObjectifs(){
     const pc=S.config.persons[p];
     const RuleTxt = p === 'saad' ? 'Calories strictes (poids ignoré)' : 'Poids obligatoire (Kcal acceptées jusqu\'en nov. 2025)';
     
-    h+='<div class="card" style="padding:16px">';
-    /* ── BUG CORRIGÉ : point-virgule manquant et margin-bottom dans la chaîne ── */
+    h+='<div class="card" style="padding:16px;border-color:'+P_BORD[p]+';background:'+P_BG[p]+'">';
     h+='<div class="mono" style="font-size:12px;text-transform:uppercase;color:'+P_COLOR[p]+';margin-bottom:12px">'+pc.name+'</div>';
     h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">';
     [['persons.'+p+'.startKg',pc.startKg,'2','kg',''],
