@@ -35,7 +35,7 @@
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
   input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  input[type=number] { -moz-appearance: textfield; }
+  input[type=number], input[type=password] { -moz-appearance: textfield; }
   button { font-family: var(--mono); cursor: pointer; border: none; background: none; color: inherit; }
   
   .mono { font-family: var(--mono); }
@@ -241,6 +241,8 @@ let S={
   data:saved?saved.data:JSON.parse(JSON.stringify(DEF_DATA)),
   manual:saved?saved.manual:JSON.parse(JSON.stringify(DEF_MANUAL)),
   formPerson:'anas', formMonth:CURR_KEY, pickerOpen:false, fKg:'', fKcal:'',
+  pin: localStorage.getItem('getfit_pin') || '',
+  authenticated: localStorage.getItem('getfit_auth') === 'true'
 };
 
 function persist(){try{localStorage.setItem(LS,JSON.stringify({config:S.config,data:S.data,manual:S.manual}));}catch(e){}}
@@ -252,7 +254,7 @@ function lastSaisieMonth(){
   return allKeys.sort().pop();
 }
 
-/* ════ SYNCHRONISATION ════ */
+/* ════ SYNCHRONISATION & SECURITÉ ════ */
 let syncTimer=null;
 
 function setSyncStatus(msg, color, dotColor) {
@@ -263,20 +265,49 @@ function setSyncStatus(msg, color, dotColor) {
 }
 
 async function syncLoad(){
+  if (!S.pin) {
+    S.authenticated = false;
+    render();
+    return;
+  }
   setSyncStatus('Sync...', '#aaa', 'var(--gold)');
   try{
-    const resp=await fetch(SCRIPT_URL,{cache:'no-store'});
+    const resp=await fetch(SCRIPT_URL + '?pin=' + encodeURIComponent(S.pin), {cache:'no-store'});
     const remote=await resp.json();
+    
+    if (remote && remote.status === 'error') {
+      S.pin = '';
+      S.authenticated = false;
+      localStorage.removeItem('getfit_pin');
+      localStorage.removeItem('getfit_auth');
+      render();
+      const errEl = document.getElementById('auth-error');
+      if (errEl) errEl.textContent = 'Code incorrect';
+      setSyncStatus('Erreur Code', '#ff4545', 'var(--loss)');
+      return;
+    }
+    
     if(remote && remote.data && Object.keys(remote.data).length > 0){
       S.config=remote.config||S.config;
       S.data=remote.data;
       S.manual=remote.manual||S.manual;
       persist();
-      render();
     }
+    S.authenticated = true;
+    localStorage.setItem('getfit_auth', 'true');
     setSyncStatus('À Jour', '#aaa', 'var(--win)');
+    render();
   }catch(e){
-    setSyncStatus('Hors Ligne', '#ff4545', 'var(--loss)');
+    if (localStorage.getItem('getfit_auth') === 'true') {
+      S.authenticated = true;
+      render();
+      setSyncStatus('Hors Ligne', '#ff4545', 'var(--loss)');
+    } else {
+      S.authenticated = false;
+      render();
+      const errEl = document.getElementById('auth-error');
+      if (errEl) errEl.textContent = 'Connexion internet requise';
+    }
   }
 }
 
@@ -284,7 +315,7 @@ async function syncSave(changes){
   setSyncStatus('Sauvegarde...', '#aaa', 'var(--gold)');
   try{
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({state:{config:S.config,data:S.data,manual:S.manual},changes:changes||[]})});
+      body:JSON.stringify({pin: S.pin, state:{config:S.config,data:S.data,manual:S.manual},changes:changes||[]})});
     setSyncStatus('À Jour', '#aaa', 'var(--win)');
   }catch(e){
     setSyncStatus('Hors Ligne', '#ff4545', 'var(--loss)');
@@ -379,9 +410,8 @@ function renderSuivi(){
   if (curP === 'anas') blocRadius = '0 16px 16px 16px';
   if (curP === 'saad') blocRadius = '16px 0 16px 16px';
 
-  /* --- Zone de Saisie Façon Dossier --- */
+  /* --- Zone de Saisie --- */
   h+='<div class="saisie-wrapper" style="--tab-color: '+activeColor+';">';
-  
   h+='<div class="saisie-onglets">';
   PERSONS.forEach(p=>{
     const sel = p === curP;
@@ -391,7 +421,6 @@ function renderSuivi(){
   h+='</div>';
   
   h+='<div class="saisie-bloc" style="background-color: var(--tab-color); border-radius: '+blocRadius+';">';
-  
   h+='<div style="position:relative;">';
   h+='<button data-act="picker" class="inp-color" style="text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>'+mLbl(S.formMonth).toUpperCase()+'</span><span>'+(S.pickerOpen?'▲':'▼')+'</span></button>';
   
@@ -411,12 +440,10 @@ function renderSuivi(){
   h+='<div style="flex:1;"><input id="f-kcal" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" class="inp-color"></div>';
   h+='<button data-act="add" class="btn-pure-plus"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-linecap="round"><line x1="8" y1="2" x2="8" y2="14"></line><line x1="2" y1="8" x2="14" y2="8"></line></svg></button>';
   h+='</div>';
+  h+='</div>';
 
-  h+='</div>'; /* Fin du .saisie-bloc */
-
-  /* Le preview est rendu de hauteur nulle pour ne pas casser la grille de 8px */
-  h+='<div id="preview" style="font-family:var(--mono);font-size:11px;text-align:center;height:0;overflow:visible;margin-top:2px;pointer-events:none;transition:opacity 0.2s;"></div>';
-  h+='</div>'; /* Fin du .saisie-wrapper */
+  h+='<div id="preview" style="font-family:var(--mono);font-size:11px;text-align:center;height:0;overflow:visible;margin-top:2px;pointer-events:none;"></div>';
+  h+='</div>';
 
   /* --- Caisse Commune --- */
   const keys=displayKeys();
@@ -531,7 +558,6 @@ function renderEvolution(){
 /* ════ RENDU HTML : OBJECTIFS ════ */
 function renderObjectifs(){
   let h='<div style="display:flex;flex-direction:column;gap:8px">';
-  
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
   [['Objectif atteint','var(--win)','stakes.success',S.config.stakes.success],
    ['Objectif non atteint','var(--loss)','stakes.failure',S.config.stakes.failure]].forEach(([lbl,c,path,val]) => {
@@ -564,12 +590,25 @@ function renderObjectifs(){
     h+='</div>';
   });
   h+='</div>';
-
   return h;
 }
 
 /* ════ GÉNÉRATEUR PRINCIPAL & ÉVÉNEMENTS ════ */
 function render(){
+  // Cas non authentifié : Affichage strict d'un écran de verrouillage géométrique
+  if (!S.authenticated) {
+    let h = '<div style="max-width:390px; margin: 100px auto 0; padding: 0 14px; text-align: center;">';
+    h += '<h1 style="font-family:var(--mono); font-size:24px; margin-bottom:24px; letter-spacing:-.02em;">GET FIT</h1>';
+    h += '<div class="card" style="padding:24px; display:flex; flex-direction:column; gap:16px;">';
+    h += '<div class="mono" style="font-size:10px; color:#555; text-transform:uppercase; letter-spacing:.1em;">Code d\'accès requis</div>';
+    h += '<input id="auth-pin" type="password" inputmode="numeric" placeholder="••••" style="width:100%; height:44px; text-align:center; background:#0a0a0a; border:1px solid #252525; border-radius:12px; color:#e8e8e8; font-family:var(--mono); font-size:20px; outline:none; letter-spacing: 4px;">';
+    h += '<button data-act="login" style="background:#242424; color:#e8e8e8; height:40px; border-radius:12px; font-size:12px; font-weight:500; letter-spacing:.06em; text-transform:uppercase; width:100%;">Valider</button>';
+    h += '<div id="auth-error" style="font-family:var(--mono); font-size:10px; color:var(--loss); min-height:14px;"></div>';
+    h += '</div></div>';
+    document.getElementById('root').innerHTML = h;
+    return;
+  }
+
   let h='<div class="header-container">';
   h+='<header><h1>GET FIT</h1></header>';
   h+='<div class="sync-badge" onclick="syncLoad()"><div id="sync-dot" class="sync-dot"></div><span id="sync-text">Vérification...</span></div>';
@@ -638,6 +677,16 @@ document.addEventListener('click',ev=>{
   const t=ev.target.closest('[data-act]');
   if(!t)return;
   const act=t.getAttribute('data-act');
+
+  if(act==='login') {
+    const pinEl = document.getElementById('auth-pin');
+    if (pinEl) {
+      S.pin = pinEl.value.trim();
+      localStorage.setItem('getfit_pin', S.pin);
+      syncLoad();
+    }
+    return;
+  }
 
   if(act==='tab'){S.tab=t.getAttribute('data-val');S.pickerOpen=false;render();return;}
   if(act==='fperson'){S.formPerson=t.getAttribute('data-val');render();return;}
