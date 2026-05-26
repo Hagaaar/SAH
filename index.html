@@ -5,11 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>S.A.H</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
   
   :root {
-    --mono: 'DM Mono', ui-monospace, monospace;
-    --sans: 'DM Sans', -apple-system, system-ui, sans-serif;
+    --sans: 'Inter', -apple-system, system-ui, sans-serif;
     --anas: #ffb347;
     --hicham: #7ed9a0;
     --saad: #93c5fd;
@@ -24,6 +23,7 @@
   html, body { background: var(--bg-dark); }
   body {
     font-family: var(--sans);
+    font-variant-numeric: tabular-nums; 
     color: #e8e8e8;
     font-size: 13px;
     min-height: 100vh;
@@ -36,19 +36,19 @@
   ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
   input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   input[type=number], input[type=password] { -moz-appearance: textfield; }
-  button { font-family: var(--mono); cursor: pointer; border: none; background: none; color: inherit; }
+  button { font-family: var(--sans); cursor: pointer; border: none; background: none; color: inherit; }
   
-  .mono { font-family: var(--mono); }
-  .sectitle { font-family: var(--mono); font-size: 8px; letter-spacing: .2em; color: #444; text-transform: uppercase; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #1c1c1c; }
+  .mono { font-family: var(--sans); }
+  .sectitle { font-family: var(--sans); font-size: 9px; font-weight: 500; letter-spacing: .15em; color: #555; text-transform: uppercase; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #1c1c1c; }
   .card { background: var(--card-bg); border: 1px solid #1f1f1f; border-radius: 8px; }
   
   .edt { cursor: pointer; border-bottom: 1px dotted #2a2a2a; user-select: none; display: inline-block; min-width: 18px; }
   .edt:hover { border-bottom-color: #555; }
-  .editinput { font-family: var(--mono); font-size: inherit; color: #e8e8e8; background: transparent; border: none; border-bottom: 1px solid var(--anas); outline: none; text-align: center; width: 60px; }
+  .editinput { font-family: var(--sans); font-size: inherit; font-weight: 500; color: #e8e8e8; background: transparent; border: none; border-bottom: 1px solid var(--anas); outline: none; text-align: center; width: 60px; }
   .editinput.sm { width: 44px; }
   
   .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; width: 100%; }
-  header h1 { font-family: var(--mono); font-size: 22px; font-weight: 500; letter-spacing: -.02em; line-height: 1; }
+  header h1 { font-family: var(--sans); font-size: 22px; font-weight: 600; letter-spacing: -.02em; line-height: 1; }
   
   .sync-badge {
     display: flex;
@@ -57,8 +57,9 @@
     background: transparent;
     border: none;
     padding: 6px 0;
-    font-family: var(--mono);
+    font-family: var(--sans);
     font-size: 9px;
+    font-weight: 500;
     text-transform: uppercase;
     color: #888;
     cursor: pointer;
@@ -67,82 +68,89 @@
   .sync-badge:active { opacity: 0.6; }
   .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #444; transition: background 0.3s ease; box-shadow: 0 0 4px rgba(0,0,0,0.3); }
   
-  .tabs { display: flex; gap: 3px; background: #111; padding: 3px; border-radius: 10px; border: 1px solid #1c1c1c; margin-bottom: 8px; }
-  .tab { flex: 1; padding: 9px 0; border-radius: 8px; color: #555; font-size: 11px; letter-spacing: .06em; transition: all 0.2s ease; }
-  .tab.on { background: #242424; color: #e8e8e8; font-weight: 500; }
+  .tabs { display: flex; gap: 3px; background: #111; padding: 3px; border-radius: 10px; border: 1px solid #1c1c1c; margin-bottom: 16px; }
+  .tab { flex: 1; padding: 9px 0; border-radius: 8px; color: #555; font-size: 11px; font-weight: 500; letter-spacing: .06em; transition: all 0.2s ease; }
+  .tab.on { background: #242424; color: #e8e8e8; font-weight: 600; }
   
-  .saisie-wrapper { width:100%; margin-bottom:8px; }
+  .saisie-wrapper { width: 100%; margin-bottom: 16px; margin-top: 8px; }
 
   .saisie-onglets {
     display: flex;
-    gap: 0;
     margin-bottom: 0;
-    overflow: visible;
+    position: relative;
+    z-index: 10;
   }
 
   .saisie-onglets button {
     flex: 1;
     font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #444;
-    font-weight: 500;
-    padding: 11px 0;
+    letter-spacing: 0.1em;
+    color: #666;
+    font-weight: 600;
+    padding: 16px 0;
     background: transparent;
-    border-radius: 10px 10px 0 0;
-    border: 1px solid #1f1f1f;
-    border-bottom: none;
+    border: none;
+    cursor: pointer;
     position: relative;
-    z-index: 1;
-    margin-right: -1px;
+    transition: color 0.2s;
   }
-  .saisie-onglets button:last-child { margin-right: 0; }
 
   .saisie-onglets button.active-tab {
-    background: var(--tab-bg);
-    border-color: var(--tab-bord);
-    border-bottom: none;
-    color: var(--tab-col) !important;
-    z-index: 3;
-    padding-bottom: 12px; /* overlap 1px of card top */
+    background: var(--tab-col);
+    color: #0e0e0e !important;
+    border-radius: 16px 16px 0 0;
   }
 
-  /* Coins concaves au bas de l'onglet actif */
   .saisie-onglets button.active-tab::before,
   .saisie-onglets button.active-tab::after {
     content: "";
     position: absolute;
     bottom: 0;
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
     pointer-events: none;
-    z-index: 4;
   }
   .saisie-onglets button.active-tab::before {
-    left: -12px;
-    background: radial-gradient(circle at 100% 0, transparent 12px, var(--bg-dark) 12.5px);
+    left: -16px;
+    background: radial-gradient(circle at 0 0, transparent 16px, var(--tab-col) 16.5px);
   }
   .saisie-onglets button.active-tab::after {
-    right: -12px;
-    background: radial-gradient(circle at 0% 0, transparent 12px, var(--bg-dark) 12.5px);
+    right: -16px;
+    background: radial-gradient(circle at 100% 0, transparent 16px, var(--tab-col) 16.5px);
   }
+
   .saisie-onglets button:first-child.active-tab::before { display: none; }
   .saisie-onglets button:last-child.active-tab::after { display: none; }
 
   .saisie-bloc {
-    position: relative;
-    z-index: 2;
-    padding: 16px;
+    background: var(--tab-col);
+    padding: 20px;
     display: flex;
     flex-direction: column;
     gap: 12px;
+    position: relative;
+    z-index: 1;
   }
+
+  .saisie-input-bg {
+    background: rgba(0, 0, 0, 0.15);
+    border: none;
+    border-radius: 12px;
+    color: #0e0e0e;
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 600;
+    outline: none;
+    box-sizing: border-box;
+  }
+  .saisie-input-bg::placeholder { color: rgba(0, 0, 0, 0.35); font-weight: 500; }
 
   .pin-dot { width:14px; height:14px; border-radius:50%; border:1.5px solid #555; background:transparent; transition:background 0.1s, border-color 0.1s; }
   .pin-dot.filled { background:#e8e8e8; border-color:#e8e8e8; }
   .pin-dot.error { background:var(--loss); border-color:var(--loss); }
   
-  .pin-key { width:72px; height:72px; border-radius:50%; border:1px solid #2a2a2a; background:#141414; color:#e8e8e8; font-size:24px; font-family:var(--mono); cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; user-select:none; }
+  .pin-key { width:72px; height:72px; border-radius:50%; border:1px solid #2a2a2a; background:#141414; color:#e8e8e8; font-size:24px; font-family:var(--sans); font-weight: 500; cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; user-select:none; }
   .pin-key:active { background:#242424; }
   .pin-key.del { font-size:22px; color:#888; }
   
@@ -179,17 +187,19 @@ const mLbl=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mShrt=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mStep=(k,d)=>{let[y,m]=k.split('-').map(Number);const n=m+d;return n>12?mKey(y+1,n-12):n<1?mKey(y-1,n+12):mKey(y,n);};
 
-const START_KEY='2025-09', OBS_END='2025-10', CURR_KEY='2026-05';
+const START_KEY='2025-09', OBS_END='2025-10';
+const FORM_START='2026-05', FORM_END='2026-12';
 const PERSONS=['anas','hicham','saad'];
 
 const P_COLOR={anas:'#ffb347',hicham:'#7ed9a0',saad:'#93c5fd'};
 const P_BG={anas:'rgba(255,179,71,.1)',hicham:'rgba(126,217,160,.1)',saad:'rgba(147,197,253,.1)'};
 const P_BORD={anas:'rgba(255,179,71,.3)',hicham:'rgba(126,217,160,.3)',saad:'rgba(147,197,253,.3)'};
 
+// Liste des mois de Mai 2026 à Décembre 2026
 const FORM_MONTHS=(()=>{
   const a=[];
-  let k = START_KEY;
-  while(k <= CURR_KEY) {
+  let k = FORM_START;
+  while(k <= FORM_END) {
     a.push(k);
     k = mStep(k, 1);
   }
@@ -224,26 +234,30 @@ const LS='getfit_v2';
 function load(){try{const r=JSON.parse(localStorage.getItem(LS));if(r&&r.config&&r.data)return r;}catch(e){}return null;}
 const saved=load();
 
+// Fonction pour trouver automatiquement le dernier mois avec des données saisies (entre Mai et Dec)
+function getTargetMonth(data){
+  const fSet=new Set(FORM_MONTHS);
+  const allKeys=Object.keys(data).filter(k=>fSet.has(k)&&PERSONS.some(p=>{const d=data[k]&&data[k][p];return d&&(d.kg!=null||d.kcal!=null);}));
+  if(!allKeys.length)return FORM_START;
+  return allKeys.sort().pop();
+}
+
 let S={
   tab:'suivi',
   config:saved?saved.config:JSON.parse(JSON.stringify(DEF_CFG)),
   data:saved?saved.data:JSON.parse(JSON.stringify(DEF_DATA)),
   manual:saved?saved.manual:JSON.parse(JSON.stringify(DEF_MANUAL)),
-  formPerson:'anas', formMonth:CURR_KEY, pickerOpen:false, fKg:'', fKcal:'',
+  formPerson:'anas', formMonth:FORM_START, pickerOpen:false, fKg:'', fKcal:'',
   pin: localStorage.getItem('getfit_pin') || '',
   pinEntry: '',
   pinLoading: false,
   authenticated: localStorage.getItem('getfit_auth') === 'true'
 };
 
-function persist(){try{localStorage.setItem(LS,JSON.stringify({config:S.config,data:S.data,manual:S.manual}));}catch(e){}}
+// Auto-sélection intelligente au démarrage
+S.formMonth = getTargetMonth(S.data);
 
-function lastSaisieMonth(){
-  const fSet=new Set(FORM_MONTHS);
-  const allKeys=Object.keys(S.data).filter(k=>fSet.has(k)&&PERSONS.some(p=>{const d=S.data[k]&&S.data[k][p];return d&&(d.kg!=null||d.kcal!=null);}));
-  if(!allKeys.length)return CURR_KEY;
-  return allKeys.sort().pop();
-}
+function persist(){try{localStorage.setItem(LS,JSON.stringify({config:S.config,data:S.data,manual:S.manual}));}catch(e){}}
 
 /* ════ SYNCHRONISATION ════ */
 let syncTimer=null;
@@ -291,6 +305,8 @@ async function syncLoad(){
     
     if(remote && remote.data && Object.keys(remote.data).length > 0){
       S.config = remote.config || S.config; S.data = remote.data; S.manual = remote.manual || S.manual;
+      // Mise à jour sur la dernière saisie cloud
+      S.formMonth = getTargetMonth(S.data);
       persist();
     }
     
@@ -406,31 +422,27 @@ function badge(e,key,p){
   const bg=e.pass?'rgba(61,220,132,.08)':'rgba(255,69,69,.08)';
   const bd=e.pass?'rgba(61,220,132,.2)':'rgba(255,69,69,.2)';
   return '<span class="mono" data-act="toggle" data-month="'+esc(key)+'" data-person="'+p+'" '+
-    'style="font-size:12px;font-weight:500;cursor:pointer;user-select:none;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+e.amount+'€</span>';
+    'style="font-size:12px;font-weight:600;cursor:pointer;user-select:none;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+e.amount+'€</span>';
 }
 
 function editCell(key,person,field,value){
   const isKcal=field==='kcal';
   const lbl=value!=null?esc(value)+(isKcal?' kcal':' kg'):'—';
   const col=value!=null?(isKcal?'#777':'#e8e8e8'):'#2a2a2a';
-  return '<span class="edt" data-act="editcell" data-month="'+esc(key)+'" data-person="'+person+'" data-field="'+field+'" data-val="'+(value!=null?esc(value):'')+'" style="color:'+col+';font-size:10px">'+lbl+'</span>';
+  return '<span class="edt" data-act="editcell" data-month="'+esc(key)+'" data-person="'+person+'" data-field="'+field+'" data-val="'+(value!=null?esc(value):'')+'" style="color:'+col+';font-size:11px;font-weight:500;">'+lbl+'</span>';
 }
 
 /* ════ RENDU HTML ════ */
 function renderSuivi(){
   let h = '';
   const curP = S.formPerson;
-  const activeColor = P_COLOR[curP];
 
   let blocRadius = '16px 16px 16px 16px';
   if (curP === 'anas') blocRadius = '0 16px 16px 16px';
   if (curP === 'saad') blocRadius = '16px 0 16px 16px';
 
-  // ── Wrapper avec CSS vars pour les pseudo-éléments concaves
-  const bR = curP==='anas'?'0 10px 10px 10px':curP==='saad'?'10px 0 10px 10px':'10px 10px 10px 10px';
-  h+='<div class="saisie-wrapper" style="--tab-bg:'+P_BG[curP]+';--tab-bord:'+P_BORD[curP]+';--tab-col:'+P_COLOR[curP]+'">';
-
-  // ── Onglets personne (CSS class-based pour les pseudo-éléments)
+  h+='<div class="saisie-wrapper" style="--tab-col:'+P_COLOR[curP]+'">';
+  
   h+='<div class="saisie-onglets">';
   PERSONS.forEach(p=>{
     const sel=p===curP;
@@ -438,66 +450,66 @@ function renderSuivi(){
   });
   h+='</div>';
 
-  // ── Bloc saisie : coins ajustés selon onglet actif, pas de bordure du haut côté onglet
-  h+='<div class="saisie-bloc" style="background:'+P_BG[curP]+';border:1px solid '+P_BORD[curP]+';border-top:none;margin-top:-1px;padding-top:17px;border-radius:'+bR+';">';
+  h+='<div class="saisie-bloc" style="border-radius:'+blocRadius+';">';
 
-  // Mois picker
   h+='<div style="position:relative;">';
-  h+='<button data-act="picker" style="width:100%;padding:10px 14px;background:rgba(255,255,255,.07);border:none;border-radius:8px;color:#e8e8e8;font-family:var(--mono);font-size:12px;text-align:left;display:flex;justify-content:space-between;align-items:center;box-sizing:border-box;"><span>'+mLbl(S.formMonth).toUpperCase()+'</span><span style="color:'+P_COLOR[curP]+'">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
+  h+='<button class="saisie-input-bg" data-act="picker" style="width:100%;padding:14px 16px;text-align:left;display:flex;justify-content:space-between;align-items:center;cursor:pointer;"><span>'+mLbl(S.formMonth).toUpperCase()+'</span><span style="font-size:10px;">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
   if(S.pickerOpen){
     h+='<div data-act="picker-bg" style="position:fixed;inset:0;z-index:98"></div>';
-    h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#141414;border:1px solid #2a2a2a;border-radius:10px;max-height:220px;overflow-y:auto;box-shadow:0 8px 28px rgba(0,0,0,.6)">';
+    h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#141414;border:1px solid #2a2a2a;border-radius:12px;max-height:220px;overflow-y:auto;box-shadow:0 8px 28px rgba(0,0,0,.8)">';
     FORM_MONTHS.forEach(m=>{
       const on=m===S.formMonth;
-      h+='<div data-act="pick" data-val="'+m+'"'+(on?' data-sel="1"':'')+' style="padding:12px 14px;cursor:pointer;font-family:var(--mono);font-size:12px;border-bottom:1px solid #1a1a1a;background:'+(on?'rgba(240,192,64,.07)':'transparent')+';color:'+(on?'var(--gold)':'#888')+'">'+mLbl(m).toUpperCase()+'</div>';
+      h+='<div data-act="pick" data-val="'+m+'"'+(on?' data-sel="1"':'')+' style="padding:12px 14px;cursor:pointer;font-family:var(--sans);font-weight:500;font-size:12px;border-bottom:1px solid #1a1a1a;background:'+(on?'rgba(255,255,255,.05)':'transparent')+';color:'+(on?'#fff':'#888')+'">'+mLbl(m).toUpperCase()+'</div>';
     });
     h+='</div>';
   }
   h+='</div>';
 
-  // Inputs + bouton (fond légèrement plus clair, sans bordure, tout dans le cadre)
-  h+='<div style="display:flex;gap:8px;align-items:stretch;min-width:0">';
-  h+='<input id="f-kg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:10px 12px;background:rgba(255,255,255,.07);border:none;border-radius:8px;color:#e8e8e8;font-family:var(--mono);font-size:13px;outline:none;">';
-  h+='<input id="f-kcal" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;min-width:0;padding:10px 12px;background:rgba(255,255,255,.07);border:none;border-radius:8px;color:#e8e8e8;font-family:var(--mono);font-size:13px;outline:none;">';
-  h+='<button data-act="add" style="width:40px;height:40px;flex-shrink:0;background:rgba(255,255,255,.07);border:none;border-radius:8px;color:'+P_COLOR[curP]+';font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--mono);">+</button>';
+  h+='<div style="display:flex;gap:12px;align-items:center;">';
+  h+='<input id="f-kg" class="saisie-input-bg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:14px 16px;">';
+  h+='<input id="f-kcal" class="saisie-input-bg" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;min-width:0;padding:14px 16px;">';
+  h+='<button data-act="add" style="width:48px;height:48px;flex-shrink:0;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">';
+  h+='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0e0e0e" stroke-width="3" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>';
+  h+='</button>';
   h+='</div>';
 
   h+='</div>';
   h+='</div>';
-  h+='<div id="preview" style="font-family:var(--mono);font-size:11px;text-align:center;height:0;overflow:visible;margin-top:4px;pointer-events:none;"></div>';
+  
+  h+='<div id="preview" style="font-family:var(--sans);font-weight:500;font-size:11px;text-align:center;height:0;overflow:visible;margin-top:4px;pointer-events:none;"></div>';
 
   const keys=displayKeys();
   let total=0;const per={};PERSONS.forEach(p=>per[p]={total:0,w:0,l:0});
   keys.forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(!e)return;per[p].total+=e.amount;total+=e.amount;e.pass?per[p].w++:per[p].l++;}));
   h+='<div style="background:rgba(240,192,64,.05);border:1px solid rgba(240,192,64,.15);border-radius:12px;padding:16px;margin-bottom:8px">';
-  h+='<div class="mono" style="font-size:9px;letter-spacing:.2em;color:rgba(240,192,64,.4);text-transform:uppercase;margin-bottom:6px">Caisse commune</div>';
+  h+='<div class="mono" style="font-size:9px;font-weight:600;letter-spacing:.2em;color:rgba(240,192,64,.5);text-transform:uppercase;margin-bottom:6px">Caisse commune</div>';
   h+='<div class="mono" style="font-size:42px;font-weight:700;color:var(--gold);line-height:1;margin-bottom:16px">'+total+'€</div>';
   h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
   PERSONS.forEach(p=>{
     h+='<div style="background:'+P_BG[p]+';border-radius:8px;padding:10px;border:1px solid '+P_BORD[p]+'">'+
-       '<div class="mono" style="font-size:9px;color:'+P_COLOR[p]+';margin-bottom:4px;text-transform:uppercase">'+S.config.persons[p].name+'</div>'+
-       '<div class="mono" style="font-size:18px;color:'+P_COLOR[p]+'">'+per[p].total+'€</div>'+
-       '<div class="mono" style="font-size:8px;color:#555;margin-top:4px"><span>'+per[p].w+'×20</span> · <span>'+per[p].l+'×100</span></div></div>';
+       '<div class="mono" style="font-size:10px;font-weight:600;color:'+P_COLOR[p]+';margin-bottom:4px;text-transform:uppercase">'+S.config.persons[p].name+'</div>'+
+       '<div class="mono" style="font-size:18px;font-weight:500;color:'+P_COLOR[p]+'">'+per[p].total+'€</div>'+
+       '<div class="mono" style="font-size:9px;color:#666;margin-top:4px"><span>'+per[p].w+'×20</span> · <span>'+per[p].l+'×100</span></div></div>';
   });
   h+='</div></div>';
 
-  if(keys.length===0){h+='<div style="text-align:center;color:#333;font-family:var(--mono);font-size:10px;padding:30px 0">Aucune saisie pour l\'instant</div>';}
+  if(keys.length===0){h+='<div style="text-align:center;color:#333;font-family:var(--sans);font-weight:500;font-size:11px;padding:30px 0">Aucune saisie pour l\'instant</div>';}
   keys.forEach(key=>{
     const isObs=key<=OBS_END;
     let mTot=0;PERSONS.forEach(p=>{const e=amountFor(p,key);if(e)mTot+=e.amount;});
     h+='<div class="card" style="padding:12px;margin-bottom:8px">';
     h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'+
        '<div style="display:flex;align-items:center;gap:8px">'+
-       '<span class="mono" style="font-size:11px;color:'+(isObs?'#484848':'#888')+';letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
-       (isObs?'<span class="mono" style="font-size:7px;color:#333;border:1px solid #1f1f1f;border-radius:4px;padding:2px 4px">obs</span>':'')+
-       '</div><span class="mono" style="font-size:13px;color:#666">'+mTot+'€</span></div>';
+       '<span class="mono" style="font-size:12px;font-weight:600;color:'+(isObs?'#484848':'#888')+';letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
+       (isObs?'<span class="mono" style="font-size:8px;font-weight:600;color:#333;border:1px solid #1f1f1f;border-radius:4px;padding:2px 4px">obs</span>':'')+
+       '</div><span class="mono" style="font-size:14px;font-weight:500;color:#666">'+mTot+'€</span></div>';
     h+='<div style="display:flex;flex-direction:column;gap:10px">';
     PERSONS.forEach(p=>{
       const d=(S.data[key]&&S.data[key][p])||{};
       const e=amountFor(p,key);
       h+='<div style="display:flex;align-items:center;gap:8px">'+
-         '<span class="mono" style="font-size:10px;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase">'+S.config.persons[p].name+'</span>'+
-         '<div style="flex:1;display:flex;gap:14px;font-family:var(--mono);align-items:center">'+
+         '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase">'+S.config.persons[p].name+'</span>'+
+         '<div style="flex:1;display:flex;gap:14px;font-family:var(--sans);align-items:center">'+
          editCell(key,p,'kg',d.kg!=null?d.kg:null)+
          editCell(key,p,'kcal',d.kcal!=null?d.kcal:null)+
          '</div>'+badge(e,key,p)+'</div>';
@@ -512,16 +524,17 @@ function renderLegend(){
   PERSONS.forEach(p=>{
     h+='<div style="display:flex;align-items:center;gap:6px">'+
        '<svg width="20" height="4" style="flex-shrink:0;overflow:visible"><line x1="0" y1="2" x2="20" y2="2" stroke="'+P_COLOR[p]+'" stroke-width="2.5"/><circle cx="10" cy="2" r="2.5" fill="'+P_COLOR[p]+'"/></svg>'+
-       '<span style="font-family:var(--mono);font-size:10px;text-transform:uppercase;color:'+P_COLOR[p]+'">'+S.config.persons[p].name+'</span></div>';
+       '<span style="font-family:var(--sans);font-weight:600;font-size:10px;text-transform:uppercase;color:'+P_COLOR[p]+'">'+S.config.persons[p].name+'</span></div>';
   });
   return h+'</div>';
 }
 
 function renderChart(field){
   const keys=Object.keys(S.data).filter(k=>PERSONS.some(p=>{const d=S.data[k]&&S.data[k][p];return d&&d[field]!=null;})).sort();
-  if(!keys.length)return '<div style="text-align:center;padding:24px;font-family:var(--mono);font-size:10px;color:#333">Aucune donnée</div>';
+  if(!keys.length)return '<div style="text-align:center;padding:24px;font-family:var(--sans);font-weight:500;font-size:11px;color:#333">Aucune donnée</div>';
 
-  const W=350,H=190,ml=36,mr=14,mt=16,mb=40;
+  // Marges latérales (ml et mr) augmentées pour laisser de l'espace au texte
+  const W=350,H=190,ml=42,mr=32,mt=16,mb=40;
   const cW=W-ml-mr,cH=H-mt-mb;
   const n=keys.length;
   const allV=[];
@@ -538,35 +551,80 @@ function renderChart(field){
   for(let i=0;i<=4;i++){
     const v=yLo+(yHi-yLo)*i/4, y=yOf(v);
     s+='<line x1="'+ml+'" y1="'+y.toFixed(1)+'" x2="'+(ml+cW)+'" y2="'+y.toFixed(1)+'" stroke="#1d1d1d" stroke-width="1"/>';
-    s+='<text x="'+(ml-6)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" font-family="DM Mono,monospace" font-size="8" fill="#444">'+Math.round(v)+'</text>';
+    s+='<text x="'+(ml-6)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="#444">'+Math.round(v)+'</text>';
   }
 
   keys.forEach((k,i)=>{
     const x=xOf(i).toFixed(1), yL=(mt+cH+10).toFixed(1);
-    s+='<text transform="rotate(-38,'+x+','+yL+')" x="'+x+'" y="'+yL+'" text-anchor="end" font-family="DM Mono,monospace" font-size="8" fill="#555">'+mShrt(k)+'</text>';
+    s+='<text transform="rotate(-38,'+x+','+yL+')" x="'+x+'" y="'+yL+'" text-anchor="end" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="#555">'+mShrt(k)+'</text>';
   });
+
+  const labelsToDraw = []; // On stocke les labels pour les dessiner APRES les lignes/points
 
   PERSONS.forEach(p=>{
     const col=P_COLOR[p];
-    const pts=keys.map((k,i)=>{const d=S.data[k]&&S.data[k][p];const v=d&&d[field]!=null?d[field]:null;return{x:xOf(i),y:v!=null?yOf(v):null,v};});
+    const pts=keys.map((k,i)=>{const d=S.data[k]&&S.data[k][p];const v=d&&d[field]!=null?d[field]:null;return{x:xOf(i),y:v!=null?yOf(v):null,v,i};});
+    
+    // 1. Dessin de la courbe
     let path='',pr=false;
     pts.forEach(pt=>{if(pt.y!=null){path+=(pr?'L':'M')+pt.x.toFixed(1)+' '+pt.y.toFixed(1)+' ';pr=true;}else pr=false;});
     if(path)s+='<path d="'+path+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
+    
+    // 2. Dessin des points et collecte des labels terminaux
     const lastIdx=pts.reduce((li,pt,i)=>pt.y!=null?i:li,-1);
     const firstIdx=pts.findIndex(pt=>pt.y!=null);
     pts.forEach((pt,i)=>{
       if(pt.y==null)return;
       s+='<circle cx="'+pt.x.toFixed(1)+'" cy="'+pt.y.toFixed(1)+'" r="3" fill="'+col+'"/>';
+      
       if(i===lastIdx){
-        const tx=(pt.x+6).toFixed(1), ty=(pt.y+4).toFixed(1);
-        s+='<text x="'+tx+'" y="'+ty+'" font-family="DM Mono,monospace" font-size="8" fill="'+col+'">'+pt.v+'</text>';
+        labelsToDraw.push({ type:'last', x:pt.x, y:pt.y, v:pt.v, col:col, i:i });
       } else if(i===firstIdx && firstIdx!==lastIdx){
-        // Label au-dessus et à gauche pour éviter le masquage par la courbe
-        const tx=(pt.x-6).toFixed(1), ty=(pt.y-5).toFixed(1);
-        s+='<text x="'+tx+'" y="'+ty+'" text-anchor="end" font-family="DM Mono,monospace" font-size="8" fill="'+col+'" opacity="0.8">'+pt.v+'</text>';
+        labelsToDraw.push({ type:'first', x:pt.x, y:pt.y, v:pt.v, col:col, i:i });
       }
     });
   });
+
+  // 3. Dessin du texte (Anti-collision)
+  // On regroupe les labels par index horizontal (même colonne)
+  const cols = {};
+  labelsToDraw.forEach(l => {
+      if(!cols[l.i]) cols[l.i] = [];
+      cols[l.i].push(l);
+  });
+
+  Object.values(cols).forEach(colLabels => {
+      // Tri par valeur verticale (Y) pour ajustement
+      colLabels.sort((a,b) => a.y - b.y);
+      
+      const MIN_DIST = 11; // Distance verticale minimale en pixels entre deux textes
+      
+      // Algorithme de relaxation pour séparer les labels trop proches
+      for(let iter=0; iter<5; iter++) {
+          for(let j=1; j<colLabels.length; j++) {
+              const diff = colLabels[j].y - colLabels[j-1].y;
+              if(diff < MIN_DIST) {
+                  const overlap = MIN_DIST - diff;
+                  colLabels[j-1].y -= overlap / 2;
+                  colLabels[j].y += overlap / 2;
+              }
+          }
+      }
+
+      // Rendu effectif des textes (toujours visibles et non barrés par les lignes)
+      colLabels.forEach(l => {
+          if(l.type === 'first') {
+              const tx = (l.x - 6).toFixed(1);
+              const ty = (l.y + 3).toFixed(1);
+              s+='<text x="'+tx+'" y="'+ty+'" text-anchor="end" font-family="Inter,sans-serif" font-weight="600" font-size="9" fill="'+l.col+'">'+l.v+'</text>';
+          } else {
+              const tx = (l.x + 6).toFixed(1);
+              const ty = (l.y + 3).toFixed(1);
+              s+='<text x="'+tx+'" y="'+ty+'" font-family="Inter,sans-serif" font-weight="600" font-size="9" fill="'+l.col+'">'+l.v+'</text>';
+          }
+      });
+  });
+
   return s+'</svg>';
 }
 
@@ -581,36 +639,33 @@ function renderEvolution(){
 function renderObjectifs(){
   let h='<div style="display:flex;flex-direction:column;gap:8px">';
 
-  // ── Enjeux financiers
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
   [['Objectif atteint','var(--win)','stakes.success',S.config.stakes.success],
    ['Objectif non atteint','var(--loss)','stakes.failure',S.config.stakes.failure]].forEach(([lbl,c,path,val]) => {
-    h+='<div class="card" style="padding:14px">';
-    h+='<div class="mono" style="font-size:9px;color:#555;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px">'+lbl+'</div>';
-    h+='<div class="mono" style="font-size:24px;color:'+c+';display:flex;align-items:baseline;gap:2px">+';
-    h+='<span class="edt" data-act="editnum" data-path="'+path+'" data-dec="0">'+val+'</span><span style="font-size:14px">€</span></div></div>';
+    h+='<div class="card" style="padding:16px">';
+    h+='<div class="mono" style="font-size:10px;font-weight:600;color:#777;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+lbl+'</div>';
+    h+='<div class="mono" style="font-size:24px;font-weight:500;color:'+c+';display:flex;align-items:baseline;gap:2px">+';
+    h+='<span class="edt" data-act="editnum" data-path="'+path+'" data-dec="0">'+val+'</span><span style="font-size:14px;font-weight:600;">€</span></div></div>';
   });
   h+='</div>';
 
-  // ── Cartes individuelles (même style que caisse commune)
   h+='<div style="display:flex;flex-direction:column;gap:8px">';
   PERSONS.forEach(p=>{
     const pc=S.config.persons[p];
-    // Anas & Hicham : kcal puis perte kg | Saad : kcal seulement
     const fields = p==='saad'
       ? [['persons.'+p+'.kcalMin', pc.kcalMin, '0', 'kcal / jour', '']]
       : [['persons.'+p+'.kcalMin', pc.kcalMin, '0', 'kcal / jour', ''],
          ['persons.'+p+'.targetLoss', pc.targetLoss, '1', 'kg / mois', '−']];
 
-    h+='<div style="background:'+P_BG[p]+';border:1px solid '+P_BORD[p]+';border-radius:12px;padding:18px">';
-    h+='<div class="mono" style="font-size:10px;text-transform:uppercase;letter-spacing:.14em;color:'+P_COLOR[p]+';margin-bottom:16px">'+pc.name+'</div>';
-    h+='<div style="display:flex;gap:10px">';
+    h+='<div style="background:'+P_BG[p]+';border:1px solid '+P_BORD[p]+';border-radius:12px;padding:20px">';
+    h+='<div class="mono" style="font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:'+P_COLOR[p]+';margin-bottom:20px">'+pc.name+'</div>';
+    h+='<div style="display:flex;gap:24px">';
     fields.forEach(([path,val,dec,unit,pre])=>{
-      h+='<div style="flex:1;background:#0b0b0b;border-radius:10px;padding:14px 14px 12px">';
-      h+='<div class="mono" style="font-size:8px;color:#444;text-transform:uppercase;letter-spacing:.1em;margin-bottom:10px">'+unit+'</div>';
+      h+='<div style="flex:1;display:flex;flex-direction:column;gap:6px">';
+      h+='<div class="mono" style="font-size:10px;font-weight:600;color:'+P_COLOR[p]+';opacity:0.8;text-transform:uppercase;letter-spacing:.1em;">'+unit+'</div>';
       h+='<div class="mono" style="display:flex;align-items:baseline;gap:4px;line-height:1">';
-      if(pre) h+='<span style="font-size:24px;font-weight:400;color:'+P_COLOR[p]+'">'+pre+'</span>';
-      h+='<span class="edt" data-act="editnum" data-path="'+path+'" data-dec="'+dec+'" style="font-size:40px;font-weight:500;color:'+P_COLOR[p]+'">'+val+'</span>';
+      if(pre) h+='<span style="font-size:20px;font-weight:400;color:'+P_COLOR[p]+'">'+pre+'</span>';
+      h+='<span class="edt" data-act="editnum" data-path="'+path+'" data-dec="'+dec+'" style="font-size:32px;font-weight:500;color:'+P_COLOR[p]+'">'+val+'</span>';
       h+='</div></div>';
     });
     h+='</div></div>';
@@ -625,13 +680,11 @@ function render(){
     let h = '<div style="position:fixed;inset:0;background:var(--bg-dark);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3rem;">';
 
     if (S.pinLoading) {
-      // ── État : vérification en cours ──
       h += '<div id="pin-dots" style="display:flex;gap:14px;">';
       for(let i=0; i<5; i++) h += '<div class="pin-dot loading"></div>';
       h += '</div>';
-      h += '<div class="connecting-label" style="font-family:var(--mono);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#444;">Connexion en cours</div>';
+      h += '<div class="connecting-label" style="font-family:var(--sans);font-weight:600;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#555;">Connexion en cours</div>';
     } else {
-      // ── État : saisie du code ──
       h += '<div class="pin-dots" id="pin-dots" style="display:flex;gap:14px;">';
       for(let i=0; i<5; i++) {
         const filled = (S.pinEntry && i < S.pinEntry.length) ? ' filled' : '';
@@ -668,7 +721,7 @@ function render(){
 
   h+=(S.tab==='suivi')?renderSuivi():(S.tab==='evolution')?renderEvolution():renderObjectifs();
   
-  h+='<footer style="margin-top:24px;text-align:center;font-family:var(--mono);font-size:10px;color:#333;letter-spacing:.15em;text-transform:uppercase">S.A.H · 2025–2030</footer>';
+  h+='<footer style="margin-top:24px;text-align:center;font-family:var(--sans);font-weight:600;font-size:10px;color:#444;letter-spacing:.15em;text-transform:uppercase">S.A.H · 2025–2030</footer>';
   document.getElementById('root').innerHTML=h;
   
   bindForm();
@@ -750,7 +803,8 @@ document.addEventListener('click',ev=>{
 
   if(act==='tab'){S.tab=t.getAttribute('data-val');S.pickerOpen=false;render();return;}
   if(act==='fperson'){S.formPerson=t.getAttribute('data-val');render();return;}
-  if(act==='picker'){S.pickerOpen=!S.pickerOpen;if(S.pickerOpen)S.formMonth=lastSaisieMonth();render();return;}
+  
+  if(act==='picker'){S.pickerOpen=!S.pickerOpen;render();return;}
   if(act==='picker-bg'){S.pickerOpen=false;render();return;}
   if(act==='pick'){S.formMonth=t.getAttribute('data-val');S.pickerOpen=false;render();return;}
 
