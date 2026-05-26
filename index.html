@@ -104,6 +104,7 @@
     border-bottom: none;
     color: var(--tab-col) !important;
     z-index: 3;
+    padding-bottom: 12px; /* overlap 1px of card top */
   }
 
   /* Coins concaves au bas de l'onglet actif */
@@ -438,7 +439,7 @@ function renderSuivi(){
   h+='</div>';
 
   // ── Bloc saisie : coins ajustés selon onglet actif, pas de bordure du haut côté onglet
-  h+='<div class="saisie-bloc" style="background:'+P_BG[curP]+';border:1px solid '+P_BORD[curP]+';border-radius:'+bR+';">';
+  h+='<div class="saisie-bloc" style="background:'+P_BG[curP]+';border:1px solid '+P_BORD[curP]+';border-top:none;margin-top:-1px;padding-top:17px;border-radius:'+bR+';">';
 
   // Mois picker
   h+='<div style="position:relative;">';
@@ -557,11 +558,12 @@ function renderChart(field){
       if(pt.y==null)return;
       s+='<circle cx="'+pt.x.toFixed(1)+'" cy="'+pt.y.toFixed(1)+'" r="3" fill="'+col+'"/>';
       if(i===lastIdx){
-        const tx=(pt.x+6).toFixed(1), ty=(pt.y+3).toFixed(1);
+        const tx=(pt.x+6).toFixed(1), ty=(pt.y+4).toFixed(1);
         s+='<text x="'+tx+'" y="'+ty+'" font-family="DM Mono,monospace" font-size="8" fill="'+col+'">'+pt.v+'</text>';
       } else if(i===firstIdx && firstIdx!==lastIdx){
-        const tx=(pt.x+6).toFixed(1), ty=(pt.y+3).toFixed(1);
-        s+='<text x="'+tx+'" y="'+ty+'" font-family="DM Mono,monospace" font-size="8" fill="'+col+'" opacity="0.7">'+pt.v+'</text>';
+        // Label au-dessus et à gauche pour éviter le masquage par la courbe
+        const tx=(pt.x-6).toFixed(1), ty=(pt.y-5).toFixed(1);
+        s+='<text x="'+tx+'" y="'+ty+'" text-anchor="end" font-family="DM Mono,monospace" font-size="8" fill="'+col+'" opacity="0.8">'+pt.v+'</text>';
       }
     });
   });
