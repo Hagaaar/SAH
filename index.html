@@ -461,20 +461,27 @@ function renderSuivi(){
   if (curP === 'anas') blocRadius = '0 16px 16px 16px';
   if (curP === 'saad') blocRadius = '16px 0 16px 16px';
 
-  // ── Sélecteur personne
-  h+='<div style="display:flex;gap:4px;margin-bottom:6px">';
-  PERSONS.forEach(p=>{
+  // ── Tabs personne ATTACHÉS au bloc (pas de gap)
+  const tIdx = PERSONS.indexOf(curP);
+  h+='<div style="display:flex;gap:0px;margin-bottom:0">';
+  PERSONS.forEach((p,i)=>{
     const sel=p===curP;
-    h+='<button data-act="fperson" data-val="'+p+'" style="flex:1;padding:9px 0;border-radius:8px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;background:'+(sel?P_BG[p]:'transparent')+';border:1px solid '+(sel?P_BORD[p]:'#1f1f1f')+';color:'+(sel?P_COLOR[p]:'#444')+'">'+S.config.persons[p].name+'</button>';
+    const leftR  = i===0?'9px':'0';
+    const rightR = i===PERSONS.length-1?'9px':'0';
+    h+='<button data-act="fperson" data-val="'+p+'" style="flex:1;padding:10px 0;border-radius:'+leftR+' '+rightR+' 0 0;font-size:11px;text-transform:uppercase;letter-spacing:.06em;'
+      +(sel?'background:'+P_BG[p]+';border:1px solid '+P_BORD[p]+';border-bottom:none;color:'+P_COLOR[p]+';z-index:2;position:relative;'
+           :'background:transparent;border:1px solid #1f1f1f;border-bottom:1px solid #1f1f1f;color:#444;')
+      +'margin-right:'+(i<PERSONS.length-1?'-1px':'0')+';">'+S.config.persons[p].name+'</button>';
   });
   h+='</div>';
 
-  // ── Bloc saisie (même style que les cartes caisse)
-  h+='<div style="background:'+P_BG[curP]+';border:1px solid '+P_BORD[curP]+';border-radius:12px;padding:16px;margin-bottom:6px;display:flex;flex-direction:column;gap:12px">';
+  // ── Rayon du coin supérieur selon l'onglet actif
+  const bR = curP==='anas'?'0 12px 12px 12px':curP==='saad'?'12px 0 12px 12px':'12px 12px 12px 12px';
+  h+='<div style="background:'+P_BG[curP]+';border:1px solid '+P_BORD[curP]+';border-radius:'+bR+';padding:16px;margin-bottom:6px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:1">';
 
-  // Mois picker
+  // Mois picker (fond légèrement plus clair, sans bordure)
   h+='<div style="position:relative;">';
-  h+='<button data-act="picker" style="width:100%;padding:10px 14px;background:#0a0a0a;border:1px solid #252525;border-radius:9px;color:#e8e8e8;font-family:var(--mono);font-size:12px;text-align:left;display:flex;justify-content:space-between;align-items:center;"><span>'+mLbl(S.formMonth).toUpperCase()+'</span><span style="color:'+P_COLOR[curP]+'">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
+  h+='<button data-act="picker" style="width:100%;padding:10px 14px;background:rgba(255,255,255,.07);border:none;border-radius:9px;color:#e8e8e8;font-family:var(--mono);font-size:12px;text-align:left;display:flex;justify-content:space-between;align-items:center;box-sizing:border-box;"><span>'+mLbl(S.formMonth).toUpperCase()+'</span><span style="color:'+P_COLOR[curP]+'">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
   if(S.pickerOpen){
     h+='<div data-act="picker-bg" style="position:fixed;inset:0;z-index:98"></div>';
     h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#141414;border:1px solid #2a2a2a;border-radius:12px;max-height:220px;overflow-y:auto;box-shadow:0 8px 28px rgba(0,0,0,.6)">';
@@ -486,11 +493,11 @@ function renderSuivi(){
   }
   h+='</div>';
 
-  // Champs kg + kcal + bouton
-  h+='<div style="display:flex;gap:8px;align-items:center">';
-  h+='<input id="f-kg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;padding:10px 12px;background:#0a0a0a;border:1px solid #252525;border-radius:9px;color:#e8e8e8;font-family:var(--mono);font-size:13px;outline:none;">';
-  h+='<input id="f-kcal" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;padding:10px 12px;background:#0a0a0a;border:1px solid #252525;border-radius:9px;color:#e8e8e8;font-family:var(--mono);font-size:13px;outline:none;">';
-  h+='<button data-act="add" style="width:40px;height:40px;background:'+P_BG[curP]+';border:1px solid '+P_BORD[curP]+';border-radius:9px;color:'+P_COLOR[curP]+';font-size:22px;display:flex;align-items:center;justify-content:center;flex-shrink:0;cursor:pointer;">+</button>';
+  // Inputs + bouton (tout à l'intérieur du cadre, fond légèrement plus clair)
+  h+='<div style="display:flex;gap:8px;align-items:stretch;min-width:0">';
+  h+='<input id="f-kg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:10px 12px;background:rgba(255,255,255,.07);border:none;border-radius:9px;color:#e8e8e8;font-family:var(--mono);font-size:13px;outline:none;">';
+  h+='<input id="f-kcal" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;min-width:0;padding:10px 12px;background:rgba(255,255,255,.07);border:none;border-radius:9px;color:#e8e8e8;font-family:var(--mono);font-size:13px;outline:none;">';
+  h+='<button data-act="add" style="width:40px;height:40px;flex-shrink:0;background:rgba(255,255,255,.07);border:none;border-radius:9px;color:'+P_COLOR[curP]+';font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--mono);">+</button>';
   h+='</div>';
 
   h+='</div>';
@@ -500,8 +507,8 @@ function renderSuivi(){
   let total=0;const per={};PERSONS.forEach(p=>per[p]={total:0,w:0,l:0});
   keys.forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(!e)return;per[p].total+=e.amount;total+=e.amount;e.pass?per[p].w++:per[p].l++;}));
   h+='<div style="background:rgba(240,192,64,.05);border:1px solid rgba(240,192,64,.15);border-radius:12px;padding:16px;margin-bottom:8px">';
-  h+='<div class="mono" style="font-size:13px;font-weight:700;letter-spacing:.12em;color:#ffffff;text-transform:uppercase;margin-bottom:8px">Caisse commune</div>';
-  h+='<div class="mono" style="font-size:38px;color:var(--gold);line-height:1;margin-bottom:16px">'+total+'€</div>';
+  h+='<div class="mono" style="font-size:9px;letter-spacing:.2em;color:rgba(240,192,64,.4);text-transform:uppercase;margin-bottom:6px">Caisse commune</div>';
+  h+='<div class="mono" style="font-size:42px;font-weight:700;color:var(--gold);line-height:1;margin-bottom:16px">'+total+'€</div>';
   h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
   PERSONS.forEach(p=>{
     h+='<div style="background:'+P_BG[p]+';border-radius:8px;padding:10px;border:1px solid '+P_BORD[p]+'">'+
@@ -684,7 +691,9 @@ function render(){
 
   let h='<div class="header-container">';
   h+='<header><h1>S.A.H</h1></header>';
-  h+='<button class="sync-badge" onclick="syncLoad()"><div id="sync-dot" class="sync-dot"></div><span id="sync-text">Synchronisé</span></button>';
+  h+='<button class="sync-badge" onclick="syncLoad()">'
+   +'<div id="sync-dot" class="sync-dot" style="background:'+(localStorage.getItem('getfit_auth')==='true'?'var(--win)':'#444')+'"></div>'
+   +'<span id="sync-text">'+(localStorage.getItem('getfit_auth')==='true'?'Synchronisé':'...')+'</span></button>';
   h+='</div>';
 
   h+='<div class="tabs">';
