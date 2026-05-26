@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 <title>S.A.H</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght=300;400;500&family=DM+Sans:wght=300;400;500&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500&display=swap');
   
   :root {
     --mono: 'DM Mono', ui-monospace, monospace;
@@ -47,7 +47,6 @@
   .editinput { font-family: var(--mono); font-size: inherit; color: #e8e8e8; background: transparent; border: none; border-bottom: 1px solid var(--anas); outline: none; text-align: center; width: 60px; }
   .editinput.sm { width: 44px; }
   
-  /* ════ EN-TÊTE & SYNC ════ */
   .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; width: 100%; }
   header h1 { font-family: var(--mono); font-size: 22px; font-weight: 500; letter-spacing: -.02em; line-height: 1; }
   
@@ -68,12 +67,10 @@
   .sync-badge:active { opacity: 0.6; }
   .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #444; transition: background 0.3s ease; box-shadow: 0 0 4px rgba(0,0,0,0.3); }
   
-  /* ════ NAVIGATION ════ */
   .tabs { display: flex; gap: 3px; background: #111; padding: 3px; border-radius: 10px; border: 1px solid #1c1c1c; margin-bottom: 8px; }
   .tab { flex: 1; padding: 9px 0; border-radius: 8px; color: #555; font-size: 11px; letter-spacing: .06em; transition: all 0.2s ease; }
   .tab.on { background: #242424; color: #e8e8e8; font-weight: 500; }
   
-  /* ════ DESIGN DOSSIER ════ */
   .saisie-wrapper {
     width: 100%;
     margin-bottom: 8px; 
@@ -176,7 +173,6 @@
   .btn-pure-plus:active { transform: scale(0.9); }
   .btn-pure-plus svg { width: 24px; height: 24px; stroke-width: 3; }
 
-  /* ════ LOCK SCREEN ════ */
   .pin-dot { width:14px; height:14px; border-radius:50%; border:1.5px solid #555; background:transparent; transition:background 0.1s, border-color 0.1s; }
   .pin-dot.filled { background:#e8e8e8; border-color:#e8e8e8; }
   .pin-dot.error { background:var(--loss); border-color:var(--loss); }
@@ -203,7 +199,7 @@ const mLbl=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mShrt=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mStep=(k,d)=>{let[y,m]=k.split('-').map(Number);const n=m+d;return n>12?mKey(y+1,n-12):n<1?mKey(y-1,n+12):mKey(y,n);};
 
-const START_KEY='2025-08', OBS_END='2025-10', CURR_KEY='2026-05';
+const START_KEY='2025-09', OBS_END='2025-10', CURR_KEY='2026-05';
 const PERSONS=['anas','hicham','saad'];
 
 const P_COLOR={anas:'#7eb8f7',hicham:'#c084fc',saad:'#fb923c'};
@@ -229,7 +225,6 @@ const DEF_CFG={
 };
 
 const DEF_DATA={
-  '2025-08':{anas:{kg:88.5,kcal:null},hicham:{kg:114.9,kcal:null},saad:{kg:94.9,kcal:null}},
   '2025-09':{anas:{kg:86.4,kcal:771},hicham:{kg:112.0,kcal:760},saad:{kg:null,kcal:null}},
   '2025-10':{anas:{kg:86.2,kcal:674},hicham:{kg:109.5,kcal:780},saad:{kg:91.55,kcal:877}},
   '2025-11':{anas:{kg:null,kcal:699},hicham:{kg:109.8,kcal:859},saad:{kg:90.45,kcal:714}},
@@ -362,7 +357,7 @@ function makeChange(person,monthKey,kg,kcal,note){
 
 function scheduleSave(changes){persist();clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncSave(changes),800);}
 
-/* ════ LOGIQUE MÉTIER & RÈGLES SPÉCIFIQUES ════ */
+/* ════ LOGIQUE MÉTIER ════ */
 function prevKgFor(person,key){
   let k=mStep(key,-1);
   for(let i=0;i<80;i++){
@@ -605,6 +600,7 @@ function renderObjectifs(){
     const RuleTxt = p === 'saad' ? 'Calories strictes (poids ignoré)' : 'Poids obligatoire (Kcal acceptées jusqu\'en nov. 2025)';
     
     h+='<div class="card" style="padding:16px">';
+    /* ── BUG CORRIGÉ : point-virgule manquant et margin-bottom dans la chaîne ── */
     h+='<div class="mono" style="font-size:12px;text-transform:uppercase;color:'+P_COLOR[p]+';margin-bottom:12px">'+pc.name+'</div>';
     h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px">';
     [['persons.'+p+'.startKg',pc.startKg,'2','kg',''],
@@ -631,17 +627,17 @@ function render(){
     h += '<div class="pin-dots" id="pin-dots" style="display:flex;gap:14px;">';
     for(let i=0; i<5; i++) {
       const filled = (S.pinEntry && i < S.pinEntry.length) ? ' filled' : '';
-      h += `<div class="pin-dot${filled}" id="d${i}"></div>`;
+      h += '<div class="pin-dot'+filled+'" id="d'+i+'"></div>';
     }
     h += '</div>';
     
     h += '<div class="pin-pad" style="display:grid;grid-template-columns:repeat(3,72px);gap:16px;">';
     [1,2,3,4,5,6,7,8,9].forEach(n => {
-      h += `<div class="pin-key" data-act="pin-key" data-val="${n}">${n}</div>`;
+      h += '<div class="pin-key" data-act="pin-key" data-val="'+n+'">'+n+'</div>';
     });
-    h += `<div class="pin-key empty" style="border:none;background:transparent;cursor:default;"></div>`;
-    h += `<div class="pin-key" data-act="pin-key" data-val="0">0</div>`;
-    h += `<div class="pin-key del" data-act="pin-del">⌫</div>`;
+    h += '<div class="pin-key empty" style="border:none;background:transparent;cursor:default;"></div>';
+    h += '<div class="pin-key" data-act="pin-key" data-val="0">0</div>';
+    h += '<div class="pin-key del" data-act="pin-del">⌫</div>';
     h += '</div></div>';
     
     document.getElementById('root').innerHTML = h;
@@ -650,7 +646,7 @@ function render(){
 
   let h='<div class="header-container">';
   h+='<header><h1>S.A.H</h1></header>';
-  h+='<div class="sync-badge" onclick="syncLoad()"><div id="sync-dot" class="sync-dot"></div><span id="sync-text">Synchronisé</span></div>';
+  h+='<button class="sync-badge" onclick="syncLoad()"><div id="sync-dot" class="sync-dot"></div><span id="sync-text">Synchronisé</span></button>';
   h+='</div>';
 
   h+='<div class="tabs">';
@@ -801,7 +797,7 @@ document.addEventListener('click',ev=>{
   }
 });
 
-/* ════ INITIALISATION ET PREMIER CHARGEMENT ════ */
+/* ════ INITIALISATION ════ */
 render();
 syncLoad();
 </script>
