@@ -71,107 +71,71 @@
   .tab { flex: 1; padding: 9px 0; border-radius: 8px; color: #555; font-size: 11px; letter-spacing: .06em; transition: all 0.2s ease; }
   .tab.on { background: #242424; color: #e8e8e8; font-weight: 500; }
   
-  .saisie-wrapper {
-    width: 100%;
-    margin-bottom: 8px; 
-    position: relative;
-    --tab-color: transparent; 
-  }
-  
+  .saisie-wrapper { width:100%; margin-bottom:8px; }
+
   .saisie-onglets {
     display: flex;
-    justify-content: center;
-    padding: 0;
-    margin-bottom: 0;
     gap: 0;
+    margin-bottom: 0;
+    overflow: visible;
   }
-  
+
   .saisie-onglets button {
     flex: 1;
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: rgba(232, 232, 232, 0.4);
+    color: #444;
     font-weight: 500;
-    padding: 12px 0;
+    padding: 11px 0;
     background: transparent;
-    border-radius: 16px 16px 0 0;
+    border-radius: 10px 10px 0 0;
+    border: 1px solid #1f1f1f;
+    border-bottom: none;
     position: relative;
-    z-index: 2;
-    transition: color 0.2s ease;
+    z-index: 1;
+    margin-right: -1px;
   }
-  
+  .saisie-onglets button:last-child { margin-right: 0; }
+
   .saisie-onglets button.active-tab {
-    background-color: var(--tab-color);
-    color: #000000 !important;
+    background: var(--tab-bg);
+    border-color: var(--tab-bord);
+    border-bottom: none;
+    color: var(--tab-col) !important;
+    z-index: 3;
   }
 
+  /* Coins concaves au bas de l'onglet actif */
   .saisie-onglets button.active-tab::before,
   .saisie-onglets button.active-tab::after {
     content: "";
     position: absolute;
     bottom: 0;
-    width: 16px;
-    height: 16px;
+    width: 12px;
+    height: 12px;
     pointer-events: none;
+    z-index: 4;
   }
-  
   .saisie-onglets button.active-tab::before {
-    left: -16px;
-    background: radial-gradient(circle at 0 0, transparent 16px, var(--tab-color) 16.5px);
+    left: -12px;
+    background: radial-gradient(circle at 100% 0, transparent 12px, var(--bg-dark) 12.5px);
   }
-  
   .saisie-onglets button.active-tab::after {
-    right: -16px;
-    background: radial-gradient(circle at 100% 0, transparent 16px, var(--tab-color) 16.5px);
+    right: -12px;
+    background: radial-gradient(circle at 0% 0, transparent 12px, var(--bg-dark) 12.5px);
   }
-
   .saisie-onglets button:first-child.active-tab::before { display: none; }
   .saisie-onglets button:last-child.active-tab::after { display: none; }
-  
+
   .saisie-bloc {
-    padding: 24px 20px; 
+    position: relative;
+    z-index: 2;
+    padding: 16px;
     display: flex;
     flex-direction: column;
-    gap: 16px; 
-    position: relative;
-    z-index: 1;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    transition: background-color 0.3s ease;
+    gap: 12px;
   }
-  
-  .saisie-row { display: flex; gap: 10px; align-items: center; }
-  
-  .inp-color {
-    background: rgba(0, 0, 0, 0.15);
-    color: #000;
-    border: none;
-    font-weight: 500;
-    width: 100%; 
-    height: 38px; 
-    padding: 0 12px; 
-    border-radius: 12px; 
-    font-family: var(--mono); 
-    font-size: 12px; 
-    outline: none;
-  }
-  .inp-color::placeholder { color: rgba(0,0,0,0.4); }
-  
-  .btn-pure-plus {
-    background: transparent;
-    border: none;
-    color: #000;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    padding: 0;
-    transition: transform 0.1s;
-  }
-  .btn-pure-plus:active { transform: scale(0.9); }
-  .btn-pure-plus svg { width: 24px; height: 24px; stroke-width: 3; }
 
   .pin-dot { width:14px; height:14px; border-radius:50%; border:1.5px solid #555; background:transparent; transition:background 0.1s, border-color 0.1s; }
   .pin-dot.filled { background:#e8e8e8; border-color:#e8e8e8; }
@@ -461,30 +425,27 @@ function renderSuivi(){
   if (curP === 'anas') blocRadius = '0 16px 16px 16px';
   if (curP === 'saad') blocRadius = '16px 0 16px 16px';
 
-  // ── Tabs personne ATTACHÉS au bloc (pas de gap)
-  const tIdx = PERSONS.indexOf(curP);
-  h+='<div style="display:flex;gap:0px;margin-bottom:0">';
-  PERSONS.forEach((p,i)=>{
+  // ── Wrapper avec CSS vars pour les pseudo-éléments concaves
+  const bR = curP==='anas'?'0 10px 10px 10px':curP==='saad'?'10px 0 10px 10px':'10px 10px 10px 10px';
+  h+='<div class="saisie-wrapper" style="--tab-bg:'+P_BG[curP]+';--tab-bord:'+P_BORD[curP]+';--tab-col:'+P_COLOR[curP]+'">';
+
+  // ── Onglets personne (CSS class-based pour les pseudo-éléments)
+  h+='<div class="saisie-onglets">';
+  PERSONS.forEach(p=>{
     const sel=p===curP;
-    const leftR  = i===0?'9px':'0';
-    const rightR = i===PERSONS.length-1?'9px':'0';
-    h+='<button data-act="fperson" data-val="'+p+'" style="flex:1;padding:10px 0;border-radius:'+leftR+' '+rightR+' 0 0;font-size:11px;text-transform:uppercase;letter-spacing:.06em;'
-      +(sel?'background:'+P_BG[p]+';border:1px solid '+P_BORD[p]+';border-bottom:none;color:'+P_COLOR[p]+';z-index:2;position:relative;'
-           :'background:transparent;border:1px solid #1f1f1f;border-bottom:1px solid #1f1f1f;color:#444;')
-      +'margin-right:'+(i<PERSONS.length-1?'-1px':'0')+';">'+S.config.persons[p].name+'</button>';
+    h+='<button data-act="fperson" data-val="'+p+'" '+(sel?'class="active-tab"':'')+'>'+S.config.persons[p].name+'</button>';
   });
   h+='</div>';
 
-  // ── Rayon du coin supérieur selon l'onglet actif
-  const bR = curP==='anas'?'0 12px 12px 12px':curP==='saad'?'12px 0 12px 12px':'12px 12px 12px 12px';
-  h+='<div style="background:'+P_BG[curP]+';border:1px solid '+P_BORD[curP]+';border-radius:'+bR+';padding:16px;margin-bottom:6px;display:flex;flex-direction:column;gap:12px;position:relative;z-index:1">';
+  // ── Bloc saisie : coins ajustés selon onglet actif, pas de bordure du haut côté onglet
+  h+='<div class="saisie-bloc" style="background:'+P_BG[curP]+';border:1px solid '+P_BORD[curP]+';border-radius:'+bR+';">';
 
-  // Mois picker (fond légèrement plus clair, sans bordure)
+  // Mois picker
   h+='<div style="position:relative;">';
-  h+='<button data-act="picker" style="width:100%;padding:10px 14px;background:rgba(255,255,255,.07);border:none;border-radius:9px;color:#e8e8e8;font-family:var(--mono);font-size:12px;text-align:left;display:flex;justify-content:space-between;align-items:center;box-sizing:border-box;"><span>'+mLbl(S.formMonth).toUpperCase()+'</span><span style="color:'+P_COLOR[curP]+'">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
+  h+='<button data-act="picker" style="width:100%;padding:10px 14px;background:rgba(255,255,255,.07);border:none;border-radius:8px;color:#e8e8e8;font-family:var(--mono);font-size:12px;text-align:left;display:flex;justify-content:space-between;align-items:center;box-sizing:border-box;"><span>'+mLbl(S.formMonth).toUpperCase()+'</span><span style="color:'+P_COLOR[curP]+'">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
   if(S.pickerOpen){
     h+='<div data-act="picker-bg" style="position:fixed;inset:0;z-index:98"></div>';
-    h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#141414;border:1px solid #2a2a2a;border-radius:12px;max-height:220px;overflow-y:auto;box-shadow:0 8px 28px rgba(0,0,0,.6)">';
+    h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#141414;border:1px solid #2a2a2a;border-radius:10px;max-height:220px;overflow-y:auto;box-shadow:0 8px 28px rgba(0,0,0,.6)">';
     FORM_MONTHS.forEach(m=>{
       const on=m===S.formMonth;
       h+='<div data-act="pick" data-val="'+m+'"'+(on?' data-sel="1"':'')+' style="padding:12px 14px;cursor:pointer;font-family:var(--mono);font-size:12px;border-bottom:1px solid #1a1a1a;background:'+(on?'rgba(240,192,64,.07)':'transparent')+';color:'+(on?'var(--gold)':'#888')+'">'+mLbl(m).toUpperCase()+'</div>';
@@ -493,15 +454,16 @@ function renderSuivi(){
   }
   h+='</div>';
 
-  // Inputs + bouton (tout à l'intérieur du cadre, fond légèrement plus clair)
+  // Inputs + bouton (fond légèrement plus clair, sans bordure, tout dans le cadre)
   h+='<div style="display:flex;gap:8px;align-items:stretch;min-width:0">';
-  h+='<input id="f-kg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:10px 12px;background:rgba(255,255,255,.07);border:none;border-radius:9px;color:#e8e8e8;font-family:var(--mono);font-size:13px;outline:none;">';
-  h+='<input id="f-kcal" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;min-width:0;padding:10px 12px;background:rgba(255,255,255,.07);border:none;border-radius:9px;color:#e8e8e8;font-family:var(--mono);font-size:13px;outline:none;">';
-  h+='<button data-act="add" style="width:40px;height:40px;flex-shrink:0;background:rgba(255,255,255,.07);border:none;border-radius:9px;color:'+P_COLOR[curP]+';font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--mono);">+</button>';
+  h+='<input id="f-kg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:10px 12px;background:rgba(255,255,255,.07);border:none;border-radius:8px;color:#e8e8e8;font-family:var(--mono);font-size:13px;outline:none;">';
+  h+='<input id="f-kcal" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;min-width:0;padding:10px 12px;background:rgba(255,255,255,.07);border:none;border-radius:8px;color:#e8e8e8;font-family:var(--mono);font-size:13px;outline:none;">';
+  h+='<button data-act="add" style="width:40px;height:40px;flex-shrink:0;background:rgba(255,255,255,.07);border:none;border-radius:8px;color:'+P_COLOR[curP]+';font-size:22px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:var(--mono);">+</button>';
   h+='</div>';
 
   h+='</div>';
-  h+='<div id="preview" style="font-family:var(--mono);font-size:11px;text-align:center;height:0;overflow:visible;margin-top:2px;pointer-events:none;"></div>';
+  h+='</div>';
+  h+='<div id="preview" style="font-family:var(--mono);font-size:11px;text-align:center;height:0;overflow:visible;margin-top:4px;pointer-events:none;"></div>';
 
   const keys=displayKeys();
   let total=0;const per={};PERSONS.forEach(p=>per[p]={total:0,w:0,l:0});
