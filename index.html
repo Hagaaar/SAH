@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-<title>S.A.H Challenge - Siblings Avoiding Heart-attacks Challenge</title>
+<title>S.A.H</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
   
@@ -193,14 +193,14 @@
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx8qVAaxyAJyYM1SNmufGlh3oc36YS_e0S_nLbcbZVug_DHIf_SYwV3QYlNPlurerU/exec';
 
 /* ════ CONSTANTES & UTILITAIRES ════ */
-const MFR=['JAN', 'FÉV', 'MAR', 'AVR', 'MAI', 'JUIN', 'JUIL', 'AOÛT', 'SEPT', 'OCT', 'NOV', 'DÉC'];
+const MFR=['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
 const mKey=(y,m)=>y+'-'+String(m).padStart(2,'0');
 const mLbl=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mShrt=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mStep=(k,d)=>{let[y,m]=k.split('-').map(Number);const n=m+d;return n>12?mKey(y+1,n-12):n<1?mKey(y-1,n+12):mKey(y,n);};
 
-const START_KEY='2025-08', OBS_END='2025-10'; // MAJ du point de départ à Août 2025
-const FORM_START='2026-05', FORM_END='2026-12';
+const START_KEY='2025-08', OBS_END='2025-10';
+const FORM_START='2026-05', FORM_END='2030-12';
 const PERSONS=['anas','hicham','saad'];
 
 const P_COLOR={anas:'#ffb347',hicham:'#7ed9a0',saad:'#93c5fd'};
@@ -224,7 +224,7 @@ const DEF_CFG={
 };
 
 const DEF_DATA={
-  '2025-08':{anas:{kg:89.0,kcal:null},hicham:{kg:115.1,kcal:null},saad:{kg:94.5,kcal:null}}, // Poids de départ ajoutés
+  '2025-08':{anas:{kg:89.0,kcal:null},hicham:{kg:115.1,kcal:null},saad:{kg:94.5,kcal:null}},
   '2025-09':{anas:{kg:86.4,kcal:771},hicham:{kg:112.0,kcal:760},saad:{kg:null,kcal:null}},
   '2025-10':{anas:{kg:86.2,kcal:674},hicham:{kg:109.5,kcal:780},saad:{kg:91.55,kcal:877}},
   '2025-11':{anas:{kg:null,kcal:699},hicham:{kg:109.8,kcal:859},saad:{kg:90.45,kcal:714}},
@@ -261,10 +261,10 @@ let S={
   pin: localStorage.getItem('getfit_pin') || '',
   pinEntry: '',
   pinLoading: false,
-  authenticated: localStorage.getItem('getfit_auth') === 'true'
+  authenticated: localStorage.getItem('getfit_auth') === 'true',
+  openYears: new Set(),
 };
 
-// Sécurité pour forcer la présence d'août 2025 dans les données (au cas où le cache de l'utilisateur l'avait effacé précédemment)
 if (!S.data['2025-08'] || !S.data['2025-08'].anas || S.data['2025-08'].anas.kg == null) {
   S.data['2025-08'] = {
     anas:{kg:89.0,kcal:null},
@@ -300,7 +300,7 @@ function updateDots() {
 
 async function syncLoad(){
   if (!S.pin) { S.authenticated = false; render(); return; }
-  setSyncStatus('En cours de synchronisation', '#888', 'var(--gold)');
+  setSyncStatus('Syncing', '#888', 'var(--gold)');
   try{
     const resp = await fetch(SCRIPT_URL + '?pin=' + encodeURIComponent(S.pin), {cache:'no-store'});
     const remote = await resp.json();
@@ -327,14 +327,13 @@ async function syncLoad(){
       S.manual = remote.manual || S.manual;
       S.trips = remote.trips || S.trips;
       
-      // Sécurité RENFORCÉE anti-effacement cloud pour Août 2025
       if (!S.data['2025-08'] || !S.data['2025-08'].anas || S.data['2025-08'].anas.kg == null) {
          S.data['2025-08'] = {
            anas: {kg: 89.0, kcal: null},
            hicham: {kg: 115.1, kcal: null},
            saad: {kg: 94.5, kcal: null}
          };
-         scheduleSave([]); // Force l'envoi immédiat au serveur Google pour qu'il mémorise Août !
+         scheduleSave([]);
       }
 
       S.formMonth = getTargetMonth(S.data);
@@ -342,12 +341,12 @@ async function syncLoad(){
     }
     
     S.authenticated = true; S.pinLoading = false; localStorage.setItem('getfit_auth', 'true');
-    setSyncStatus('Synchronisé', '#888', 'var(--win)');
+    setSyncStatus('Synced', '#888', 'var(--win)');
     render();
   }catch(e){
     S.pinLoading = false;
     if (localStorage.getItem('getfit_auth') === 'true') {
-      S.authenticated = true; render(); setSyncStatus('Échec synchronisation', '#888', 'var(--loss)');
+      S.authenticated = true; render(); setSyncStatus('Sync failed', '#888', 'var(--loss)');
     } else {
       S.authenticated = false; S.pinEntry = ''; render();
       const dots = document.getElementById('pin-dots');
@@ -360,13 +359,13 @@ async function syncLoad(){
 }
 
 async function syncSave(changes){
-  setSyncStatus('En cours de synchronisation', '#888', 'var(--gold)');
+  setSyncStatus('Syncing', '#888', 'var(--gold)');
   try{
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
       body:JSON.stringify({pin: S.pin, state:{config:S.config,data:S.data,manual:S.manual,trips:S.trips},changes:changes||[]})});
-    setSyncStatus('Synchronisé', '#888', 'var(--win)');
+    setSyncStatus('Synced', '#888', 'var(--win)');
   }catch(e){
-    setSyncStatus('Échec synchronisation', '#888', 'var(--loss)');
+    setSyncStatus('Sync failed', '#888', 'var(--loss)');
   }
 }
 
@@ -384,7 +383,7 @@ function makeChange(person,monthKey,kg,kcal,note){
     pass = (monthKey < '2025-12') ? (wOk || kOk) : wOk;
   }
   
-  return{month:monthKey,person,kg:kg??null,kcal:kcal??null,pass,amount:pass?S.config.stakes.success:S.config.stakes.failure,note:note||'saisie'};
+  return{month:monthKey,person,kg:kg??null,kcal:kcal??null,pass,amount:pass?S.config.stakes.success:S.config.stakes.failure,note:note||'entry'};
 }
 
 function scheduleSave(changes){persist();clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncSave(changes),800);}
@@ -420,10 +419,10 @@ function computeEntry(person,key){
   } else {
     if (key < '2025-12') {
       pass = wOk || kOk;
-      reason = pass ? (wOk ? '−'+lossKg+' kg ✓' : d.kcal+' kcal ✓') : 'Échec global';
+      reason = pass ? (wOk ? '−'+lossKg+' kg ✓' : d.kcal+' kcal ✓') : 'Failed';
     } else {
       pass = wOk;
-      reason = pass ? '−'+lossKg+' kg ✓' : (lossKg != null ? '−'+lossKg+' kg < '+pc.targetLoss : 'Poids manquant');
+      reason = pass ? '−'+lossKg+' kg ✓' : (lossKg != null ? '−'+lossKg+' kg < '+pc.targetLoss : 'Weight missing');
     }
   }
 
@@ -470,71 +469,64 @@ function renderSuivi(){
   let h = '';
   const curP = S.formPerson;
 
+  const SAISIE_ORDER = ['saad','anas','hicham'];
   let blocRadius = '16px 16px 16px 16px';
-  if (curP === 'anas') blocRadius = '0 16px 16px 16px';
-  if (curP === 'saad') blocRadius = '16px 0 16px 16px';
+  if (curP === 'saad') blocRadius = '0 16px 16px 16px';
+  if (curP === 'hicham') blocRadius = '16px 0 16px 16px';
 
-  // SECTION SAISIE POIDS/KCAL
   h+='<div class="saisie-wrapper" style="--tab-bg:'+P_BG[curP]+'; --tab-color:'+P_COLOR[curP]+'">';
   h+='<div class="saisie-onglets">';
-  PERSONS.forEach(p=>{
+  SAISIE_ORDER.forEach(p=>{
     const sel=p===curP;
     h+='<button data-act="fperson" data-val="'+p+'" '+(sel?'class="active-tab"':'')+'>'+S.config.persons[p].name+'</button>';
   });
   h+='</div>';
 
-  h+='<div class="saisie-bloc" style="border-radius:'+blocRadius+';">';
-  h+='<div style="position:relative;">';
-  h+='<button class="saisie-input-bg" data-act="picker" style="width:100%;padding:14px 16px;text-align:left;display:flex;justify-content:space-between;align-items:center;cursor:pointer;"><span>'+mLbl(S.formMonth).toUpperCase()+'</span><span style="font-size:10px;">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
+  h+='<div class="saisie-bloc" style="border-radius:'+blocRadius+';padding:14px 16px;">';
+  h+='<div style="position:relative;display:flex;gap:8px;align-items:center;">';
+  h+='<div style="position:relative;flex:1.4;min-width:0;">';
+  h+='<button class="saisie-input-bg" data-act="picker" style="width:100%;padding:11px 10px;text-align:left;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:11px;white-space:nowrap;"><span style="white-space:nowrap;">'+mLbl(S.formMonth).toUpperCase()+'</span><span style="font-size:9px;color:rgba(255,255,255,.3);flex-shrink:0;margin-left:4px;">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
   if(S.pickerOpen){
     h+='<div data-act="picker-bg" style="position:fixed;inset:0;z-index:98"></div>';
     h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#141414;border:1px solid #2a2a2a;border-radius:12px;max-height:220px;overflow-y:auto;box-shadow:0 8px 28px rgba(0,0,0,.8)">';
     FORM_MONTHS.forEach(m=>{
       const on=m===S.formMonth;
-      h+='<div data-act="pick" data-val="'+m+'"'+(on?' data-sel="1"':'')+' style="padding:12px 14px;cursor:pointer;font-family:var(--sans);font-weight:500;font-size:12px;border-bottom:1px solid #1a1a1a;background:'+(on?'rgba(255,255,255,.05)':'transparent')+';color:'+(on?'#fff':'#888')+'">'+mLbl(m).toUpperCase()+'</div>';
+      h+='<div data-act="pick" data-val="'+m+'"'+(on?' data-sel="1"':'')+' style="padding:10px 12px;cursor:pointer;font-family:var(--sans);font-weight:500;font-size:11px;white-space:nowrap;border-bottom:1px solid #1a1a1a;background:'+(on?'rgba(255,255,255,.05)':'transparent')+';color:'+(on?'#fff':'#888')+'">'+mLbl(m).toUpperCase()+'</div>';
     });
     h+='</div>';
   }
   h+='</div>';
-
-  h+='<div style="display:flex;gap:12px;align-items:center;">';
-  h+='<input id="f-kg" class="saisie-input-bg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:14px 16px;">';
-  h+='<input id="f-kcal" class="saisie-input-bg" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;min-width:0;padding:14px 16px;">';
-  h+='<button data-act="add" style="width:48px;height:48px;flex-shrink:0;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">';
-  h+='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--tab-color)" stroke-width="3" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>';
+  h+='<input id="f-kg" class="saisie-input-bg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:11px 8px;font-size:11px;">';
+  h+='<input id="f-kcal" class="saisie-input-bg" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;min-width:0;padding:11px 8px;font-size:11px;">';
+  h+='<button data-act="add" style="width:38px;height:38px;flex-shrink:0;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">';
+  h+='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--tab-color)" stroke-width="3" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>';
   h+='</button>';
   h+='</div>';
   h+='</div>';
   h+='</div>';
-  
-  h+='<div id="preview" style="font-family:var(--sans);font-weight:500;font-size:11px;text-align:center;height:0;overflow:visible;margin-top:4px;pointer-events:none;"></div>';
 
-  // SECTION CAISSE COMMUNE
   const keys=displayKeys();
   let grossTotal=0;
   const per={};PERSONS.forEach(p=>per[p]={total:0,w:0,l:0});
-  // Ne pas comptabiliser les montants d'août 2025 pour la caisse
   keys.filter(k => k > '2025-08').forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(!e)return;per[p].total+=e.amount;grossTotal+=e.amount;e.pass?per[p].w++:per[p].l++;}));
   
-  // Calcul du total des dépenses des voyages
   let tripsTotal = 0;
   if (S.trips) S.trips.forEach(t => { if(t.cost) tripsTotal += t.cost; });
   
-  // Calcul du solde final net
   let netTotal = grossTotal - tripsTotal;
-  
-  // Nettoyage des virgules pour l'affichage propre
   netTotal = Math.round(netTotal * 100) / 100;
   grossTotal = Math.round(grossTotal * 100) / 100;
   tripsTotal = Math.round(tripsTotal * 100) / 100;
 
   h+='<div style="background:rgba(240,192,64,.05);border:1px solid rgba(240,192,64,.15);border-radius:12px;padding:16px;margin-bottom:24px">';
-  h+='<div class="mono" style="font-size:9px;font-weight:600;letter-spacing:.2em;color:rgba(240,192,64,.5);text-transform:uppercase;margin-bottom:6px">Caisse commune</div>';
-  h+='<div class="mono" style="font-size:42px;font-weight:700;color:var(--gold);line-height:1;margin-bottom:6px">'+netTotal+'€</div>';
+  h+='<div class="mono" style="font-size:9px;font-weight:600;letter-spacing:.2em;color:rgba(240,192,64,.5);text-transform:uppercase;margin-bottom:6px">Common Pool</div>';
+  h+='<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px">';
+  h+='<div class="mono" style="font-size:42px;font-weight:700;color:var(--gold);line-height:1">'+netTotal+'€</div>';
+  h+='<div id="preview" style="font-family:var(--sans);font-weight:700;font-size:42px;line-height:1;text-align:right;pointer-events:none;"></div>';
+  h+='</div>';
   
-  // Affichage du sous-total explicatif s'il y a des voyages
   if(tripsTotal > 0) {
-      h+='<div class="mono" style="font-size:10px;font-weight:500;color:#888;margin-bottom:16px">Fonds : '+grossTotal+'€ — Voyages : '+tripsTotal+'€</div>';
+      h+='<div class="mono" style="font-size:10px;font-weight:500;color:#888;margin-bottom:16px">Contributions: '+grossTotal+'€ — Trips: '+tripsTotal+'€</div>';
   } else {
       h+='<div style="margin-bottom:16px"></div>';
   }
@@ -548,15 +540,14 @@ function renderSuivi(){
   });
   h+='</div></div>';
 
-  // SECTION VOYAGES
   h+='<div style="margin-bottom:32px;">';
-  h+='<div class="sectitle" style="margin-bottom:12px;">Dépenses des voyages</div>';
+  h+='<div class="sectitle" style="margin-bottom:12px;">The Guilt Trips</div>';
   
   h+='<div class="saisie-bloc" style="border-radius:12px; background:rgba(255,255,255,0.04); padding:16px; gap:8px;">';
-  h+='<input id="f-trip-title" class="saisie-input-bg" type="text" placeholder="Titre du voyage" value="'+esc(S.fTripTitle)+'" style="padding:14px 16px; width:100%;">';
+  h+='<input id="f-trip-title" class="saisie-input-bg" type="text" placeholder="Trip name" value="'+esc(S.fTripTitle)+'" style="padding:14px 16px; width:100%;">';
   h+='<div style="display:flex; gap:12px; align-items:center;">';
   h+='<input id="f-trip-dates" class="saisie-input-bg" type="text" placeholder="Dates" value="'+esc(S.fTripDates)+'" style="flex:1; min-width:0; padding:14px 16px;">';
-  h+='<input id="f-trip-cost" class="saisie-input-bg" type="number" inputmode="decimal" placeholder="€ (Coût)" value="'+esc(S.fTripCost)+'" style="flex:1; min-width:0; padding:14px 16px;">';
+  h+='<input id="f-trip-cost" class="saisie-input-bg" type="number" inputmode="decimal" placeholder="€ (Cost)" value="'+esc(S.fTripCost)+'" style="flex:1; min-width:0; padding:14px 16px;">';
   h+='<button data-act="add-trip" style="width:48px; height:48px; flex-shrink:0; background:transparent; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;">';
   h+='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e8e8e8" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
   h+='</button>';
@@ -582,30 +573,67 @@ function renderSuivi(){
   }
   h+='</div>';
 
-  // SECTION HISTORIQUE MOIS
-  h+='<div class="sectitle">Historique mensuel</div>';
-  if(keys.length===0){h+='<div style="text-align:center;color:#333;font-family:var(--sans);font-weight:500;font-size:11px;padding:30px 0">Aucune saisie pour l\'instant</div>';}
-  keys.forEach(key=>{
-    const isObs=key<=OBS_END;
-    let mTot=0;PERSONS.forEach(p=>{const e=amountFor(p,key);if(e && key > '2025-08')mTot+=e.amount;}); 
-    h+='<div class="card" style="padding:12px;margin-bottom:8px">';
-    h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'+
-       '<div style="display:flex;align-items:center;gap:8px">'+
-       '<span class="mono" style="font-size:12px;font-weight:600;color:'+(isObs?'#484848':'#888')+';letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
-       (isObs?'<span class="mono" style="font-size:8px;font-weight:600;color:#333;border:1px solid #1f1f1f;border-radius:4px;padding:2px 4px">obs</span>':'')+
-       '</div><span class="mono" style="font-size:14px;font-weight:500;color:#666">'+(key === '2025-08' ? '—' : mTot+'€')+'</span></div>';
-    h+='<div style="display:flex;flex-direction:column;gap:10px">';
-    PERSONS.forEach(p=>{
-      const d=(S.data[key]&&S.data[key][p])||{};
-      const e=amountFor(p,key);
-      h+='<div style="display:flex;align-items:center;gap:8px">'+
-         '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase">'+S.config.persons[p].name+'</span>'+
-         '<div style="flex:1;display:flex;gap:14px;font-family:var(--sans);align-items:center">'+
-         editCell(key,p,'kg',d.kg!=null?d.kg:null)+
-         editCell(key,p,'kcal',d.kcal!=null?d.kcal:null)+
-         '</div>'+(key === '2025-08' ? '<span style="font-size:10px;color:#444;font-family:var(--sans);font-weight:500;">DÉPART</span>' : badge(e,key,p))+'</div>';
-    });
+  h+='<div class="sectitle">Monthly history</div>';
+  if(keys.length===0){h+='<div style="text-align:center;color:#333;font-family:var(--sans);font-weight:500;font-size:11px;padding:30px 0">No entries yet — get moving!</div>';}
+
+  // Group keys by year
+  const byYear={};
+  keys.forEach(k=>{const y=k.split('-')[0];if(!byYear[y])byYear[y]=[];byYear[y].push(k);});
+  const years=Object.keys(byYear).sort().reverse();
+
+
+
+  years.forEach(yr=>{
+    const yKeys=byYear[yr];
+    const open=S.openYears.has(yr);
+    // year total
+    let yTot=0;yKeys.forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(e&&k>'2025-08')yTot+=e.amount;}));
+    const wCount=yKeys.reduce((n,k)=>{PERSONS.forEach(p=>{const e=amountFor(p,k);if(e&&k>'2025-08'&&e.pass)n++;});return n;},0);
+    const lCount=yKeys.reduce((n,k)=>{PERSONS.forEach(p=>{const e=amountFor(p,k);if(e&&k>'2025-08'&&!e.pass)n++;});return n;},0);
+
+    h+='<div style="margin-bottom:6px">';
+    // Year header row (accordion toggle)
+    h+='<div data-act="toggle-year" data-year="'+yr+'" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;border-radius:8px;background:#111;border:1px solid #1c1c1c;'+(open?'border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom-color:transparent;':'')+'">';
+    h+='<div style="display:flex;align-items:center;gap:10px">';
+    h+='<span class="mono" style="font-size:13px;font-weight:700;color:#888;letter-spacing:.08em">'+yr+'</span>';
+    h+='<span class="mono" style="font-size:9px;color:#555">'+yKeys.length+' month'+(yKeys.length>1?'s':'')+'</span>';
+    if(lCount>0) h+='<span class="mono" style="font-size:9px;color:var(--loss)">'+lCount+'✗</span>';
+    if(wCount>0) h+='<span class="mono" style="font-size:9px;color:var(--win)">'+wCount+'✓</span>';
+    h+='</div>';
+    h+='<div style="display:flex;align-items:center;gap:12px">';
+    if(yTot>0) h+='<span class="mono" style="font-size:12px;font-weight:600;color:#666">'+yTot+'€</span>';
+    h+='<span style="color:#444;font-size:11px;transform:'+(open?'rotate(180deg)':'rotate(0deg)')+';display:inline-block;transition:transform .2s">▼</span>';
     h+='</div></div>';
+
+    // Months inside accordion
+    if(open){
+      h+='<div style="border:1px solid #1c1c1c;border-top:none;border-bottom-left-radius:8px;border-bottom-right-radius:8px;overflow:hidden">';
+      yKeys.forEach((key,idx)=>{
+        const isObs=key<=OBS_END;
+        let mTot=0;PERSONS.forEach(p=>{const e=amountFor(p,key);if(e&&key>'2025-08')mTot+=e.amount;});
+        const last=idx===yKeys.length-1;
+        h+='<div style="padding:12px;background:#141414;'+(last?'':'border-bottom:1px solid #1a1a1a')+'">';
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
+           '<div style="display:flex;align-items:center;gap:8px">'+
+           '<span class="mono" style="font-size:11px;font-weight:600;color:'+(isObs?'#484848':'#666')+';letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
+           (isObs?'<span class="mono" style="font-size:8px;font-weight:600;color:#333;border:1px solid #1f1f1f;border-radius:4px;padding:2px 4px">obs</span>':'')+
+           '</div><span class="mono" style="font-size:13px;font-weight:500;color:#555">'+(key==='2025-08'?'—':mTot+'€')+'</span></div>';
+        h+='<div style="display:flex;flex-direction:column;gap:10px">';
+        PERSONS.forEach(p=>{
+          const d=(S.data[key]&&S.data[key][p])||{};
+          const e=amountFor(p,key);
+          h+='<div style="display:flex;align-items:center;gap:8px">'+
+             '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase">'+S.config.persons[p].name+'</span>'+
+             '<div style="flex:1;display:flex;gap:14px;font-family:var(--sans);align-items:center">'+
+             editCell(key,p,'kg',d.kg!=null?d.kg:null)+
+             editCell(key,p,'kcal',d.kcal!=null?d.kcal:null)+
+             '</div>'+(key==='2025-08'?'<span style="font-size:10px;color:#444;font-family:var(--sans);font-weight:500;">START</span>':badge(e,key,p))+'</div>';
+        });
+        h+='</div></div>';
+      });
+      h+='</div>';
+    }
+    h+='</div>';
   });
   return h;
 }
@@ -622,9 +650,9 @@ function renderLegend(){
 
 function renderChart(field){
   const keys=Object.keys(S.data).filter(k=>PERSONS.some(p=>{const d=S.data[k]&&S.data[k][p];return d&&d[field]!=null;})).sort();
-  if(!keys.length)return '<div style="text-align:center;padding:24px;font-family:var(--sans);font-weight:500;font-size:11px;color:#333">Aucune donnée</div>';
+  if(!keys.length)return '<div style="text-align:center;padding:24px;font-family:var(--sans);font-weight:500;font-size:11px;color:#333">No data</div>';
 
-  const W=350,H=190,ml=42,mr=32,mt=16,mb=40;
+  const W=350,H=180,ml=42,mr=32,mt=16,mb=24;
   const cW=W-ml-mr,cH=H-mt-mb;
   const n=keys.length;
   const allV=[];
@@ -644,9 +672,13 @@ function renderChart(field){
     s+='<text x="'+(ml-6)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="#444">'+Math.round(v)+'</text>';
   }
 
+  /* — Labels X : premier et dernier mois uniquement — */
   keys.forEach((k,i)=>{
-    const x=xOf(i).toFixed(1), yL=(mt+cH+10).toFixed(1);
-    s+='<text transform="rotate(-38,'+x+','+yL+')" x="'+x+'" y="'+yL+'" text-anchor="end" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="#555">'+mShrt(k)+'</text>';
+    if(i !== 0 && i !== keys.length - 1) return;
+    const x = xOf(i).toFixed(1);
+    const yL = (mt + cH + 14).toFixed(1);
+    const anchor = i === 0 ? 'start' : 'end';
+    s+='<text x="'+x+'" y="'+yL+'" text-anchor="'+anchor+'" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="#555">'+mShrt(k)+'</text>';
   });
 
   const labelsToDraw = [];
@@ -663,7 +695,9 @@ function renderChart(field){
     const firstIdx=pts.findIndex(pt=>pt.y!=null);
     pts.forEach((pt,i)=>{
       if(pt.y==null)return;
-      s+='<circle cx="'+pt.x.toFixed(1)+'" cy="'+pt.y.toFixed(1)+'" r="3" fill="'+col+'"/>';
+      // Points : taille réduite quand beaucoup de données pour rester lisibles
+      const r = n > 24 ? 1.5 : 3;
+      s+='<circle cx="'+pt.x.toFixed(1)+'" cy="'+pt.y.toFixed(1)+'" r="'+r+'" fill="'+col+'"/>';
       
       if(i===lastIdx){
         labelsToDraw.push({ type:'last', x:pt.x, y:pt.y, v:pt.v, col:col, i:i });
@@ -681,9 +715,7 @@ function renderChart(field){
 
   Object.values(cols).forEach(colLabels => {
       colLabels.sort((a,b) => a.y - b.y);
-      
       const MIN_DIST = 11;
-      
       for(let iter=0; iter<5; iter++) {
           for(let j=1; j<colLabels.length; j++) {
               const diff = colLabels[j].y - colLabels[j-1].y;
@@ -694,16 +726,11 @@ function renderChart(field){
               }
           }
       }
-
       colLabels.forEach(l => {
           if(l.type === 'first') {
-              const tx = (l.x - 6).toFixed(1);
-              const ty = (l.y + 3).toFixed(1);
-              s+='<text x="'+tx+'" y="'+ty+'" text-anchor="end" font-family="Inter,sans-serif" font-weight="600" font-size="9" fill="'+l.col+'">'+l.v+'</text>';
+              s+='<text x="'+(l.x - 6).toFixed(1)+'" y="'+(l.y + 3).toFixed(1)+'" text-anchor="end" font-family="Inter,sans-serif" font-weight="600" font-size="9" fill="'+l.col+'">'+l.v+'</text>';
           } else {
-              const tx = (l.x + 6).toFixed(1);
-              const ty = (l.y + 3).toFixed(1);
-              s+='<text x="'+tx+'" y="'+ty+'" font-family="Inter,sans-serif" font-weight="600" font-size="9" fill="'+l.col+'">'+l.v+'</text>';
+              s+='<text x="'+(l.x + 6).toFixed(1)+'" y="'+(l.y + 3).toFixed(1)+'" font-family="Inter,sans-serif" font-weight="600" font-size="9" fill="'+l.col+'">'+l.v+'</text>';
           }
       });
   });
@@ -713,7 +740,7 @@ function renderChart(field){
 
 function renderEvolution(){
   let h='<div style="display:flex;flex-direction:column;gap:8px">';
-  [['kg','Poids (kg)'],['kcal','Calories (kcal/j)']].forEach(([f,t])=>{
+  [['kg','Weight (kg)'],['kcal','Calories (kcal/d)']].forEach(([f,t])=>{
     h+='<div class="card" style="padding:16px"><div class="sectitle">'+t+'</div>'+renderLegend()+renderChart(f)+'</div>';
   });
   return h+'</div>';
@@ -723,8 +750,8 @@ function renderObjectifs(){
   let h='<div style="display:flex;flex-direction:column;gap:8px">';
 
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">';
-  [['Objectif atteint','var(--win)','stakes.success',S.config.stakes.success],
-   ['Objectif non atteint','var(--loss)','stakes.failure',S.config.stakes.failure]].forEach(([lbl,c,path,val]) => {
+  [['Goal reached','var(--win)','stakes.success',S.config.stakes.success],
+   ['Goal missed','var(--loss)','stakes.failure',S.config.stakes.failure]].forEach(([lbl,c,path,val]) => {
     h+='<div class="card" style="padding:16px">';
     h+='<div class="mono" style="font-size:10px;font-weight:600;color:#777;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+lbl+'</div>';
     h+='<div class="mono" style="font-size:24px;font-weight:500;color:'+c+';display:flex;align-items:baseline;gap:2px">+';
@@ -735,20 +762,27 @@ function renderObjectifs(){
   h+='<div style="display:flex;flex-direction:column;gap:8px">';
   PERSONS.forEach(p=>{
     const pc=S.config.persons[p];
-    const fields = p==='saad'
-      ? [['persons.'+p+'.kcalMin', pc.kcalMin, '0', 'kcal / jour', '']]
-      : [['persons.'+p+'.kcalMin', pc.kcalMin, '0', 'kcal / jour', ''],
-         ['persons.'+p+'.targetLoss', pc.targetLoss, '1', 'kg / mois', '−']];
+    const isSaad = p==='saad';
+    // 3 stats for everyone; mandatory one is full-opacity, secondary ones dimmed
+    const stats = [
+      { path:'persons.'+p+'.startKg', val:pc.startKg, dec:1, unit:'start kg', pre:'', primary:false },
+      { path:'persons.'+p+'.kcalMin', val:pc.kcalMin, dec:0, unit:'kcal / day', pre:'', primary:isSaad },
+      { path:'persons.'+p+'.targetLoss', val:pc.targetLoss, dec:1, unit:'kg / month', pre:'−', primary:!isSaad },
+    ];
 
     h+='<div style="background:'+P_BG[p]+';border:1px solid '+P_BORD[p]+';border-radius:12px;padding:20px">';
-    h+='<div class="mono" style="font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:'+P_COLOR[p]+';margin-bottom:20px">'+pc.name+'</div>';
-    h+='<div style="display:flex;gap:24px">';
-    fields.forEach(([path,val,dec,unit,pre])=>{
-      h+='<div style="flex:1;display:flex;flex-direction:column;gap:6px">';
-      h+='<div class="mono" style="font-size:10px;font-weight:600;color:'+P_COLOR[p]+';opacity:0.8;text-transform:uppercase;letter-spacing:.1em;">'+unit+'</div>';
-      h+='<div class="mono" style="display:flex;align-items:baseline;gap:4px;line-height:1">';
-      if(pre) h+='<span style="font-size:20px;font-weight:400;color:'+P_COLOR[p]+'">'+pre+'</span>';
-      h+='<span class="edt" data-act="editnum" data-path="'+path+'" data-dec="'+dec+'" style="font-size:32px;font-weight:500;color:'+P_COLOR[p]+'">'+val+'</span>';
+    h+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px">';
+    h+='<div class="mono" style="font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:'+P_COLOR[p]+'">'+pc.name+'</div>';
+    h+='<div class="mono" style="font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:'+P_COLOR[p]+';opacity:0.4;">'+(isSaad?'kcal-first':'weight-first')+'</div>';
+    h+='</div>';
+    h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">';
+    stats.forEach(({path,val,dec,unit,pre,primary})=>{
+      const op = primary ? '1' : '0.35';
+      h+='<div style="display:flex;flex-direction:column;gap:5px;opacity:'+op+'">';
+      h+='<div class="mono" style="font-size:9px;font-weight:600;color:'+P_COLOR[p]+';text-transform:uppercase;letter-spacing:.08em;white-space:nowrap">'+unit+'</div>';
+      h+='<div class="mono" style="display:flex;align-items:baseline;gap:3px;line-height:1">';
+      if(pre) h+='<span style="font-size:16px;font-weight:400;color:'+P_COLOR[p]+'">'+pre+'</span>';
+      h+='<span class="edt" data-act="editnum" data-path="'+path+'" data-dec="'+dec+'" style="font-size:26px;font-weight:500;color:'+P_COLOR[p]+'">'+val+'</span>';
       h+='</div></div>';
     });
     h+='</div></div>';
@@ -765,7 +799,7 @@ function render(){
       h += '<div id="pin-dots" style="display:flex;gap:14px;">';
       for(let i=0; i<5; i++) h += '<div class="pin-dot loading"></div>';
       h += '</div>';
-      h += '<div class="connecting-label" style="font-family:var(--sans);font-weight:600;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#555;">Connexion en cours</div>';
+      h += '<div class="connecting-label" style="font-family:var(--sans);font-weight:600;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#555;">Connecting...</div>';
     } else {
       h += '<div class="pin-dots" id="pin-dots" style="display:flex;gap:14px;">';
       for(let i=0; i<5; i++) {
@@ -789,16 +823,20 @@ function render(){
   }
 
   let h='<div class="header-container">';
-  h+='<header><h1>S.A.H</h1></header>';
-  h+='<button class="sync-badge" onclick="syncLoad()">'
+  h+='<header>';
+  h+='<h1 style="font-size:26px;letter-spacing:-.03em;line-height:1;">S.A.H Challenge</h1>';
+  h+='<div style="font-size:8px;font-weight:500;letter-spacing:.1em;color:#3a3a3a;text-transform:uppercase;margin-top:6px;">Siblings Avoiding Heart-attacks Challenge</div>';
+  h+='</header>';
+  h+='<button class="sync-badge" onclick="syncLoad()" style="flex-shrink:0;display:flex;align-items:center;gap:5px;">'
+    +'<span id="sync-text" style="font-size:7px;letter-spacing:.1em;color:#444;">'+(localStorage.getItem('getfit_auth')==='true'?'Synced':'Offline')+'</span>'
     +'<div id="sync-dot" class="sync-dot" style="background:'+(localStorage.getItem('getfit_auth')==='true'?'var(--win)':'var(--loss)')+'"></div>'
-    +'<span id="sync-text" style="color:'+(localStorage.getItem('getfit_auth')==='true'?'#888':'var(--loss)')+'">'+(localStorage.getItem('getfit_auth')==='true'?'Synchronisé':'Hors ligne')+'</span></button>';
+    +'</button>';
   h+='</div>';
 
   h+='<div class="tabs">';
-  h+='<button class="tab '+(S.tab==='suivi'?'on':'')+'" data-act="tab" data-val="suivi">Suivi</button>';
-  h+='<button class="tab '+(S.tab==='evolution'?'on':'')+'" data-act="tab" data-val="evolution">Évolution</button>';
-  h+='<button class="tab '+(S.tab==='objectifs'?'on':'')+'" data-act="tab" data-val="objectifs">Objectifs</button>';
+  h+='<button class="tab '+(S.tab==='suivi'?'on':'')+'" data-act="tab" data-val="suivi">Tracking</button>';
+  h+='<button class="tab '+(S.tab==='evolution'?'on':'')+'" data-act="tab" data-val="evolution">Progress</button>';
+  h+='<button class="tab '+(S.tab==='objectifs'?'on':'')+'" data-act="tab" data-val="objectifs">Goals</button>';
   h+='</div>';
 
   h+=(S.tab==='suivi')?renderSuivi():(S.tab==='evolution')?renderEvolution():renderObjectifs();
@@ -827,7 +865,7 @@ function bindForm(){
     S.data[S.formMonth]=Object.assign({},bak,{[S.formPerson]:{kg:kgN,kcal:kcN}});
     const e=computeEntry(S.formPerson,S.formMonth);
     S.data[S.formMonth]=bak;
-    el.innerHTML='<span style="color:'+(e.pass?'var(--win)':'var(--loss)')+'">→ <strong style="font-size:12px">'+e.amount+'€</strong><span style="color:#888;margin-left:6px;">'+esc(e.reason)+'</span></span>';
+    el.innerHTML='<span style="color:'+(e.pass?'var(--win)':'var(--loss)')+'">+'+(e.amount)+'€</span>';
   }
   if(kg)kg.addEventListener('input',upd);
   if(kc)kc.addEventListener('input',upd);
@@ -888,6 +926,12 @@ document.addEventListener('click',ev=>{
     return;
   }
 
+  if(act==='toggle-year'){
+    const yr=t.getAttribute('data-year');
+    if(S.openYears.has(yr)) S.openYears.delete(yr); else S.openYears.add(yr);
+    render();return;
+  }
+
   if(act==='tab'){S.tab=t.getAttribute('data-val');S.pickerOpen=false;render();return;}
   if(act==='fperson'){S.formPerson=t.getAttribute('data-val');render();return;}
   
@@ -906,7 +950,8 @@ document.addEventListener('click',ev=>{
     S.data[key]=Object.assign({},S.data[key],{[p]:{kg:kgN,kcal:kcN}});
     if(S.manual[key]&&S.manual[key][p]!==undefined){delete S.manual[key][p];}
     S.fKg='';S.fKcal='';
-    const ch=makeChange(p,key,kgN,kcN,'saisie formulaire');
+    const ch=makeChange(p,key,kgN,kcN,'form entry');
+    S.openYears.add(key.split('-')[0]);
     scheduleSave([ch]);
     render();return;
   }
@@ -947,7 +992,7 @@ document.addEventListener('click',ev=>{
     if(!S.manual[key])S.manual[key]={};
     S.manual[key][p]=nv;
     const d=(S.data[key]&&S.data[key][p])||{};
-    const ch={month:key,person:p,kg:d.kg??null,kcal:d.kcal??null,pass:nv===S.config.stakes.success,amount:nv,note:'correction manuelle montant'};
+    const ch={month:key,person:p,kg:d.kg??null,kcal:d.kcal??null,pass:nv===S.config.stakes.success,amount:nv,note:'manual override'};
     scheduleSave([ch]);
     render();return;
   }
@@ -961,7 +1006,7 @@ document.addEventListener('click',ev=>{
       if(!S.data[key][p])S.data[key][p]={kg:null,kcal:null};
       S.data[key][p][field]=val;
       const d=S.data[key][p];
-      const ch=makeChange(p,key,d.kg,d.kcal,'modification inline '+field);
+      const ch=makeChange(p,key,d.kg,d.kcal,'inline edit '+field);
       scheduleSave([ch]);
       render();
     });
@@ -980,14 +1025,11 @@ document.addEventListener('click',ev=>{
   }
 });
 
-/* ════ NETTOYAGE MOIS SUPPRIMÉS ════ */
-// 2025-08 a été retiré de cette liste pour ne plus effacer les poids de départ.
 ["2026-06"].forEach(k=>{
   if(S.data[k]){delete S.data[k];persist();}
   if(S.manual[k]){delete S.manual[k];persist();}
 });
 
-/* ════ INITIALISATION ════ */
 render();
 syncLoad();
 </script>
