@@ -35,7 +35,7 @@
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
   input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-  input[type=number], input[type=password] { -moz-appearance: textfield; }
+  input[type=number], input[type=password], input[type=text] { -moz-appearance: textfield; }
   button { font-family: var(--sans); cursor: pointer; border: none; background: none; color: inherit; }
   
   .mono { font-family: var(--sans); }
@@ -44,8 +44,19 @@
   
   .edt { cursor: pointer; border-bottom: 1px dotted #2a2a2a; user-select: none; display: inline-block; min-width: 18px; }
   .edt:hover { border-bottom-color: #555; }
-  .editinput { font-family: var(--sans); font-size: inherit; font-weight: 500; color: #e8e8e8; background: transparent; border: none; border-bottom: 1px solid var(--anas); outline: none; text-align: center; width: 60px; }
-  .editinput.sm { width: 44px; }
+  .editinput { 
+    font-family: var(--sans); 
+    font-size: inherit; 
+    font-weight: 500; 
+    color: inherit; 
+    background: transparent; 
+    border: none; 
+    border-bottom: 1px solid currentColor; 
+    outline: none; 
+    text-align: center; 
+    width: 5.5em; 
+  }
+  .editinput.sm { width: 4em; }
   
   .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; width: 100%; }
   header h1 { font-family: var(--sans); font-size: 22px; font-weight: 600; letter-spacing: -.02em; line-height: 1; }
@@ -97,8 +108,8 @@
   }
 
   .saisie-onglets button.active-tab {
-    background: var(--tab-col);
-    color: #0e0e0e !important;
+    background: var(--tab-bg);
+    color: var(--tab-color) !important;
     border-radius: 16px 16px 0 0;
   }
 
@@ -113,18 +124,19 @@
   }
   .saisie-onglets button.active-tab::before {
     left: -16px;
-    background: radial-gradient(circle at 0 0, transparent 16px, var(--tab-col) 16.5px);
+    background: radial-gradient(circle at 0 0, transparent 16px, var(--tab-bg) 16.5px);
   }
   .saisie-onglets button.active-tab::after {
     right: -16px;
-    background: radial-gradient(circle at 100% 0, transparent 16px, var(--tab-col) 16.5px);
+    background: radial-gradient(circle at 100% 0, transparent 16px, var(--tab-bg) 16.5px);
   }
 
   .saisie-onglets button:first-child.active-tab::before { display: none; }
   .saisie-onglets button:last-child.active-tab::after { display: none; }
 
   .saisie-bloc {
-    background: var(--tab-col);
+    background: var(--tab-bg);
+    border: none;
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -134,17 +146,17 @@
   }
 
   .saisie-input-bg {
-    background: rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.25);
     border: none;
     border-radius: 12px;
-    color: #0e0e0e;
+    color: #e8e8e8;
     font-family: var(--sans);
     font-size: 14px;
     font-weight: 600;
     outline: none;
     box-sizing: border-box;
   }
-  .saisie-input-bg::placeholder { color: rgba(0, 0, 0, 0.35); font-weight: 500; }
+  .saisie-input-bg::placeholder { color: rgba(255, 255, 255, 0.2); font-weight: 500; }
 
   .pin-dot { width:14px; height:14px; border-radius:50%; border:1.5px solid #555; background:transparent; transition:background 0.1s, border-color 0.1s; }
   .pin-dot.filled { background:#e8e8e8; border-color:#e8e8e8; }
@@ -187,7 +199,7 @@ const mLbl=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mShrt=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mStep=(k,d)=>{let[y,m]=k.split('-').map(Number);const n=m+d;return n>12?mKey(y+1,n-12):n<1?mKey(y-1,n+12):mKey(y,n);};
 
-const START_KEY='2025-09', OBS_END='2025-10';
+const START_KEY='2025-08', OBS_END='2025-10'; // MAJ du point de départ à Août 2025
 const FORM_START='2026-05', FORM_END='2026-12';
 const PERSONS=['anas','hicham','saad'];
 
@@ -195,14 +207,9 @@ const P_COLOR={anas:'#ffb347',hicham:'#7ed9a0',saad:'#93c5fd'};
 const P_BG={anas:'rgba(255,179,71,.1)',hicham:'rgba(126,217,160,.1)',saad:'rgba(147,197,253,.1)'};
 const P_BORD={anas:'rgba(255,179,71,.3)',hicham:'rgba(126,217,160,.3)',saad:'rgba(147,197,253,.3)'};
 
-// Liste des mois de Mai 2026 à Décembre 2026
 const FORM_MONTHS=(()=>{
-  const a=[];
-  let k = FORM_START;
-  while(k <= FORM_END) {
-    a.push(k);
-    k = mStep(k, 1);
-  }
+  const a=[]; let k = FORM_START;
+  while(k <= FORM_END) { a.push(k); k = mStep(k, 1); }
   return a;
 })();
 
@@ -217,6 +224,7 @@ const DEF_CFG={
 };
 
 const DEF_DATA={
+  '2025-08':{anas:{kg:89.0,kcal:null},hicham:{kg:115.1,kcal:null},saad:{kg:94.5,kcal:null}}, // Poids de départ ajoutés
   '2025-09':{anas:{kg:86.4,kcal:771},hicham:{kg:112.0,kcal:760},saad:{kg:null,kcal:null}},
   '2025-10':{anas:{kg:86.2,kcal:674},hicham:{kg:109.5,kcal:780},saad:{kg:91.55,kcal:877}},
   '2025-11':{anas:{kg:null,kcal:699},hicham:{kg:109.8,kcal:859},saad:{kg:90.45,kcal:714}},
@@ -228,13 +236,13 @@ const DEF_DATA={
 };
 
 const DEF_MANUAL={'2026-01':{saad:20}};
+const DEF_TRIPS=[];
 
 /* ════ ETAT GLOBAL ════ */
 const LS='getfit_v2';
 function load(){try{const r=JSON.parse(localStorage.getItem(LS));if(r&&r.config&&r.data)return r;}catch(e){}return null;}
 const saved=load();
 
-// Fonction pour trouver automatiquement le dernier mois avec des données saisies (entre Mai et Dec)
 function getTargetMonth(data){
   const fSet=new Set(FORM_MONTHS);
   const allKeys=Object.keys(data).filter(k=>fSet.has(k)&&PERSONS.some(p=>{const d=data[k]&&data[k][p];return d&&(d.kg!=null||d.kcal!=null);}));
@@ -247,17 +255,28 @@ let S={
   config:saved?saved.config:JSON.parse(JSON.stringify(DEF_CFG)),
   data:saved?saved.data:JSON.parse(JSON.stringify(DEF_DATA)),
   manual:saved?saved.manual:JSON.parse(JSON.stringify(DEF_MANUAL)),
+  trips:saved&&saved.trips?saved.trips:JSON.parse(JSON.stringify(DEF_TRIPS)),
   formPerson:'anas', formMonth:FORM_START, pickerOpen:false, fKg:'', fKcal:'',
+  fTripTitle:'', fTripDates:'', fTripCost:'',
   pin: localStorage.getItem('getfit_pin') || '',
   pinEntry: '',
   pinLoading: false,
   authenticated: localStorage.getItem('getfit_auth') === 'true'
 };
 
-// Auto-sélection intelligente au démarrage
+// Sécurité pour forcer la présence d'août 2025 dans les données (au cas où le cache de l'utilisateur l'avait effacé précédemment)
+if (!S.data['2025-08'] || !S.data['2025-08'].anas || S.data['2025-08'].anas.kg == null) {
+  S.data['2025-08'] = {
+    anas:{kg:89.0,kcal:null},
+    hicham:{kg:115.1,kcal:null},
+    saad:{kg:94.5,kcal:null}
+  };
+  persist();
+}
+
 S.formMonth = getTargetMonth(S.data);
 
-function persist(){try{localStorage.setItem(LS,JSON.stringify({config:S.config,data:S.data,manual:S.manual}));}catch(e){}}
+function persist(){try{localStorage.setItem(LS,JSON.stringify({config:S.config,data:S.data,manual:S.manual,trips:S.trips}));}catch(e){}}
 
 /* ════ SYNCHRONISATION ════ */
 let syncTimer=null;
@@ -289,8 +308,7 @@ async function syncLoad(){
     if (remote && remote.status === 'error') {
       S.pin = ''; S.authenticated = false; S.pinLoading = false;
       localStorage.removeItem('getfit_pin'); localStorage.removeItem('getfit_auth');
-      S.pinEntry = '';
-      render();
+      S.pinEntry = ''; render();
       const dots = document.getElementById('pin-dots');
       if (dots) {
         dots.classList.add('shake');
@@ -304,8 +322,21 @@ async function syncLoad(){
     }
     
     if(remote && remote.data && Object.keys(remote.data).length > 0){
-      S.config = remote.config || S.config; S.data = remote.data; S.manual = remote.manual || S.manual;
-      // Mise à jour sur la dernière saisie cloud
+      S.config = remote.config || S.config; 
+      S.data = remote.data; 
+      S.manual = remote.manual || S.manual;
+      S.trips = remote.trips || S.trips;
+      
+      // Sécurité RENFORCÉE anti-effacement cloud pour Août 2025
+      if (!S.data['2025-08'] || !S.data['2025-08'].anas || S.data['2025-08'].anas.kg == null) {
+         S.data['2025-08'] = {
+           anas: {kg: 89.0, kcal: null},
+           hicham: {kg: 115.1, kcal: null},
+           saad: {kg: 94.5, kcal: null}
+         };
+         scheduleSave([]); // Force l'envoi immédiat au serveur Google pour qu'il mémorise Août !
+      }
+
       S.formMonth = getTargetMonth(S.data);
       persist();
     }
@@ -332,7 +363,7 @@ async function syncSave(changes){
   setSyncStatus('En cours de synchronisation', '#888', 'var(--gold)');
   try{
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({pin: S.pin, state:{config:S.config,data:S.data,manual:S.manual},changes:changes||[]})});
+      body:JSON.stringify({pin: S.pin, state:{config:S.config,data:S.data,manual:S.manual,trips:S.trips},changes:changes||[]})});
     setSyncStatus('Synchronisé', '#888', 'var(--win)');
   }catch(e){
     setSyncStatus('Échec synchronisation', '#888', 'var(--loss)');
@@ -418,6 +449,8 @@ const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'
 
 function badge(e,key,p){
   if(!e)return '';
+  if(key <= OBS_END) return '<span style="font-size:10px;color:#555;font-family:var(--sans);font-weight:600;padding:2px 4px;">OBS</span>';
+  
   const c=e.pass?'var(--win)':'var(--loss)';
   const bg=e.pass?'rgba(61,220,132,.08)':'rgba(255,69,69,.08)';
   const bd=e.pass?'rgba(61,220,132,.2)':'rgba(255,69,69,.2)';
@@ -441,8 +474,8 @@ function renderSuivi(){
   if (curP === 'anas') blocRadius = '0 16px 16px 16px';
   if (curP === 'saad') blocRadius = '16px 0 16px 16px';
 
-  h+='<div class="saisie-wrapper" style="--tab-col:'+P_COLOR[curP]+'">';
-  
+  // SECTION SAISIE POIDS/KCAL
+  h+='<div class="saisie-wrapper" style="--tab-bg:'+P_BG[curP]+'; --tab-color:'+P_COLOR[curP]+'">';
   h+='<div class="saisie-onglets">';
   PERSONS.forEach(p=>{
     const sel=p===curP;
@@ -451,7 +484,6 @@ function renderSuivi(){
   h+='</div>';
 
   h+='<div class="saisie-bloc" style="border-radius:'+blocRadius+';">';
-
   h+='<div style="position:relative;">';
   h+='<button class="saisie-input-bg" data-act="picker" style="width:100%;padding:14px 16px;text-align:left;display:flex;justify-content:space-between;align-items:center;cursor:pointer;"><span>'+mLbl(S.formMonth).toUpperCase()+'</span><span style="font-size:10px;">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
   if(S.pickerOpen){
@@ -469,21 +501,44 @@ function renderSuivi(){
   h+='<input id="f-kg" class="saisie-input-bg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:14px 16px;">';
   h+='<input id="f-kcal" class="saisie-input-bg" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;min-width:0;padding:14px 16px;">';
   h+='<button data-act="add" style="width:48px;height:48px;flex-shrink:0;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">';
-  h+='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0e0e0e" stroke-width="3" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>';
+  h+='<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="var(--tab-color)" stroke-width="3" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>';
   h+='</button>';
   h+='</div>';
-
   h+='</div>';
   h+='</div>';
   
   h+='<div id="preview" style="font-family:var(--sans);font-weight:500;font-size:11px;text-align:center;height:0;overflow:visible;margin-top:4px;pointer-events:none;"></div>';
 
+  // SECTION CAISSE COMMUNE
   const keys=displayKeys();
-  let total=0;const per={};PERSONS.forEach(p=>per[p]={total:0,w:0,l:0});
-  keys.forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(!e)return;per[p].total+=e.amount;total+=e.amount;e.pass?per[p].w++:per[p].l++;}));
-  h+='<div style="background:rgba(240,192,64,.05);border:1px solid rgba(240,192,64,.15);border-radius:12px;padding:16px;margin-bottom:8px">';
+  let grossTotal=0;
+  const per={};PERSONS.forEach(p=>per[p]={total:0,w:0,l:0});
+  // Ne pas comptabiliser les montants d'août 2025 pour la caisse
+  keys.filter(k => k > '2025-08').forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(!e)return;per[p].total+=e.amount;grossTotal+=e.amount;e.pass?per[p].w++:per[p].l++;}));
+  
+  // Calcul du total des dépenses des voyages
+  let tripsTotal = 0;
+  if (S.trips) S.trips.forEach(t => { if(t.cost) tripsTotal += t.cost; });
+  
+  // Calcul du solde final net
+  let netTotal = grossTotal - tripsTotal;
+  
+  // Nettoyage des virgules pour l'affichage propre
+  netTotal = Math.round(netTotal * 100) / 100;
+  grossTotal = Math.round(grossTotal * 100) / 100;
+  tripsTotal = Math.round(tripsTotal * 100) / 100;
+
+  h+='<div style="background:rgba(240,192,64,.05);border:1px solid rgba(240,192,64,.15);border-radius:12px;padding:16px;margin-bottom:24px">';
   h+='<div class="mono" style="font-size:9px;font-weight:600;letter-spacing:.2em;color:rgba(240,192,64,.5);text-transform:uppercase;margin-bottom:6px">Caisse commune</div>';
-  h+='<div class="mono" style="font-size:42px;font-weight:700;color:var(--gold);line-height:1;margin-bottom:16px">'+total+'€</div>';
+  h+='<div class="mono" style="font-size:42px;font-weight:700;color:var(--gold);line-height:1;margin-bottom:6px">'+netTotal+'€</div>';
+  
+  // Affichage du sous-total explicatif s'il y a des voyages
+  if(tripsTotal > 0) {
+      h+='<div class="mono" style="font-size:10px;font-weight:500;color:#888;margin-bottom:16px">Fonds : '+grossTotal+'€ — Voyages : '+tripsTotal+'€</div>';
+  } else {
+      h+='<div style="margin-bottom:16px"></div>';
+  }
+  
   h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
   PERSONS.forEach(p=>{
     h+='<div style="background:'+P_BG[p]+';border-radius:8px;padding:10px;border:1px solid '+P_BORD[p]+'">'+
@@ -493,16 +548,52 @@ function renderSuivi(){
   });
   h+='</div></div>';
 
+  // SECTION VOYAGES
+  h+='<div style="margin-bottom:32px;">';
+  h+='<div class="sectitle" style="margin-bottom:12px;">Dépenses des voyages</div>';
+  
+  h+='<div class="saisie-bloc" style="border-radius:12px; background:rgba(255,255,255,0.04); padding:16px; gap:8px;">';
+  h+='<input id="f-trip-title" class="saisie-input-bg" type="text" placeholder="Titre du voyage" value="'+esc(S.fTripTitle)+'" style="padding:14px 16px; width:100%;">';
+  h+='<div style="display:flex; gap:12px; align-items:center;">';
+  h+='<input id="f-trip-dates" class="saisie-input-bg" type="text" placeholder="Dates" value="'+esc(S.fTripDates)+'" style="flex:1; min-width:0; padding:14px 16px;">';
+  h+='<input id="f-trip-cost" class="saisie-input-bg" type="number" inputmode="decimal" placeholder="€ (Coût)" value="'+esc(S.fTripCost)+'" style="flex:1; min-width:0; padding:14px 16px;">';
+  h+='<button data-act="add-trip" style="width:48px; height:48px; flex-shrink:0; background:transparent; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;">';
+  h+='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e8e8e8" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+  h+='</button>';
+  h+='</div>';
+  h+='</div>';
+
+  if (S.trips && S.trips.length > 0) {
+    h+='<div style="display:flex; flex-direction:column; gap:8px; margin-top:12px;">';
+    S.trips.forEach((trip, idx) => {
+      h+='<div class="card" style="padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">';
+      h+='<div style="display:flex; align-items:center; gap:8px;">';
+      h+='<span style="font-family:var(--sans); font-weight:600; font-size:13px; color:#e8e8e8;">'+esc(trip.title)+'</span>';
+      h+='<span style="color:#444;">—</span>';
+      h+='<span style="font-family:var(--sans); font-weight:500; font-size:12px; color:#888;">'+esc(trip.dates)+'</span>';
+      h+='</div>';
+      h+='<div style="display:flex; align-items:center; gap:16px;">';
+      h+='<span class="mono" style="font-weight:600; font-size:14px; color:var(--loss);">−'+trip.cost+'€</span>';
+      h+='<button data-act="del-trip" data-idx="'+idx+'" style="color:#555; font-size:14px; padding:2px 4px;">✕</button>';
+      h+='</div>';
+      h+='</div>';
+    });
+    h+='</div>';
+  }
+  h+='</div>';
+
+  // SECTION HISTORIQUE MOIS
+  h+='<div class="sectitle">Historique mensuel</div>';
   if(keys.length===0){h+='<div style="text-align:center;color:#333;font-family:var(--sans);font-weight:500;font-size:11px;padding:30px 0">Aucune saisie pour l\'instant</div>';}
   keys.forEach(key=>{
     const isObs=key<=OBS_END;
-    let mTot=0;PERSONS.forEach(p=>{const e=amountFor(p,key);if(e)mTot+=e.amount;});
+    let mTot=0;PERSONS.forEach(p=>{const e=amountFor(p,key);if(e && key > '2025-08')mTot+=e.amount;}); 
     h+='<div class="card" style="padding:12px;margin-bottom:8px">';
     h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'+
        '<div style="display:flex;align-items:center;gap:8px">'+
        '<span class="mono" style="font-size:12px;font-weight:600;color:'+(isObs?'#484848':'#888')+';letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
        (isObs?'<span class="mono" style="font-size:8px;font-weight:600;color:#333;border:1px solid #1f1f1f;border-radius:4px;padding:2px 4px">obs</span>':'')+
-       '</div><span class="mono" style="font-size:14px;font-weight:500;color:#666">'+mTot+'€</span></div>';
+       '</div><span class="mono" style="font-size:14px;font-weight:500;color:#666">'+(key === '2025-08' ? '—' : mTot+'€')+'</span></div>';
     h+='<div style="display:flex;flex-direction:column;gap:10px">';
     PERSONS.forEach(p=>{
       const d=(S.data[key]&&S.data[key][p])||{};
@@ -512,7 +603,7 @@ function renderSuivi(){
          '<div style="flex:1;display:flex;gap:14px;font-family:var(--sans);align-items:center">'+
          editCell(key,p,'kg',d.kg!=null?d.kg:null)+
          editCell(key,p,'kcal',d.kcal!=null?d.kcal:null)+
-         '</div>'+badge(e,key,p)+'</div>';
+         '</div>'+(key === '2025-08' ? '<span style="font-size:10px;color:#444;font-family:var(--sans);font-weight:500;">DÉPART</span>' : badge(e,key,p))+'</div>';
     });
     h+='</div></div>';
   });
@@ -533,7 +624,6 @@ function renderChart(field){
   const keys=Object.keys(S.data).filter(k=>PERSONS.some(p=>{const d=S.data[k]&&S.data[k][p];return d&&d[field]!=null;})).sort();
   if(!keys.length)return '<div style="text-align:center;padding:24px;font-family:var(--sans);font-weight:500;font-size:11px;color:#333">Aucune donnée</div>';
 
-  // Marges latérales (ml et mr) augmentées pour laisser de l'espace au texte
   const W=350,H=190,ml=42,mr=32,mt=16,mb=40;
   const cW=W-ml-mr,cH=H-mt-mb;
   const n=keys.length;
@@ -559,18 +649,16 @@ function renderChart(field){
     s+='<text transform="rotate(-38,'+x+','+yL+')" x="'+x+'" y="'+yL+'" text-anchor="end" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="#555">'+mShrt(k)+'</text>';
   });
 
-  const labelsToDraw = []; // On stocke les labels pour les dessiner APRES les lignes/points
+  const labelsToDraw = [];
 
   PERSONS.forEach(p=>{
     const col=P_COLOR[p];
     const pts=keys.map((k,i)=>{const d=S.data[k]&&S.data[k][p];const v=d&&d[field]!=null?d[field]:null;return{x:xOf(i),y:v!=null?yOf(v):null,v,i};});
     
-    // 1. Dessin de la courbe
     let path='',pr=false;
     pts.forEach(pt=>{if(pt.y!=null){path+=(pr?'L':'M')+pt.x.toFixed(1)+' '+pt.y.toFixed(1)+' ';pr=true;}else pr=false;});
     if(path)s+='<path d="'+path+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
     
-    // 2. Dessin des points et collecte des labels terminaux
     const lastIdx=pts.reduce((li,pt,i)=>pt.y!=null?i:li,-1);
     const firstIdx=pts.findIndex(pt=>pt.y!=null);
     pts.forEach((pt,i)=>{
@@ -585,8 +673,6 @@ function renderChart(field){
     });
   });
 
-  // 3. Dessin du texte (Anti-collision)
-  // On regroupe les labels par index horizontal (même colonne)
   const cols = {};
   labelsToDraw.forEach(l => {
       if(!cols[l.i]) cols[l.i] = [];
@@ -594,12 +680,10 @@ function renderChart(field){
   });
 
   Object.values(cols).forEach(colLabels => {
-      // Tri par valeur verticale (Y) pour ajustement
       colLabels.sort((a,b) => a.y - b.y);
       
-      const MIN_DIST = 11; // Distance verticale minimale en pixels entre deux textes
+      const MIN_DIST = 11;
       
-      // Algorithme de relaxation pour séparer les labels trop proches
       for(let iter=0; iter<5; iter++) {
           for(let j=1; j<colLabels.length; j++) {
               const diff = colLabels[j].y - colLabels[j-1].y;
@@ -611,7 +695,6 @@ function renderChart(field){
           }
       }
 
-      // Rendu effectif des textes (toujours visibles et non barrés par les lignes)
       colLabels.forEach(l => {
           if(l.type === 'first') {
               const tx = (l.x - 6).toFixed(1);
@@ -674,7 +757,6 @@ function renderObjectifs(){
   return h;
 }
 
-
 function render(){
   if (!S.authenticated) {
     let h = '<div style="position:fixed;inset:0;background:var(--bg-dark);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3rem;">';
@@ -709,8 +791,8 @@ function render(){
   let h='<div class="header-container">';
   h+='<header><h1>S.A.H</h1></header>';
   h+='<button class="sync-badge" onclick="syncLoad()">'
-   +'<div id="sync-dot" class="sync-dot" style="background:'+(localStorage.getItem('getfit_auth')==='true'?'var(--win)':'#444')+'"></div>'
-   +'<span id="sync-text">'+(localStorage.getItem('getfit_auth')==='true'?'Synchronisé':'...')+'</span></button>';
+    +'<div id="sync-dot" class="sync-dot" style="background:'+(localStorage.getItem('getfit_auth')==='true'?'var(--win)':'var(--loss)')+'"></div>'
+    +'<span id="sync-text" style="color:'+(localStorage.getItem('getfit_auth')==='true'?'#888':'var(--loss)')+'">'+(localStorage.getItem('getfit_auth')==='true'?'Synchronisé':'Hors ligne')+'</span></button>';
   h+='</div>';
 
   h+='<div class="tabs">';
@@ -749,6 +831,11 @@ function bindForm(){
   }
   if(kg)kg.addEventListener('input',upd);
   if(kc)kc.addEventListener('input',upd);
+
+  const tt=document.getElementById('f-trip-title'), td=document.getElementById('f-trip-dates'), tc=document.getElementById('f-trip-cost');
+  if(tt) tt.addEventListener('input', () => S.fTripTitle = tt.value);
+  if(td) td.addEventListener('input', () => S.fTripDates = td.value);
+  if(tc) tc.addEventListener('input', () => S.fTripCost = tc.value);
 }
 
 function openInlineEdit(el, currentVal, dec, isKcal, onCommit){
@@ -824,6 +911,35 @@ document.addEventListener('click',ev=>{
     render();return;
   }
 
+  if(act==='add-trip'){
+    const titleEl=document.getElementById('f-trip-title');
+    const datesEl=document.getElementById('f-trip-dates');
+    const costEl=document.getElementById('f-trip-cost');
+    
+    const titleVal = titleEl ? titleEl.value.trim() : '';
+    const datesVal = datesEl ? datesEl.value.trim() : '';
+    const costVal = costEl && costEl.value ? parseFloat(costEl.value.replace(',','.')) : null;
+
+    if (titleVal && costVal != null) {
+      if(!S.trips) S.trips = [];
+      S.trips.push({ title: titleVal, dates: datesVal, cost: costVal });
+      S.fTripTitle=''; S.fTripDates=''; S.fTripCost='';
+      scheduleSave([]);
+      render();
+    }
+    return;
+  }
+
+  if(act==='del-trip'){
+    const idx = parseInt(t.getAttribute('data-idx'));
+    if(S.trips && S.trips[idx] !== undefined) {
+      S.trips.splice(idx, 1);
+      scheduleSave([]);
+      render();
+    }
+    return;
+  }
+
   if(act==='toggle'){
     const key=t.getAttribute('data-month'),p=t.getAttribute('data-person');
     const e=amountFor(p,key);if(!e)return;
@@ -865,7 +981,8 @@ document.addEventListener('click',ev=>{
 });
 
 /* ════ NETTOYAGE MOIS SUPPRIMÉS ════ */
-["2025-08","2026-06"].forEach(k=>{
+// 2025-08 a été retiré de cette liste pour ne plus effacer les poids de départ.
+["2026-06"].forEach(k=>{
   if(S.data[k]){delete S.data[k];persist();}
   if(S.manual[k]){delete S.manual[k];persist();}
 });
