@@ -548,6 +548,7 @@ function badge(e,key,p){
 
   const d=(S.data[key]&&S.data[key][p])||{};
   if(d.kg==null&&d.kcal==null)return '';
+  if(e.pass===null)return '<span style="font-size:10px;font-weight:600;color:#444;padding:2px 5px;border-radius:4px;border:1px dashed #333;">—</span>';
 
   const c=e.pass?'var(--win)':'var(--loss)';
   const bg=e.pass?'rgba(61,220,132,.08)':'rgba(255,69,69,.08)';
@@ -581,6 +582,7 @@ function renderSuivi(){
   h+='</div>';
 
   h+='<div class="saisie-bloc" style="border-radius:'+blocRadius+';padding:14px 16px;">';
+  h+='<div style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--tab-color);opacity:0.7;margin-bottom:2px;">Entry for '+S.config.persons[curP].name+'</div>';
   h+='<div style="position:relative;display:flex;gap:8px;align-items:center;">';
   h+='<div style="position:relative;flex:1.4;min-width:0;">';
   h+='<button class="saisie-input-bg" data-act="picker" style="width:100%;padding:11px 10px;text-align:left;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:11px;white-space:nowrap;"><span style="white-space:nowrap;">'+mLbl(S.formMonth).toUpperCase()+'</span><span style="font-size:9px;color:rgba(255,255,255,.3);flex-shrink:0;margin-left:4px;">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
@@ -963,6 +965,7 @@ function bindForm(){
     S.data[S.formMonth]=Object.assign({},bak,{[S.formPerson]:{kg:kgN,kcal:kcN}});
     const e=computeEntry(S.formPerson,S.formMonth);
     S.data[S.formMonth]=bak;
+    if(e.pass===null){el.innerHTML='<span style="color:#444;font-size:18px;">—</span>';return;}
     el.innerHTML='<span style="color:'+(e.pass?'var(--win)':'var(--loss)')+'">+'+(e.amount)+'€</span>';
   }
   if(kg)kg.addEventListener('input',upd);
