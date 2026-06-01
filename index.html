@@ -473,18 +473,16 @@ function makeChange(person,monthKey,kg,kcal,note){
   const wOk=lk!=null&&lk>=pc.targetLoss; const kOk=kcal!=null&&kcal>=pc.kcalMin;
   
   let pass, amount;
-  if (person === 'saad') {
-    if (kcal == null) { pass = null; amount = 0; }
-    else { pass = kOk; amount = pass ? S.config.stakes.success : S.config.stakes.failure; }
-  } else {
-    if (monthKey < '2025-12') {
-      if (wOk || kOk) { pass = true; amount = S.config.stakes.success; }
-      else if (kg == null || kcal == null) { pass = null; amount = 0; }
-      else { pass = false; amount = S.config.stakes.failure; }
-    } else {
-      if (kg == null) { pass = null; amount = 0; }
-      else { pass = wOk; amount = pass ? S.config.stakes.success : S.config.stakes.failure; }
+  if (monthKey >= FORM_START) {
+    if (person === 'saad' && kcal == null) { pass=null; amount=0; }
+    else if (person !== 'saad' && kg == null) { pass=null; amount=0; }
+    else {
+      pass = person === 'saad' ? kOk : wOk;
+      amount = pass ? S.config.stakes.success : S.config.stakes.failure;
     }
+  } else {
+    pass = person === 'saad' ? kOk : ((monthKey < '2025-12') ? (wOk||kOk) : wOk);
+    amount = pass ? S.config.stakes.success : S.config.stakes.failure;
   }
 
   return{month:monthKey,person,kg:kg??null,kcal:kcal??null,pass,amount,note:note||'entry'};
@@ -517,27 +515,22 @@ function computeEntry(person,key){
   
   let pass, reason;
 
+  // Mois formulaire (≥ FORM_START) : en attente tant que le champ décisif n'est pas saisi
+  if (key >= FORM_START) {
+    if (person === 'saad' && d.kcal == null) return {pass:null, amount:0, reason:'pending'};
+    if (person !== 'saad' && d.kg  == null) return {pass:null, amount:0, reason:'pending'};
+  }
+
   if (person === 'saad') {
-    if (d.kcal == null) return {pass:null, amount:0, reason:'pending'};
     pass = kOk;
-    reason = pass ? (d.kcal + ' kcal ✓') : (d.kcal + ' kcal < ' + pc.kcalMin);
+    reason = pass ? (d.kcal + ' kcal ✓') : ((d.kcal != null ? d.kcal : '—') + ' kcal < ' + pc.kcalMin);
   } else {
     if (key < '2025-12') {
-      // Résultat définitif seulement quand au moins une condition est remplie
-      // ou quand les deux champs sont saisis (et les deux échouent)
-      if (wOk || kOk) {
-        pass = true;
-        reason = wOk ? '−'+lossKg+' kg ✓' : d.kcal+' kcal ✓';
-      } else if (d.kg == null || d.kcal == null) {
-        return {pass:null, amount:0, reason:'pending'};
-      } else {
-        pass = false;
-        reason = 'Failed';
-      }
+      pass = wOk || kOk;
+      reason = pass ? (wOk ? '−'+lossKg+' kg ✓' : d.kcal+' kcal ✓') : 'Failed';
     } else {
-      if (d.kg == null) return {pass:null, amount:0, reason:'pending'};
       pass = wOk;
-      reason = pass ? '−'+lossKg+' kg ✓' : '−'+lossKg+' kg < '+pc.targetLoss;
+      reason = pass ? '−'+lossKg+' kg ✓' : (lossKg != null ? '−'+lossKg+' kg < '+pc.targetLoss : 'Weight missing');
     }
   }
 
@@ -565,6 +558,8 @@ function badge(e,key,p){
   if(!e)return '';
   if(key <= OBS_END) return '<span style="font-size:10px;color:#555;font-family:var(--sans);font-weight:600;padding:2px 4px;">OBS</span>';
 
+  const d=(S.data[key]&&S.data[key][p])||{};
+  if(d.kg==null&&d.kcal==null)return '';
   if(e.pass===null)return '';
 
   const c=e.pass?'var(--win)':'var(--loss)';
