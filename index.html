@@ -449,12 +449,14 @@ const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'
 function badge(e,key,p){
   if(!e)return '';
   if(key <= OBS_END) return '<span style="font-size:10px;color:#555;font-family:var(--sans);font-weight:600;padding:2px 4px;">OBS</span>';
-  
+
+  const d=(S.data[key]&&S.data[key][p])||{};
+  if(d.kg==null&&d.kcal==null)return '';
+
   const c=e.pass?'var(--win)':'var(--loss)';
   const bg=e.pass?'rgba(61,220,132,.08)':'rgba(255,69,69,.08)';
   const bd=e.pass?'rgba(61,220,132,.2)':'rgba(255,69,69,.2)';
-  return '<span class="mono" data-act="toggle" data-month="'+esc(key)+'" data-person="'+p+'" '+
-    'style="font-size:12px;font-weight:600;cursor:pointer;user-select:none;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+e.amount+'€</span>';
+  return '<span class="mono" style="font-size:12px;font-weight:600;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+e.amount+'€</span>';
 }
 
 function editCell(key,person,field,value){
@@ -824,8 +826,8 @@ function render(){
 
   let h='<div class="header-container">';
   h+='<header>';
-  h+='<h1 style="font-size:26px;letter-spacing:-.03em;line-height:1;">S.A.H Challenge</h1>';
-  h+='<div style="font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-top:6px;">Siblings Avoiding Heart-attacks Challenge</div>';
+  h+='<h1 style="font-size:26px;letter-spacing:-.03em;line-height:1;color:var(--gold);">S.A.H Challenge</h1>';
+  h+='<div style="font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-top:6px;color:var(--gold);">Siblings Avoiding Heart-attacks Challenge</div>';
   h+='</header>';
   h+='<button class="sync-badge" onclick="syncLoad()" style="flex-shrink:0;display:flex;align-items:center;gap:5px;">'
     +'<span id="sync-text" style="font-size:7px;letter-spacing:.1em;color:#444;">'+(localStorage.getItem('getfit_auth')==='true'?'Synced':'Offline')+'</span>'
