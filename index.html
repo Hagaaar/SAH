@@ -472,14 +472,22 @@ function makeChange(person,monthKey,kg,kcal,note){
   const lk=kg!=null?+(prevKg2-kg).toFixed(2):null;
   const wOk=lk!=null&&lk>=pc.targetLoss; const kOk=kcal!=null&&kcal>=pc.kcalMin;
   
-  let pass;
+  let pass, amount;
   if (person === 'saad') {
-    pass = kOk; 
+    if (kcal == null) { pass = null; amount = 0; }
+    else { pass = kOk; amount = pass ? S.config.stakes.success : S.config.stakes.failure; }
   } else {
-    pass = (monthKey < '2025-12') ? (wOk || kOk) : wOk;
+    if (monthKey < '2025-12') {
+      if (wOk || kOk) { pass = true; amount = S.config.stakes.success; }
+      else if (kg == null || kcal == null) { pass = null; amount = 0; }
+      else { pass = false; amount = S.config.stakes.failure; }
+    } else {
+      if (kg == null) { pass = null; amount = 0; }
+      else { pass = wOk; amount = pass ? S.config.stakes.success : S.config.stakes.failure; }
+    }
   }
-  
-  return{month:monthKey,person,kg:kg??null,kcal:kcal??null,pass,amount:pass?S.config.stakes.success:S.config.stakes.failure,note:note||'entry'};
+
+  return{month:monthKey,person,kg:kg??null,kcal:kcal??null,pass,amount,note:note||'entry'};
 }
 
 function scheduleSave(changes){persist();clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncSave(changes),800);}
@@ -510,15 +518,26 @@ function computeEntry(person,key){
   let pass, reason;
 
   if (person === 'saad') {
+    if (d.kcal == null) return {pass:null, amount:0, reason:'pending'};
     pass = kOk;
-    reason = pass ? (d.kcal + ' kcal ✓') : ((d.kcal != null ? d.kcal : '—') + ' kcal < ' + pc.kcalMin);
+    reason = pass ? (d.kcal + ' kcal ✓') : (d.kcal + ' kcal < ' + pc.kcalMin);
   } else {
     if (key < '2025-12') {
-      pass = wOk || kOk;
-      reason = pass ? (wOk ? '−'+lossKg+' kg ✓' : d.kcal+' kcal ✓') : 'Failed';
+      // Résultat définitif seulement quand au moins une condition est remplie
+      // ou quand les deux champs sont saisis (et les deux échouent)
+      if (wOk || kOk) {
+        pass = true;
+        reason = wOk ? '−'+lossKg+' kg ✓' : d.kcal+' kcal ✓';
+      } else if (d.kg == null || d.kcal == null) {
+        return {pass:null, amount:0, reason:'pending'};
+      } else {
+        pass = false;
+        reason = 'Failed';
+      }
     } else {
+      if (d.kg == null) return {pass:null, amount:0, reason:'pending'};
       pass = wOk;
-      reason = pass ? '−'+lossKg+' kg ✓' : (lossKg != null ? '−'+lossKg+' kg < '+pc.targetLoss : 'Weight missing');
+      reason = pass ? '−'+lossKg+' kg ✓' : '−'+lossKg+' kg < '+pc.targetLoss;
     }
   }
 
@@ -546,8 +565,7 @@ function badge(e,key,p){
   if(!e)return '';
   if(key <= OBS_END) return '<span style="font-size:10px;color:#555;font-family:var(--sans);font-weight:600;padding:2px 4px;">OBS</span>';
 
-  const d=(S.data[key]&&S.data[key][p])||{};
-  if(d.kg==null&&d.kcal==null)return '';
+  if(e.pass===null)return '';
 
   const c=e.pass?'var(--win)':'var(--loss)';
   const bg=e.pass?'rgba(61,220,132,.08)':'rgba(255,69,69,.08)';
@@ -606,7 +624,7 @@ function renderSuivi(){
   const keys=displayKeys();
   let grossTotal=0;
   const per={};PERSONS.forEach(p=>per[p]={total:0,w:0,l:0});
-  keys.filter(k => k > '2025-08').forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(!e)return;per[p].total+=e.amount;grossTotal+=e.amount;e.pass?per[p].w++:per[p].l++;}));
+  keys.filter(k => k > '2025-08').forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(!e||e.pass===null)return;per[p].total+=e.amount;grossTotal+=e.amount;if(e.pass===true)per[p].w++;else per[p].l++;}));
   
   let tripsTotal = 0;
   if (S.trips) S.trips.forEach(t => { if(t.cost) tripsTotal += t.cost; });
@@ -685,9 +703,9 @@ function renderSuivi(){
     const yKeys=byYear[yr];
     const open=S.openYears.has(yr);
     // year total
-    let yTot=0;yKeys.forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(e&&k>'2025-08')yTot+=e.amount;}));
-    const wCount=yKeys.reduce((n,k)=>{PERSONS.forEach(p=>{const e=amountFor(p,k);if(e&&k>'2025-08'&&e.pass)n++;});return n;},0);
-    const lCount=yKeys.reduce((n,k)=>{PERSONS.forEach(p=>{const e=amountFor(p,k);if(e&&k>'2025-08'&&!e.pass)n++;});return n;},0);
+    let yTot=0;yKeys.forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(e&&e.pass!==null&&k>'2025-08')yTot+=e.amount;}));
+    const wCount=yKeys.reduce((n,k)=>{PERSONS.forEach(p=>{const e=amountFor(p,k);if(e&&k>'2025-08'&&e.pass===true)n++;});return n;},0);
+    const lCount=yKeys.reduce((n,k)=>{PERSONS.forEach(p=>{const e=amountFor(p,k);if(e&&k>'2025-08'&&e.pass===false)n++;});return n;},0);
 
     h+='<div style="margin-bottom:6px">';
     // Year header row (accordion toggle)
@@ -708,7 +726,7 @@ function renderSuivi(){
       h+='<div style="border:1px solid #1c1c1c;border-top:none;border-bottom-left-radius:8px;border-bottom-right-radius:8px;overflow:hidden">';
       yKeys.forEach((key,idx)=>{
         const isObs=key<=OBS_END;
-        let mTot=0;PERSONS.forEach(p=>{const e=amountFor(p,key);if(e&&key>'2025-08')mTot+=e.amount;});
+        let mTot=0;PERSONS.forEach(p=>{const e=amountFor(p,key);if(e&&e.pass!==null&&key>'2025-08')mTot+=e.amount;});
         const last=idx===yKeys.length-1;
         h+='<div style="padding:12px;background:#141414;'+(last?'':'border-bottom:1px solid #1a1a1a')+'">';
         h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
