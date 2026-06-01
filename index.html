@@ -183,12 +183,108 @@
 
   @keyframes fade-in { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   .connecting-label { animation: fade-in 0.4s ease forwards; }
+
+  /* ── AUTH OVERLAY ── */
+  @keyframes auth-fade-out { to { opacity:0; pointer-events:none; } }
+  #auth-overlay {
+    position: fixed;
+    inset: 0;
+    background: #0e0e0e;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #auth-overlay.out { animation: auth-fade-out 0.35s ease forwards; }
+  #auth-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+  #auth-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: .22em;
+    text-transform: uppercase;
+    color: #444;
+  }
+  #auth-dots { display: flex; gap: 14px; }
+  #auth-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 72px);
+    gap: 14px;
+  }
+  #auth-pad .pin-key.ghost { border: none; background: transparent; cursor: default; pointer-events: none; }
 </style>
 </head>
 <body>
+<div id="auth-overlay">
+  <div id="auth-card">
+    <div id="auth-label">S · A · H</div>
+    <div id="auth-dots">
+      <div class="pin-dot" id="ad0"></div>
+      <div class="pin-dot" id="ad1"></div>
+      <div class="pin-dot" id="ad2"></div>
+      <div class="pin-dot" id="ad3"></div>
+      <div class="pin-dot" id="ad4"></div>
+    </div>
+    <div id="auth-pad">
+      <button class="pin-key" data-k="1">1</button>
+      <button class="pin-key" data-k="2">2</button>
+      <button class="pin-key" data-k="3">3</button>
+      <button class="pin-key" data-k="4">4</button>
+      <button class="pin-key" data-k="5">5</button>
+      <button class="pin-key" data-k="6">6</button>
+      <button class="pin-key" data-k="7">7</button>
+      <button class="pin-key" data-k="8">8</button>
+      <button class="pin-key" data-k="9">9</button>
+      <button class="pin-key ghost"></button>
+      <button class="pin-key" data-k="0">0</button>
+      <button class="pin-key del" id="auth-del">⌫</button>
+    </div>
+  </div>
+</div>
 <div id="root"></div>
 
 <script>
+/* ── AUTH ── */
+(function(){
+  const HASH = 'c9f1e824ac8f66e7b43c117cb0e7fe182d3a30fe0f209345d7c47d0243e5aef5';
+  const SK   = '__sah_ok';
+  const ov   = document.getElementById('auth-overlay');
+  if(sessionStorage.getItem(SK)==='1'){ov.style.display='none';return;}
+  let buf='',done=false;
+  async function digest(s){
+    const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+  }
+  function dots(){for(let i=0;i<5;i++){const d=document.getElementById('ad'+i);if(d)d.className='pin-dot'+(i<buf.length?' filled':'');}}
+  async function submit(){
+    if(await digest(buf)===HASH){
+      done=true;
+      sessionStorage.setItem(SK,'1');
+      ov.classList.add('out');
+      setTimeout(()=>{ov.style.display='none';},350);
+    } else {
+      const w=document.getElementById('auth-dots');
+      document.querySelectorAll('#auth-dots .pin-dot').forEach(d=>d.classList.add('error'));
+      w.classList.add('shake');
+      setTimeout(()=>{w.classList.remove('shake');document.querySelectorAll('#auth-dots .pin-dot').forEach(d=>d.classList.remove('error'));buf='';dots();},500);
+    }
+  }
+  document.getElementById('auth-pad').addEventListener('click',e=>{
+    if(done)return;
+    const k=e.target.closest('[data-k]'),dl=e.target.closest('#auth-del');
+    if(k&&buf.length<5){buf+=k.dataset.k;dots();if(buf.length===5)submit();}
+    else if(dl&&buf.length>0){buf=buf.slice(0,-1);dots();}
+  });
+  document.addEventListener('keydown',e=>{
+    if(done||ov.style.display==='none')return;
+    if(e.key>='0'&&e.key<='9'&&buf.length<5){buf+=e.key;dots();if(buf.length===5)submit();}
+    else if(e.key==='Backspace'&&buf.length>0){buf=buf.slice(0,-1);dots();}
+  });
+})();
 /* ════ CONFIGURATION APP SCRIPT ════ */
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx8qVAaxyAJyYM1SNmufGlh3oc36YS_e0S_nLbcbZVug_DHIf_SYwV3QYlNPlurerU/exec';
 
