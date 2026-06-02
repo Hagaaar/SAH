@@ -309,8 +309,8 @@
     S.A.H - Siblings Avoiding Heart-attacks Challenge
   </div>
   <button class="sync-badge" onclick="syncLoad(true)" style="flex-shrink:0; display:flex; align-items:center; gap:5px; padding:0;">
-    <span id="sync-text" style="font-size:7px;letter-spacing:.1em;color:rgba(242,242,247,.3);">Offline</span>
-    <div id="sync-dot" class="sync-dot" style="background:var(--loss);box-shadow:0 0 0 3px rgba(255,107,107,.18),0 0 10px rgba(255,107,107,.45)"></div>
+    <span id="sync-text" style="font-size:7px;letter-spacing:.1em;color:rgba(242,242,247,.3);"></span>
+    <div id="sync-dot" class="sync-dot"></div>
   </button>
 </header>
 
@@ -454,6 +454,10 @@ function persist(){try{localStorage.setItem(LS,JSON.stringify({config:S.config,d
 let syncTimer=null;
 let _syncOk=false;
 
+function isPWA(){
+  return !!navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+}
+
 function setSyncStatus(msg, color, dotColor) {
   const elTxt = document.getElementById('sync-text');
   const elDot = document.getElementById('sync-dot');
@@ -480,6 +484,7 @@ function updateDots() {
 }
 
 async function syncLoad(manual=false){
+  if (manual && !isPWA()) return;
   if (!S.pin) {
     if (!manual) return;
     const entered = prompt('Sync PIN:');
@@ -548,7 +553,7 @@ function makeChange(person,monthKey,kg,kcal,note){
   return{month:monthKey,person,kg:kg??null,kcal:kcal??null,pass,amount,note:note||'entry'};
 }
 
-function scheduleSave(changes){persist();clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncSave(changes),800);}
+function scheduleSave(changes){persist();if(isPWA()){clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncSave(changes),800);}}
 
 /* ════ LOGIQUE MÉTIER ════ */
 function prevKgFor(person,key){
@@ -1278,7 +1283,6 @@ document.addEventListener('click',ev=>{
 });
 
 render();
-syncLoad();
 </script>
 </body>
 </html>
