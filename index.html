@@ -33,7 +33,7 @@
     min-height: 100vh;
     max-width: 390px;
     margin: 0 auto;
-    padding: 20px 16px 60px;
+    padding: 20px 16px 100px;
   }
 
   ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -83,9 +83,50 @@
   .sync-badge:active { opacity: 0.6; }
   .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.2); transition: background 0.4s ease; box-shadow: 0 0 6px rgba(0,0,0,.5); }
 
-  .tabs { display: flex; gap: 2px; background: rgba(255,255,255,0.05); padding: 3px; border-radius: 14px; border: 1px solid rgba(255,255,255,.06); margin-bottom: 20px; }
-  .tab { flex: 1; padding: 9px 0; border-radius: 11px; color: var(--text-secondary); font-size: 11px; font-weight: 500; letter-spacing: .05em; transition: all 0.2s ease; }
-  .tab.on { background: rgba(255,159,90,.15); color: var(--anas); font-weight: 600; border: 1px solid rgba(255,159,90,.22); }
+  #tab-bar {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(358px, calc(100vw - 32px));
+    display: flex;
+    align-items: center;
+    background: rgba(14,14,18,0.82);
+    backdrop-filter: blur(32px) saturate(180%);
+    -webkit-backdrop-filter: blur(32px) saturate(180%);
+    border: 1px solid rgba(255,255,255,.12);
+    border-radius: 28px;
+    padding: 5px;
+    z-index: 1000;
+    box-shadow: 0 12px 40px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.07);
+  }
+  #tab-highlight {
+    position: absolute;
+    top: 5px;
+    left: 5px;
+    border-radius: 22px;
+    background: rgba(255,159,90,.14);
+    border: 1px solid rgba(255,159,90,.2);
+    transition: transform 0.32s cubic-bezier(0.4,0,0.2,1), width 0.32s cubic-bezier(0.4,0,0.2,1);
+    height: calc(100% - 10px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  #tab-bar .tab {
+    flex: 1;
+    position: relative;
+    z-index: 1;
+    padding: 11px 0;
+    border-radius: 22px;
+    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: .05em;
+    background: none;
+    border: none;
+    transition: color 0.2s ease;
+  }
+  #tab-bar .tab.on { color: var(--anas); font-weight: 600; }
 
   .saisie-wrapper { width: 100%; margin-bottom: 16px; margin-top: 8px; }
 
@@ -166,8 +207,9 @@
   .pin-dot.filled { background:var(--text-primary); border-color:var(--text-primary); }
   .pin-dot.error { background:var(--loss); border-color:var(--loss); }
 
-  .pin-key { width:76px; height:76px; border-radius:50%; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.08); color:var(--text-primary); font-size:26px; font-family:var(--sans); font-weight:400; cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; user-select:none; }
-  .pin-key:active { background:rgba(255,255,255,.18); }
+  .pin-key { width:76px; height:76px; border-radius:50%; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.08); color:var(--text-primary); font-size:26px; font-family:var(--sans); font-weight:400; cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; user-select:none; transition:background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
+  .pin-key:not(.del):not(.ghost):active { background:rgba(255,159,90,.32); box-shadow:0 0 28px rgba(255,159,90,.45), inset 0 0 12px rgba(255,159,90,.18); border-color:rgba(255,159,90,.55); transition:none; }
+  .pin-key.del:active { background:rgba(255,255,255,.14); transition:none; }
   .pin-key.del { font-size:20px; color:var(--text-secondary); border:none; background:transparent; }
 
   @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
@@ -249,6 +291,12 @@
     </div>
   </div>
 </div>
+<nav id="tab-bar">
+  <div id="tab-highlight"></div>
+  <button class="tab" data-act="tab" data-val="suivi">Tracking</button>
+  <button class="tab" data-act="tab" data-val="evolution">Progress</button>
+  <button class="tab" data-act="tab" data-val="objectifs">Goals</button>
+</nav>
 <div id="root"></div>
 
 <script>
@@ -678,7 +726,7 @@ function renderSuivi(){
   h+='<div style="margin-bottom:32px;">';
   h+='<div class="sectitle" style="margin-bottom:12px;">The Guilt Trips</div>';
   
-  h+='<div class="saisie-bloc" style="border-radius:12px; background:rgba(255,255,255,0.04); padding:16px; gap:8px;">';
+  h+='<div class="saisie-bloc" style="border-radius:12px; background:transparent; padding:16px; gap:8px;">';
   h+='<input id="f-trip-title" class="saisie-input-bg" type="text" placeholder="Trip name" value="'+esc(S.fTripTitle)+'" style="padding:14px 16px; width:100%;">';
   h+='<div style="display:flex; gap:12px; align-items:center;">';
   h+='<input id="f-trip-dates" class="saisie-input-bg" type="text" placeholder="Dates" value="'+esc(S.fTripDates)+'" style="flex:1; min-width:0; padding:14px 16px;">';
@@ -790,15 +838,24 @@ function renderChart(field){
   const yOf=v=>mt+cH-((v-yLo)/(yHi-yLo))*cH;
 
   let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">';
-  s+='<rect x="'+ml+'" y="'+mt+'" width="'+cW+'" height="'+cH+'" fill="#0C0C0F" rx="4"/>';
 
+  // Gradient defs for area fills
+  s+='<defs>';
+  PERSONS.forEach(p=>{
+    s+='<linearGradient id="ag-'+p+'-'+field+'" x1="0" y1="0" x2="0" y2="1">';
+    s+='<stop offset="0%" stop-color="'+P_COLOR[p]+'" stop-opacity="0.18"/>';
+    s+='<stop offset="100%" stop-color="'+P_COLOR[p]+'" stop-opacity="0"/>';
+    s+='</linearGradient>';
+  });
+  s+='</defs>';
+
+  // Grid lines (no background rect — chart floats on page bg)
   for(let i=0;i<=4;i++){
     const v=yLo+(yHi-yLo)*i/4, y=yOf(v);
     s+='<line x1="'+ml+'" y1="'+y.toFixed(1)+'" x2="'+(ml+cW)+'" y2="'+y.toFixed(1)+'" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
     s+='<text x="'+(ml-6)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="rgba(242,242,247,.28)">'+Math.round(v)+'</text>';
   }
 
-  /* — Labels X : premier et dernier mois uniquement — */
   keys.forEach((k,i)=>{
     if(i !== 0 && i !== keys.length - 1) return;
     const x = xOf(i).toFixed(1);
@@ -812,24 +869,32 @@ function renderChart(field){
   PERSONS.forEach(p=>{
     const col=P_COLOR[p];
     const pts=keys.map((k,i)=>{const d=chartData[k]&&chartData[k][p];const v=d&&d[field]!=null?d[field]:null;return{x:xOf(i),y:v!=null?yOf(v):null,v,i};});
-    
+
+    // Area fills per continuous segment
+    const segs=[];let cur=[];
+    pts.forEach(pt=>{if(pt.y!=null){cur.push(pt);}else{if(cur.length>1)segs.push([...cur]);cur=[];}});
+    if(cur.length>1)segs.push(cur);
+    segs.forEach(seg=>{
+      let ap='M'+seg[0].x.toFixed(1)+' '+seg[0].y.toFixed(1);
+      seg.slice(1).forEach(pt=>{ap+=' L'+pt.x.toFixed(1)+' '+pt.y.toFixed(1);});
+      ap+=' L'+seg[seg.length-1].x.toFixed(1)+' '+(mt+cH).toFixed(1);
+      ap+=' L'+seg[0].x.toFixed(1)+' '+(mt+cH).toFixed(1)+' Z';
+      s+='<path d="'+ap+'" fill="url(#ag-'+p+'-'+field+')" />';
+    });
+
+    // Line
     let path='',pr=false;
     pts.forEach(pt=>{if(pt.y!=null){path+=(pr?'L':'M')+pt.x.toFixed(1)+' '+pt.y.toFixed(1)+' ';pr=true;}else pr=false;});
-    if(path)s+='<path d="'+path+'" fill="none" stroke="'+col+'" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
-    
+    if(path)s+='<path d="'+path+'" fill="none" stroke="'+col+'" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>';
+
     const lastIdx=pts.reduce((li,pt,i)=>pt.y!=null?i:li,-1);
     const firstIdx=pts.findIndex(pt=>pt.y!=null);
     pts.forEach((pt,i)=>{
       if(pt.y==null)return;
-      // Points : taille réduite quand beaucoup de données pour rester lisibles
-      const r = n > 24 ? 1.5 : 3;
+      const r=n>24?2:3.5;
       s+='<circle cx="'+pt.x.toFixed(1)+'" cy="'+pt.y.toFixed(1)+'" r="'+r+'" fill="'+col+'"/>';
-      
-      if(i===lastIdx){
-        labelsToDraw.push({ type:'last', x:pt.x, y:pt.y, v:pt.v, col:col, i:i });
-      } else if(i===firstIdx && firstIdx!==lastIdx){
-        labelsToDraw.push({ type:'first', x:pt.x, y:pt.y, v:pt.v, col:col, i:i });
-      }
+      if(i===lastIdx){labelsToDraw.push({type:'last',x:pt.x,y:pt.y,v:pt.v,col,i});}
+      else if(i===firstIdx&&firstIdx!==lastIdx){labelsToDraw.push({type:'first',x:pt.x,y:pt.y,v:pt.v,col,i});}
     });
   });
 
@@ -865,9 +930,9 @@ function renderChart(field){
 }
 
 function renderEvolution(){
-  let h='<div style="display:flex;flex-direction:column;gap:8px">';
+  let h='<div style="display:flex;flex-direction:column;gap:32px">';
   [['kg','Weight (kg)'],['kcal','Calories (kcal/d)']].forEach(([f,t])=>{
-    h+='<div class="card" style="padding:16px"><div class="sectitle">'+t+'</div>'+renderLegend()+renderChart(f)+'</div>';
+    h+='<div><div class="sectitle">'+t+'</div>'+renderLegend()+renderChart(f)+'</div>';
   });
   return h+'</div>';
 }
@@ -917,6 +982,40 @@ function renderObjectifs(){
   return h;
 }
 
+let _lastTab = null;
+
+function updateTabHighlight(){
+  const bar = document.getElementById('tab-bar');
+  const hl  = document.getElementById('tab-highlight');
+  if(!bar || !hl) return;
+
+  bar.querySelectorAll('.tab').forEach(btn=>{
+    btn.classList.toggle('on', btn.getAttribute('data-val')===S.tab);
+  });
+
+  const tabs  = Array.from(bar.querySelectorAll('.tab'));
+  const idx   = tabs.findIndex(t=>t.getAttribute('data-val')===S.tab);
+  if(idx<0 || bar.clientWidth===0) return;
+
+  const pad   = 5;
+  const innerW = bar.clientWidth - pad*2;
+  const tabW  = innerW / tabs.length;
+  const tx    = idx * tabW;
+
+  const animate = _lastTab !== null && _lastTab !== S.tab;
+  _lastTab = S.tab;
+
+  if(!animate){
+    hl.style.transition = 'none';
+    hl.style.width = tabW+'px';
+    hl.style.transform = 'translateX('+tx+'px)';
+    requestAnimationFrame(()=>{ hl.style.transition=''; });
+  } else {
+    hl.style.width = tabW+'px';
+    hl.style.transform = 'translateX('+tx+'px)';
+  }
+}
+
 function render(){
   let h='<div class="header-container">';
   h+='<header>';
@@ -929,17 +1028,12 @@ function render(){
     +'</button>';
   h+='</div>';
 
-  h+='<div class="tabs">';
-  h+='<button class="tab '+(S.tab==='suivi'?'on':'')+'" data-act="tab" data-val="suivi">Tracking</button>';
-  h+='<button class="tab '+(S.tab==='evolution'?'on':'')+'" data-act="tab" data-val="evolution">Progress</button>';
-  h+='<button class="tab '+(S.tab==='objectifs'?'on':'')+'" data-act="tab" data-val="objectifs">Goals</button>';
-  h+='</div>';
-
   h+=(S.tab==='suivi')?renderSuivi():(S.tab==='evolution')?renderEvolution():renderObjectifs();
-  
+
   h+='<footer style="margin-top:24px;text-align:center;font-family:var(--sans);font-weight:600;font-size:10px;color:var(--text-tertiary);letter-spacing:.15em;text-transform:uppercase">S.A.H · 2025–2030</footer>';
   document.getElementById('root').innerHTML=h;
-  
+
+  updateTabHighlight();
   bindForm();
   
   if(S.pickerOpen){
