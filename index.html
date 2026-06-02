@@ -81,7 +81,7 @@
   
   .tabs { display: flex; gap: 3px; background: #111; padding: 3px; border-radius: 10px; border: 1px solid #1c1c1c; margin-bottom: 16px; }
   .tab { flex: 1; padding: 9px 0; border-radius: 8px; color: #555; font-size: 11px; font-weight: 500; letter-spacing: .06em; transition: all 0.2s ease; }
-  .tab.on { background: #242424; color: #e8e8e8; font-weight: 600; }
+  .tab.on { background: rgba(255,179,71,.1); color: #ffb347; font-weight: 600; border: 1px solid rgba(255,179,71,.25); }
   
   .saisie-wrapper { width: 100%; margin-bottom: 16px; margin-top: 8px; }
 
@@ -646,7 +646,7 @@ function renderSuivi(){
   }
   
   h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
-  PERSONS.forEach(p=>{
+  ['saad','anas','hicham'].forEach(p=>{
     h+='<div style="background:'+P_BG[p]+';border-radius:8px;padding:10px;border:1px solid '+P_BORD[p]+'">'+
        '<div class="mono" style="font-size:10px;font-weight:600;color:'+P_COLOR[p]+';margin-bottom:4px;text-transform:uppercase">'+S.config.persons[p].name+'</div>'+
        '<div class="mono" style="font-size:18px;font-weight:500;color:'+P_COLOR[p]+'">'+per[p].total+'€</div>'+
