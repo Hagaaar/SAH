@@ -333,7 +333,7 @@
       <div id="tab-title-main">S.A.H Challenge</div>
       <div id="tab-title-sub">Siblings Avoiding Heart-attacks Challenge</div>
     </div>
-    <button class="sync-badge" onclick="syncLoad()" style="flex-shrink:0;display:flex;align-items:center;gap:5px;">
+    <button class="sync-badge" onclick="syncLoad(true)" style="flex-shrink:0;display:flex;align-items:center;gap:5px;">
       <span id="sync-text" style="font-size:7px;letter-spacing:.1em;color:rgba(242,242,247,.3);">Offline</span>
       <div id="sync-dot" class="sync-dot" style="background:var(--loss);box-shadow:0 0 0 3px rgba(255,107,107,.18),0 0 10px rgba(255,107,107,.45)"></div>
     </button>
@@ -495,8 +495,14 @@ function updateDots() {
   }
 }
 
-async function syncLoad(){
-  if (!S.pin) return;
+async function syncLoad(manual=false){
+  if (!S.pin) {
+    if (!manual) return;
+    const entered = prompt('Sync PIN:');
+    if (!entered || !entered.trim()) return;
+    S.pin = entered.trim();
+    try { localStorage.setItem('getfit_pin', S.pin); } catch(e) {}
+  }
   setSyncStatus('Syncing', '#888', 'var(--gold)');
   try{
     const resp = await fetch(SCRIPT_URL + '?pin=' + encodeURIComponent(S.pin), {cache:'no-store'});
