@@ -295,7 +295,7 @@ const mLbl=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mShrt=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mStep=(k,d)=>{let[y,m]=k.split('-').map(Number);const n=m+d;return n>12?mKey(y+1,n-12):n<1?mKey(y-1,n+12):mKey(y,n);};
 
-const START_KEY='2025-08', OBS_END='2025-10';
+const START_KEY='2025-09', OBS_END='2025-10';
 const FORM_START='2026-05', FORM_END='2030-12';
 const PERSONS=['anas','hicham','saad'];
 
@@ -311,7 +311,6 @@ const FORM_MONTHS=(()=>{
 
 const STATIC_END = '2026-04';
 const STATIC_HISTORY = {
-  '2025-08':{anas:{kg:88.5,kcal:null,amount:20},hicham:{kg:114.9,kcal:null,amount:20},saad:{kg:94.9,kcal:null,amount:20}},
   '2025-09':{anas:{kg:86.4,kcal:771,amount:20},hicham:{kg:112.0,kcal:760,amount:20},saad:{kg:null,kcal:null,amount:20}},
   '2025-10':{anas:{kg:86.2,kcal:674,amount:20},hicham:{kg:109.5,kcal:780,amount:20},saad:{kg:91.55,kcal:877,amount:20}},
   '2025-11':{anas:{kg:null,kcal:699,amount:20},hicham:{kg:109.8,kcal:859,amount:20},saad:{kg:90.45,kcal:714,amount:100}},
@@ -357,9 +356,6 @@ let S={
   formPerson:'anas', formMonth:FORM_START, pickerOpen:false, fKg:'', fKcal:'',
   fTripTitle:'', fTripDates:'', fTripCost:'',
   pin: localStorage.getItem('getfit_pin') || '',
-  pinEntry: '',
-  pinLoading: false,
-  authenticated: localStorage.getItem('getfit_auth') === 'true',
   openYears: new Set([new Date().getFullYear().toString()]),
   userSelectedMonth: false,
 };
@@ -397,64 +393,32 @@ function updateDots() {
 }
 
 async function syncLoad(){
-  if (!S.pin) { S.authenticated = false; render(); return; }
+  if (!S.pin) return;
   setSyncStatus('Syncing', '#888', 'var(--gold)');
   try{
     const resp = await fetch(SCRIPT_URL + '?pin=' + encodeURIComponent(S.pin), {cache:'no-store'});
     const remote = await resp.json();
-    
+
     if (remote && remote.status === 'error') {
-      S.pin = ''; S.authenticated = false; S.pinLoading = false;
-      localStorage.removeItem('getfit_pin'); localStorage.removeItem('getfit_auth');
-      S.pinEntry = ''; render();
-      const dots = document.getElementById('pin-dots');
-      if (dots) {
-        dots.classList.add('shake');
-        document.querySelectorAll('.pin-dot').forEach(d => d.classList.add('error'));
-        setTimeout(() => {
-          dots.classList.remove('shake');
-          document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('error'));
-        }, 600);
-      }
+      setSyncStatus('Sync failed', '#888', 'var(--loss)');
       return;
     }
-    
+
     if(remote && remote.data && Object.keys(remote.data).length > 0){
-      S.config = remote.config || S.config; 
-      S.data = remote.data; 
+      S.config = remote.config || S.config;
+      S.data = remote.data;
       S.manual = remote.manual || S.manual;
       S.trips = remote.trips || S.trips;
-      
-      if (!S.data['2025-08'] || !S.data['2025-08'].anas || S.data['2025-08'].anas.kg == null) {
-         S.data['2025-08'] = {
-           anas: {kg: 89.0, kcal: null},
-           hicham: {kg: 115.1, kcal: null},
-           saad: {kg: 94.5, kcal: null}
-         };
-         scheduleSave([]);
-      }
-
       if(!S.userSelectedMonth) S.formMonth = getTargetMonth(S.data);
-      // Open year accordions for any form months already in the data
       Object.keys(S.data).filter(k=>k>=FORM_START).forEach(k=>S.openYears.add(k.split('-')[0]));
       persist();
     }
 
-    S.authenticated = true; S.pinLoading = false; localStorage.setItem('getfit_auth', 'true');
     setSyncStatus('Synced', '#888', 'var(--win)');
     render();
   }catch(e){
-    S.pinLoading = false;
-    if (localStorage.getItem('getfit_auth') === 'true') {
-      S.authenticated = true; render(); setSyncStatus('Sync failed', '#888', 'var(--loss)');
-    } else {
-      S.authenticated = false; S.pinEntry = ''; render();
-      const dots = document.getElementById('pin-dots');
-      if (dots) {
-        dots.classList.add('shake');
-        setTimeout(() => { dots.classList.remove('shake'); }, 600);
-      }
-    }
+    setSyncStatus('Sync failed', '#888', 'var(--loss)');
+    render();
   }
 }
 
@@ -574,7 +538,7 @@ function renderStaticHistory(){
     const yKeys=byYear[yr];
     const open=S.openYears.has('arch-'+yr);
     let yTot=0,wCount=0,lCount=0;
-    yKeys.filter(k=>k>'2025-08').forEach(k=>PERSONS.forEach(p=>{
+    yKeys.forEach(k=>PERSONS.forEach(p=>{
       const d=STATIC_HISTORY[k][p];yTot+=d.amount;
       if(d.amount===S.config.stakes.success)wCount++;else lCount++;
     }));
@@ -592,28 +556,22 @@ function renderStaticHistory(){
     if(open){
       h+='<div style="border:1px solid #181818;border-top:none;border-bottom-left-radius:8px;border-bottom-right-radius:8px;overflow:hidden">';
       yKeys.forEach((key,idx)=>{
-        const isStart=key==='2025-08';
-        let mTot=0;if(!isStart)PERSONS.forEach(p=>{mTot+=STATIC_HISTORY[key][p].amount;});
+        let mTot=0;PERSONS.forEach(p=>{mTot+=STATIC_HISTORY[key][p].amount;});
         const last=idx===yKeys.length-1;
         h+='<div style="padding:12px;background:#111;'+(last?'':'border-bottom:1px solid #161616')+'">';
         h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
            '<span class="mono" style="font-size:11px;font-weight:600;color:#444;letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
-           '<span class="mono" style="font-size:13px;font-weight:500;color:#444">'+(isStart?'—':mTot+'€')+'</span></div>';
+           '<span class="mono" style="font-size:13px;font-weight:500;color:#444">'+mTot+'€</span></div>';
         h+='<div style="display:flex;flex-direction:column;gap:10px">';
         PERSONS.forEach(p=>{
           const d=STATIC_HISTORY[key][p];
           const kgLbl=d.kg!=null?d.kg+' kg':'—';
           const kcLbl=d.kcal!=null?d.kcal+' kcal':'—';
-          let badgeHtml='';
-          if(isStart){
-            badgeHtml='<span style="font-size:10px;color:#333;font-family:var(--sans);font-weight:500;">START</span>';
-          } else {
-            const win=d.amount===S.config.stakes.success;
-            const c=win?'var(--win)':'var(--loss)';
-            const bg=win?'rgba(61,220,132,.06)':'rgba(255,69,69,.06)';
-            const bd=win?'rgba(61,220,132,.15)':'rgba(255,69,69,.15)';
-            badgeHtml='<span class="mono" style="font-size:12px;font-weight:600;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+d.amount+'€</span>';
-          }
+          const win=d.amount===S.config.stakes.success;
+          const c=win?'var(--win)':'var(--loss)';
+          const bg=win?'rgba(61,220,132,.06)':'rgba(255,69,69,.06)';
+          const bd=win?'rgba(61,220,132,.15)':'rgba(255,69,69,.15)';
+          const badgeHtml='<span class="mono" style="font-size:12px;font-weight:600;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+d.amount+'€</span>';
           h+='<div style="display:flex;align-items:center;gap:8px">'+
              '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase;opacity:.6">'+S.config.persons[p].name+'</span>'+
              '<div style="flex:1;display:flex;gap:14px;font-family:var(--sans);align-items:center">'+
@@ -674,7 +632,7 @@ function renderSuivi(){
   let grossTotal=0;
   const per={};PERSONS.forEach(p=>per[p]={total:0,w:0,l:0});
   // Archive (Aug 2025 – Apr 2026) : montants figés
-  Object.keys(STATIC_HISTORY).filter(k=>k>'2025-08').forEach(k=>PERSONS.forEach(p=>{
+  Object.keys(STATIC_HISTORY).forEach(k=>PERSONS.forEach(p=>{
     const d=STATIC_HISTORY[k][p];
     per[p].total+=d.amount; grossTotal+=d.amount;
     if(d.amount===S.config.stakes.success)per[p].w++; else per[p].l++;
@@ -745,9 +703,7 @@ function renderSuivi(){
   }
   h+='</div>';
 
-  h += renderStaticHistory();
-
-  h+='<div class="sectitle" style="margin-top:24px;">Monthly History</div>';
+  h+='<div class="sectitle">Monthly History</div>';
   if(keys.length===0){h+='<div style="text-align:center;color:#333;font-family:var(--sans);font-weight:500;font-size:11px;padding:30px 0">No entries yet — add your first month above.</div>';}
 
   const byYear={};
@@ -795,6 +751,8 @@ function renderSuivi(){
     }
     h+='</div>';
   });
+
+  h += renderStaticHistory();
   return h;
 }
 
@@ -955,36 +913,6 @@ function renderObjectifs(){
 }
 
 function render(){
-  if (!S.authenticated) {
-    let h = '<div style="position:fixed;inset:0;background:var(--bg-dark);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3rem;">';
-
-    if (S.pinLoading) {
-      h += '<div id="pin-dots" style="display:flex;gap:14px;">';
-      for(let i=0; i<5; i++) h += '<div class="pin-dot loading"></div>';
-      h += '</div>';
-      h += '<div class="connecting-label" style="font-family:var(--sans);font-weight:600;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#555;">Connecting...</div>';
-    } else {
-      h += '<div class="pin-dots" id="pin-dots" style="display:flex;gap:14px;">';
-      for(let i=0; i<5; i++) {
-        const filled = (S.pinEntry && i < S.pinEntry.length) ? ' filled' : '';
-        h += '<div class="pin-dot'+filled+'" id="d'+i+'"></div>';
-      }
-      h += '</div>';
-      h += '<div class="pin-pad" style="display:grid;grid-template-columns:repeat(3,72px);gap:16px;">';
-      [1,2,3,4,5,6,7,8,9].forEach(n => {
-        h += '<div class="pin-key" data-act="pin-key" data-val="'+n+'">'+n+'</div>';
-      });
-      h += '<div class="pin-key empty" style="border:none;background:transparent;cursor:default;"></div>';
-      h += '<div class="pin-key" data-act="pin-key" data-val="0">0</div>';
-      h += '<div class="pin-key del" data-act="pin-del">⌫</div>';
-      h += '</div>';
-    }
-
-    h += '</div>';
-    document.getElementById('root').innerHTML = h;
-    return;
-  }
-
   let h='<div class="header-container">';
   h+='<header>';
   h+='<h1 style="font-size:26px;letter-spacing:-.03em;line-height:1;color:var(--gold);">S.A.H Challenge</h1>';
@@ -1065,30 +993,6 @@ document.addEventListener('click',ev=>{
   const t=ev.target.closest('[data-act]');
   if(!t)return;
   const act=t.getAttribute('data-act');
-
-  if(act === 'pin-key') {
-    if(!S.pinEntry) S.pinEntry = '';
-    if(S.pinEntry.length < 5) {
-      S.pinEntry += t.getAttribute('data-val');
-      updateDots();
-      if(S.pinEntry.length === 5) {
-        S.pin = S.pinEntry;
-        localStorage.setItem('getfit_pin', S.pin);
-        S.pinLoading = true;
-        render();
-        syncLoad();
-      }
-    }
-    return;
-  }
-  
-  if(act === 'pin-del') {
-    if(S.pinEntry && S.pinEntry.length > 0) {
-      S.pinEntry = S.pinEntry.slice(0, -1);
-      updateDots();
-    }
-    return;
-  }
 
   if(act==='toggle-year'){
     const yr=t.getAttribute('data-year');
