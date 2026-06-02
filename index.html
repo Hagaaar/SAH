@@ -476,16 +476,12 @@ function makeChange(person,monthKey,kg,kcal,note){
   const wOk=lk!=null&&lk>=pc.targetLoss; const kOk=kcal!=null&&kcal>=pc.kcalMin;
   
   let pass, amount;
-  if (monthKey >= FORM_START) {
-    if (person === 'saad' && kcal == null) { pass=null; amount=0; }
-    else if (person !== 'saad' && kg == null) { pass=null; amount=0; }
-    else {
-      pass = person === 'saad' ? kOk : wOk;
-      amount = pass ? S.config.stakes.success : S.config.stakes.failure;
-    }
+  if (person === 'saad') {
+    if (kcal == null) { pass=null; amount=0; }
+    else { pass=kOk; amount=pass?S.config.stakes.success:S.config.stakes.failure; }
   } else {
-    pass = person === 'saad' ? kOk : ((monthKey < '2025-12') ? (wOk||kOk) : wOk);
-    amount = pass ? S.config.stakes.success : S.config.stakes.failure;
+    if (kg == null) { pass=null; amount=0; }
+    else { pass=wOk; amount=pass?S.config.stakes.success:S.config.stakes.failure; }
   }
 
   return{month:monthKey,person,kg:kg??null,kcal:kcal??null,pass,amount,note:note||'entry'};
@@ -508,36 +504,24 @@ function prevKgFor(person,key){
 function computeEntry(person,key){
   const pc = S.config.persons[person];
   if(key <= OBS_END) return {pass:true, amount:S.config.stakes.success, reason:'obs'};
-  
+
   const d = (S.data[key] && S.data[key][person]) || {};
   const prevKg = prevKgFor(person,key);
-  
-  const lossKg = d.kg != null ? +(prevKg - d.kg).toFixed(2) : null; 
+  const lossKg = d.kg != null ? +(prevKg - d.kg).toFixed(2) : null;
   const wOk = lossKg != null && lossKg >= pc.targetLoss;
   const kOk = d.kcal != null && d.kcal >= pc.kcalMin;
-  
-  let pass, reason;
-
-  // Mois formulaire (≥ FORM_START) : en attente tant que le champ décisif n'est pas saisi
-  if (key >= FORM_START) {
-    if (person === 'saad' && d.kcal == null) return {pass:null, amount:0, reason:'pending'};
-    if (person !== 'saad' && d.kg  == null) return {pass:null, amount:0, reason:'pending'};
-  }
 
   if (person === 'saad') {
-    pass = kOk;
-    reason = pass ? (d.kcal + ' kcal ✓') : ((d.kcal != null ? d.kcal : '—') + ' kcal < ' + pc.kcalMin);
+    if (d.kcal == null) return {pass:null, amount:0, reason:'pending'};
+    const pass = kOk;
+    return {pass, amount: pass ? S.config.stakes.success : S.config.stakes.failure,
+            reason: pass ? (d.kcal+' kcal ✓') : (d.kcal+' kcal < '+pc.kcalMin)};
   } else {
-    if (key < '2025-12') {
-      pass = wOk || kOk;
-      reason = pass ? (wOk ? '−'+lossKg+' kg ✓' : d.kcal+' kcal ✓') : 'Failed';
-    } else {
-      pass = wOk;
-      reason = pass ? '−'+lossKg+' kg ✓' : (lossKg != null ? '−'+lossKg+' kg < '+pc.targetLoss : 'Weight missing');
-    }
+    if (d.kg == null) return {pass:null, amount:0, reason:'pending'};
+    const pass = wOk;
+    return {pass, amount: pass ? S.config.stakes.success : S.config.stakes.failure,
+            reason: pass ? '−'+lossKg+' kg ✓' : '−'+lossKg+' kg < '+pc.targetLoss};
   }
-
-  return {pass, amount: pass ? S.config.stakes.success : S.config.stakes.failure, reason};
 }
 
 function amountFor(person,key){
@@ -979,6 +963,7 @@ function bindForm(){
     S.data[S.formMonth]=Object.assign({},bak,{[S.formPerson]:{kg:kgN,kcal:kcN}});
     const e=computeEntry(S.formPerson,S.formMonth);
     S.data[S.formMonth]=bak;
+    if(e.pass===null){el.innerHTML='';return;}
     el.innerHTML='<span style="color:'+(e.pass?'var(--win)':'var(--loss)')+'">+'+(e.amount)+'€</span>';
   }
   if(kg)kg.addEventListener('input',upd);
