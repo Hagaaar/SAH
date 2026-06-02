@@ -154,25 +154,25 @@
   .saisie-onglets button.active-tab {
     background: var(--tab-bg);
     color: var(--tab-color) !important;
-    border-radius: 16px 16px 0 0;
+    border-radius: 0 0 16px 16px;
   }
 
   .saisie-onglets button.active-tab::before,
   .saisie-onglets button.active-tab::after {
     content: "";
     position: absolute;
-    bottom: 0;
+    top: 0;
     width: 16px;
     height: 16px;
     pointer-events: none;
   }
   .saisie-onglets button.active-tab::before {
     left: -16px;
-    background: radial-gradient(circle at 0 0, transparent 16px, var(--tab-bg) 16.5px);
+    background: radial-gradient(circle at 0 100%, transparent 16px, var(--tab-bg) 16.5px);
   }
   .saisie-onglets button.active-tab::after {
     right: -16px;
-    background: radial-gradient(circle at 100% 0, transparent 16px, var(--tab-bg) 16.5px);
+    background: radial-gradient(circle at 100% 100%, transparent 16px, var(--tab-bg) 16.5px);
   }
 
   .saisie-onglets button:first-child.active-tab::before { display: none; }
@@ -404,10 +404,10 @@ let S={
   data:saved?saved.data:JSON.parse(JSON.stringify(DEF_DATA)),
   manual:saved?saved.manual:JSON.parse(JSON.stringify(DEF_MANUAL)),
   trips:saved&&saved.trips?saved.trips:JSON.parse(JSON.stringify(DEF_TRIPS)),
-  formPerson:'anas', formMonth:FORM_START, pickerOpen:false, fKg:'', fKcal:'',
+  formPerson:'saad', formMonth:FORM_START, pickerOpen:false, fKg:'', fKcal:'',
   fTripTitle:'', fTripDates:'', fTripCost:'',
   pin: localStorage.getItem('getfit_pin') || '',
-  openYears: new Set([new Date().getFullYear().toString()]),
+  openYears: new Set(),
   userSelectedMonth: false,
 };
 
@@ -425,6 +425,7 @@ function persist(){try{localStorage.setItem(LS,JSON.stringify({config:S.config,d
 
 /* ════ SYNCHRONISATION ════ */
 let syncTimer=null;
+let _syncOk=false;
 
 function setSyncStatus(msg, color, dotColor) {
   const elTxt = document.getElementById('sync-text');
@@ -473,9 +474,11 @@ async function syncLoad(){
       persist();
     }
 
+    _syncOk=true;
     setSyncStatus('Synced', '#888', 'var(--win)');
     render();
   }catch(e){
+    _syncOk=false;
     setSyncStatus('Sync failed', '#888', 'var(--loss)');
     render();
   }
@@ -486,8 +489,10 @@ async function syncSave(changes){
   try{
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
       body:JSON.stringify({pin: S.pin, state:{config:S.config,data:S.data,manual:S.manual,trips:S.trips},changes:changes||[]})});
+    _syncOk=true;
     setSyncStatus('Synced', '#888', 'var(--win)');
   }catch(e){
+    _syncOk=false;
     setSyncStatus('Sync failed', '#888', 'var(--loss)');
   }
 }
@@ -653,61 +658,24 @@ function renderSuivi(){
   const curP = S.formPerson;
 
   const SAISIE_ORDER = ['saad','anas','hicham'];
-  let blocRadius = '16px 16px 16px 16px';
-  if (curP === 'saad') blocRadius = '0 16px 16px 16px';
-  if (curP === 'hicham') blocRadius = '16px 0 16px 16px';
 
-  h+='<div class="saisie-wrapper" style="--tab-bg:'+P_BG[curP]+'; --tab-color:'+P_COLOR[curP]+'">';
-  h+='<div class="saisie-onglets">';
-  SAISIE_ORDER.forEach(p=>{
-    const sel=p===curP;
-    h+='<button data-act="fperson" data-val="'+p+'" '+(sel?'class="active-tab"':'')+'>'+S.config.persons[p].name+'</button>';
-  });
-  h+='</div>';
-
-  h+='<div class="saisie-bloc" style="border-radius:'+blocRadius+';padding:14px 16px;">';
-  h+='<div style="position:relative;display:flex;gap:8px;align-items:center;">';
-  h+='<div style="position:relative;flex:1.4;min-width:0;">';
-  h+='<button class="saisie-input-bg" data-act="picker" style="width:100%;padding:11px 10px;text-align:left;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:11px;white-space:nowrap;"><span style="white-space:nowrap;">'+mLbl(S.formMonth).toUpperCase()+'</span><span style="font-size:9px;color:rgba(255,255,255,.3);flex-shrink:0;margin-left:4px;">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
-  if(S.pickerOpen){
-    h+='<div data-act="picker-bg" style="position:fixed;inset:0;z-index:98"></div>';
-    h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#1C1C1F;border:1px solid rgba(255,255,255,.08);border-radius:16px;max-height:220px;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,.7)">';
-    FORM_MONTHS.forEach(m=>{
-      const on=m===S.formMonth;
-      h+='<div data-act="pick" data-val="'+m+'"'+(on?' data-sel="1"':'')+' style="padding:10px 14px;cursor:pointer;font-family:var(--sans);font-weight:500;font-size:11px;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.04);background:'+(on?'rgba(255,255,255,.06)':'transparent')+';color:'+(on?'#F2F2F7':'rgba(242,242,247,.4)')+'">'+mLbl(m).toUpperCase()+'</div>';
-    });
-    h+='</div>';
-  }
-  h+='</div>';
-  h+='<input id="f-kg" class="saisie-input-bg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:11px 8px;font-size:11px;">';
-  h+='<input id="f-kcal" class="saisie-input-bg" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;min-width:0;padding:11px 8px;font-size:11px;">';
-  h+='<button data-act="add" style="width:38px;height:38px;flex-shrink:0;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">';
-  h+='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--tab-color)" stroke-width="3" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>';
-  h+='</button>';
-  h+='</div>';
-  h+='</div>';
-  h+='</div>';
-
+  // ── Pool calculation ──
   const keys=displayKeys();
   let grossTotal=0;
   const per={};PERSONS.forEach(p=>per[p]={total:0,w:0,l:0});
-  // Archive (Aug 2025 – Apr 2026) : montants figés
   Object.keys(STATIC_HISTORY).forEach(k=>PERSONS.forEach(p=>{
     const d=STATIC_HISTORY[k][p];
     per[p].total+=d.amount; grossTotal+=d.amount;
     if(d.amount===S.config.stakes.success)per[p].w++; else per[p].l++;
   }));
-  // Dynamique (mai 2026+) : calcul en temps réel
   keys.forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(!e||e.pass===null)return;per[p].total+=e.amount;grossTotal+=e.amount;if(e.pass===true)per[p].w++;else per[p].l++;}));
-  
-  let tripsTotal = 0;
-  if (S.trips) S.trips.forEach(t => { if(t.cost) tripsTotal += t.cost; });
-  
-  let netTotal = grossTotal - tripsTotal;
-  netTotal = Math.round(netTotal * 100) / 100;
-  grossTotal = Math.round(grossTotal * 100) / 100;
-  tripsTotal = Math.round(tripsTotal * 100) / 100;
+  let tripsTotal=0;
+  if(S.trips)S.trips.forEach(t=>{if(t.cost)tripsTotal+=t.cost;});
+  let netTotal=Math.round((grossTotal-tripsTotal)*100)/100;
+  grossTotal=Math.round(grossTotal*100)/100;
+  tripsTotal=Math.round(tripsTotal*100)/100;
 
+  // ── Common Pool (top) ──
   h+='<div style="background:rgba(255,220,80,.07);border-radius:16px;padding:16px;margin-bottom:24px">';
   h+='<div class="mono" style="font-size:9px;font-weight:600;letter-spacing:.2em;color:rgba(255,208,96,.5);text-transform:uppercase;margin-bottom:6px">Common Pool</div>';
   h+='<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px">';
@@ -729,6 +697,41 @@ function renderSuivi(){
        '<div class="mono" style="font-size:9px;color:rgba(242,242,247,.3);margin-top:4px"><span>'+per[p].w+'×20</span> · <span>'+per[p].l+'×100</span></div></div>';
   });
   h+='</div></div>';
+
+  // ── Entry Form (below pool, tabs at bottom) ──
+  let blocRadius = '16px 16px 16px 16px';
+  if (curP === 'saad')   blocRadius = '16px 16px 0 16px';
+  if (curP === 'hicham') blocRadius = '16px 16px 16px 0';
+
+  h+='<div class="saisie-wrapper" style="--tab-bg:'+P_BG[curP]+'; --tab-color:'+P_COLOR[curP]+'; margin-bottom:24px;">';
+  h+='<div class="saisie-bloc" style="border-radius:'+blocRadius+';padding:14px 16px;">';
+  h+='<div style="position:relative;display:flex;gap:8px;align-items:center;">';
+  h+='<div style="position:relative;flex:1.4;min-width:0;">';
+  h+='<button class="saisie-input-bg" data-act="picker" style="width:100%;padding:11px 10px;text-align:left;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:11px;white-space:nowrap;"><span style="white-space:nowrap;">'+mLbl(S.formMonth).toUpperCase()+'</span><span style="font-size:9px;color:rgba(255,255,255,.3);flex-shrink:0;margin-left:4px;">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
+  if(S.pickerOpen){
+    h+='<div data-act="picker-bg" style="position:fixed;inset:0;z-index:98"></div>';
+    h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#1C1C1F;border:1px solid rgba(255,255,255,.08);border-radius:16px;max-height:220px;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,.7)">';
+    FORM_MONTHS.forEach(m=>{
+      const on=m===S.formMonth;
+      h+='<div data-act="pick" data-val="'+m+'"'+(on?' data-sel="1"':'')+' style="padding:10px 14px;cursor:pointer;font-family:var(--sans);font-weight:500;font-size:11px;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.04);background:'+(on?'rgba(255,255,255,.06)':'transparent')+';color:'+(on?'#F2F2F7':'rgba(242,242,247,.4)')+'">'+mLbl(m).toUpperCase()+'</div>';
+    });
+    h+='</div>';
+  }
+  h+='</div>';
+  h+='<input id="f-kg" class="saisie-input-bg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:11px 8px;font-size:11px;">';
+  h+='<input id="f-kcal" class="saisie-input-bg" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;min-width:0;padding:11px 8px;font-size:11px;">';
+  h+='<button data-act="add" style="width:38px;height:38px;flex-shrink:0;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">';
+  h+='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--tab-color)" stroke-width="3" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>';
+  h+='</button>';
+  h+='</div>';
+  h+='</div>';
+  h+='<div class="saisie-onglets">';
+  SAISIE_ORDER.forEach(p=>{
+    const sel=p===curP;
+    h+='<button data-act="fperson" data-val="'+p+'" '+(sel?'class="active-tab"':'')+'>'+S.config.persons[p].name+'</button>';
+  });
+  h+='</div>';
+  h+='</div>';
 
   // ── Merged Monthly History (dynamic + static archive) ──
   h+='<div class="sectitle">Monthly History</div>';
@@ -1072,7 +1075,6 @@ function render(){
   h+='<h1 style="font-size:26px;letter-spacing:-.03em;line-height:1;color:var(--text-secondary);">S.A.H Challenge</h1>';
   h+='<div style="font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-top:6px;color:var(--text-tertiary);">Siblings Avoiding Heart-attacks Challenge</div>';
   h+='</header>';
-  const _syncOk = localStorage.getItem('getfit_auth')==='true';
   const _dotBg = _syncOk ? 'var(--win)' : 'var(--loss)';
   const _dotGlow = _syncOk
     ? '0 0 0 3px rgba(76,211,126,.18), 0 0 10px rgba(76,211,126,.45)'
