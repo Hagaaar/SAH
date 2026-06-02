@@ -358,7 +358,8 @@ let S={
   pinEntry: '',
   pinLoading: false,
   authenticated: localStorage.getItem('getfit_auth') === 'true',
-  openYears: new Set(),
+  openYears: new Set([new Date().getFullYear().toString()]),
+  userSelectedMonth: false,
 };
 
 if (!S.data['2025-08'] || !S.data['2025-08'].anas || S.data['2025-08'].anas.kg == null) {
@@ -432,10 +433,12 @@ async function syncLoad(){
          scheduleSave([]);
       }
 
-      S.formMonth = getTargetMonth(S.data);
+      if(!S.userSelectedMonth) S.formMonth = getTargetMonth(S.data);
+      // Open year accordions for any form months already in the data
+      Object.keys(S.data).filter(k=>k>=FORM_START).forEach(k=>S.openYears.add(k.split('-')[0]));
       persist();
     }
-    
+
     S.authenticated = true; S.pinLoading = false; localStorage.setItem('getfit_auth', 'true');
     setSyncStatus('Synced', '#888', 'var(--win)');
     render();
@@ -1048,7 +1051,7 @@ document.addEventListener('click',ev=>{
   
   if(act==='picker'){S.pickerOpen=!S.pickerOpen;render();return;}
   if(act==='picker-bg'){S.pickerOpen=false;render();return;}
-  if(act==='pick'){S.formMonth=t.getAttribute('data-val');S.pickerOpen=false;render();return;}
+  if(act==='pick'){S.formMonth=t.getAttribute('data-val');S.userSelectedMonth=true;S.pickerOpen=false;render();return;}
 
   if(act==='add'){
     const kgEl=document.getElementById('f-kg'),kcEl=document.getElementById('f-kcal');
