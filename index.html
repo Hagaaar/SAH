@@ -497,6 +497,7 @@ function computeEntry(person,key){
 
 function amountFor(person,key){
   const auto=computeEntry(person,key);
+  if(auto.pass===null)return auto;
   const man=S.manual[key]&&S.manual[key][person];
   if(man!==undefined)return{...auto,amount:man,pass:man===S.config.stakes.success};
   return auto;
@@ -919,8 +920,8 @@ function renderObjectifs(){
 function render(){
   let h='<div class="header-container">';
   h+='<header>';
-  h+='<h1 style="font-size:26px;letter-spacing:-.03em;line-height:1;color:var(--gold);">S.A.H Challenge</h1>';
-  h+='<div style="font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-top:6px;color:var(--gold);">Siblings Avoiding Heart-attacks Challenge</div>';
+  h+='<h1 style="font-size:26px;letter-spacing:-.03em;line-height:1;color:var(--text-secondary);">S.A.H Challenge</h1>';
+  h+='<div style="font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-top:6px;color:var(--text-tertiary);">Siblings Avoiding Heart-attacks Challenge</div>';
   h+='</header>';
   h+='<button class="sync-badge" onclick="syncLoad()" style="flex-shrink:0;display:flex;align-items:center;gap:5px;">'
     +'<span id="sync-text" style="font-size:7px;letter-spacing:.1em;color:rgba(242,242,247,.3);">'+(localStorage.getItem('getfit_auth')==='true'?'Synced':'Offline')+'</span>'
