@@ -6,61 +6,65 @@
 <title>S.A.H</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-  
+
   :root {
     --sans: 'Inter', -apple-system, system-ui, sans-serif;
-    --anas: #ffb347;
-    --hicham: #7ed9a0;
-    --saad: #93c5fd;
-    --win: #3ddc84;
-    --loss: #ff4545;
-    --gold: #f0c040;
-    --bg-dark: #0e0e0e;
-    --card-bg: #141414;
+    --anas: #FF9F5A;
+    --hicham: #5DE0A4;
+    --saad: #6CBEFF;
+    --win: #4CD37E;
+    --loss: #FF6B6B;
+    --gold: #FFD060;
+    --bg-dark: #0C0C0F;
+    --card-bg: #1C1C1F;
+    --card-border: rgba(255,255,255,0.07);
+    --text-primary: #F2F2F7;
+    --text-secondary: rgba(242,242,247,0.55);
+    --text-tertiary: rgba(242,242,247,0.28);
   }
-  
+
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
   html, body { background: var(--bg-dark); }
   body {
     font-family: var(--sans);
-    font-variant-numeric: tabular-nums; 
-    color: #e8e8e8;
+    font-variant-numeric: tabular-nums;
+    color: var(--text-primary);
     font-size: 13px;
     min-height: 100vh;
     max-width: 390px;
     margin: 0 auto;
-    padding: 16px 14px 50px;
+    padding: 20px 16px 60px;
   }
-  
+
   ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 2px; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,.12); border-radius: 4px; }
   input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
   input[type=number], input[type=password], input[type=text] { -moz-appearance: textfield; }
   button { font-family: var(--sans); cursor: pointer; border: none; background: none; color: inherit; }
-  
+
   .mono { font-family: var(--sans); }
-  .sectitle { font-family: var(--sans); font-size: 9px; font-weight: 500; letter-spacing: .15em; color: #555; text-transform: uppercase; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid #1c1c1c; }
-  .card { background: var(--card-bg); border: 1px solid #1f1f1f; border-radius: 8px; }
-  
-  .edt { cursor: pointer; border-bottom: 1px dotted #2a2a2a; user-select: none; display: inline-block; min-width: 18px; }
-  .edt:hover { border-bottom-color: #555; }
-  .editinput { 
-    font-family: var(--sans); 
-    font-size: inherit; 
-    font-weight: 500; 
-    color: inherit; 
-    background: transparent; 
-    border: none; 
-    border-bottom: 1px solid currentColor; 
-    outline: none; 
-    text-align: center; 
-    width: 5.5em; 
+  .sectitle { font-family: var(--sans); font-size: 9px; font-weight: 600; letter-spacing: .18em; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; }
+
+  .edt { cursor: pointer; border-bottom: 1px dotted rgba(255,255,255,.15); user-select: none; display: inline-block; min-width: 18px; }
+  .edt:hover { border-bottom-color: rgba(255,255,255,.4); }
+  .editinput {
+    font-family: var(--sans);
+    font-size: inherit;
+    font-weight: 500;
+    color: inherit;
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid currentColor;
+    outline: none;
+    text-align: center;
+    width: 5.5em;
   }
   .editinput.sm { width: 4em; }
-  
-  .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; width: 100%; }
-  header h1 { font-family: var(--sans); font-size: 22px; font-weight: 600; letter-spacing: -.02em; line-height: 1; }
-  
+
+  .header-container { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; width: 100%; }
+  header h1 { font-family: var(--sans); font-size: 22px; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+
   .sync-badge {
     display: flex;
     align-items: center;
@@ -72,17 +76,17 @@
     font-size: 9px;
     font-weight: 500;
     text-transform: uppercase;
-    color: #888;
+    color: var(--text-tertiary);
     cursor: pointer;
     transition: opacity 0.2s ease;
   }
   .sync-badge:active { opacity: 0.6; }
-  .sync-dot { width: 6px; height: 6px; border-radius: 50%; background: #444; transition: background 0.3s ease; box-shadow: 0 0 4px rgba(0,0,0,0.3); }
-  
-  .tabs { display: flex; gap: 3px; background: #111; padding: 3px; border-radius: 10px; border: 1px solid #1c1c1c; margin-bottom: 16px; }
-  .tab { flex: 1; padding: 9px 0; border-radius: 8px; color: #555; font-size: 11px; font-weight: 500; letter-spacing: .06em; transition: all 0.2s ease; }
-  .tab.on { background: #242424; color: #e8e8e8; font-weight: 600; }
-  
+  .sync-dot { width: 7px; height: 7px; border-radius: 50%; background: rgba(255,255,255,.2); transition: background 0.4s ease; box-shadow: 0 0 6px rgba(0,0,0,.5); }
+
+  .tabs { display: flex; gap: 2px; background: rgba(255,255,255,0.05); padding: 3px; border-radius: 14px; border: 1px solid rgba(255,255,255,.06); margin-bottom: 20px; }
+  .tab { flex: 1; padding: 9px 0; border-radius: 11px; color: var(--text-secondary); font-size: 11px; font-weight: 500; letter-spacing: .05em; transition: all 0.2s ease; }
+  .tab.on { background: rgba(255,159,90,.15); color: var(--anas); font-weight: 600; border: 1px solid rgba(255,159,90,.22); }
+
   .saisie-wrapper { width: 100%; margin-bottom: 16px; margin-top: 8px; }
 
   .saisie-onglets {
@@ -97,7 +101,7 @@
     font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.1em;
-    color: #666;
+    color: var(--text-secondary);
     font-weight: 600;
     padding: 16px 0;
     background: transparent;
@@ -146,33 +150,33 @@
   }
 
   .saisie-input-bg {
-    background: rgba(0, 0, 0, 0.25);
-    border: none;
+    background: rgba(255,255,255,0.07);
+    border: 1px solid rgba(255,255,255,0.1);
     border-radius: 12px;
-    color: #e8e8e8;
+    color: var(--text-primary);
     font-family: var(--sans);
     font-size: 14px;
     font-weight: 600;
     outline: none;
     box-sizing: border-box;
   }
-  .saisie-input-bg::placeholder { color: rgba(255, 255, 255, 0.2); font-weight: 500; }
+  .saisie-input-bg::placeholder { color: rgba(242,242,247,.25); font-weight: 500; }
 
-  .pin-dot { width:14px; height:14px; border-radius:50%; border:1.5px solid #555; background:transparent; transition:background 0.1s, border-color 0.1s; }
-  .pin-dot.filled { background:#e8e8e8; border-color:#e8e8e8; }
+  .pin-dot { width:12px; height:12px; border-radius:50%; border:1.5px solid rgba(255,255,255,.22); background:transparent; transition:background 0.12s, border-color 0.12s; }
+  .pin-dot.filled { background:var(--text-primary); border-color:var(--text-primary); }
   .pin-dot.error { background:var(--loss); border-color:var(--loss); }
-  
-  .pin-key { width:72px; height:72px; border-radius:50%; border:1px solid #2a2a2a; background:#141414; color:#e8e8e8; font-size:24px; font-family:var(--sans); font-weight: 500; cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; user-select:none; }
-  .pin-key:active { background:#242424; }
-  .pin-key.del { font-size:22px; color:#888; }
-  
+
+  .pin-key { width:76px; height:76px; border-radius:50%; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.08); color:var(--text-primary); font-size:26px; font-family:var(--sans); font-weight:400; cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; user-select:none; }
+  .pin-key:active { background:rgba(255,255,255,.18); }
+  .pin-key.del { font-size:20px; color:var(--text-secondary); border:none; background:transparent; }
+
   @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
   .shake { animation:shake 0.35s ease; }
 
   @keyframes pin-pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.5);opacity:0.4} }
   .pin-dot.loading {
-    background: #e8e8e8;
-    border-color: #e8e8e8;
+    background: var(--text-primary);
+    border-color: var(--text-primary);
     animation: pin-pulse 1.1s ease-in-out infinite;
   }
   .pin-dot.loading:nth-child(1){animation-delay:0s}
@@ -183,12 +187,108 @@
 
   @keyframes fade-in { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
   .connecting-label { animation: fade-in 0.4s ease forwards; }
+
+  /* ── AUTH OVERLAY ── */
+  @keyframes auth-fade-out { to { opacity:0; pointer-events:none; } }
+  #auth-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-dark);
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #auth-overlay.out { animation: auth-fade-out 0.35s ease forwards; }
+  #auth-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 44px;
+  }
+  #auth-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: .28em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+  }
+  #auth-dots { display: flex; gap: 16px; }
+  #auth-pad {
+    display: grid;
+    grid-template-columns: repeat(3, 76px);
+    gap: 16px;
+  }
+  #auth-pad .pin-key.ghost { border: none; background: transparent; cursor: default; pointer-events: none; }
 </style>
 </head>
 <body>
+<div id="auth-overlay">
+  <div id="auth-card">
+    <div id="auth-label">S · A · H</div>
+    <div id="auth-dots">
+      <div class="pin-dot" id="ad0"></div>
+      <div class="pin-dot" id="ad1"></div>
+      <div class="pin-dot" id="ad2"></div>
+      <div class="pin-dot" id="ad3"></div>
+      <div class="pin-dot" id="ad4"></div>
+    </div>
+    <div id="auth-pad">
+      <button class="pin-key" data-k="1">1</button>
+      <button class="pin-key" data-k="2">2</button>
+      <button class="pin-key" data-k="3">3</button>
+      <button class="pin-key" data-k="4">4</button>
+      <button class="pin-key" data-k="5">5</button>
+      <button class="pin-key" data-k="6">6</button>
+      <button class="pin-key" data-k="7">7</button>
+      <button class="pin-key" data-k="8">8</button>
+      <button class="pin-key" data-k="9">9</button>
+      <button class="pin-key ghost"></button>
+      <button class="pin-key" data-k="0">0</button>
+      <button class="pin-key del" id="auth-del">⌫</button>
+    </div>
+  </div>
+</div>
 <div id="root"></div>
 
 <script>
+/* ── AUTH ── */
+(function(){
+  const HASH = 'c9f1e824ac8f66e7b43c117cb0e7fe182d3a30fe0f209345d7c47d0243e5aef5';
+  const SK   = '__sah_ok';
+  const ov   = document.getElementById('auth-overlay');
+  if(sessionStorage.getItem(SK)==='1'){ov.style.display='none';return;}
+  let buf='',done=false;
+  async function digest(s){
+    const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
+    return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
+  }
+  function dots(){for(let i=0;i<5;i++){const d=document.getElementById('ad'+i);if(d)d.className='pin-dot'+(i<buf.length?' filled':'');}}
+  async function submit(){
+    if(await digest(buf)===HASH){
+      done=true;
+      sessionStorage.setItem(SK,'1');
+      ov.classList.add('out');
+      setTimeout(()=>{ov.style.display='none';},350);
+    } else {
+      const w=document.getElementById('auth-dots');
+      document.querySelectorAll('#auth-dots .pin-dot').forEach(d=>d.classList.add('error'));
+      w.classList.add('shake');
+      setTimeout(()=>{w.classList.remove('shake');document.querySelectorAll('#auth-dots .pin-dot').forEach(d=>d.classList.remove('error'));buf='';dots();},500);
+    }
+  }
+  document.getElementById('auth-pad').addEventListener('click',e=>{
+    if(done)return;
+    const k=e.target.closest('[data-k]'),dl=e.target.closest('#auth-del');
+    if(k&&buf.length<5){buf+=k.dataset.k;dots();if(buf.length===5)submit();}
+    else if(dl&&buf.length>0){buf=buf.slice(0,-1);dots();}
+  });
+  document.addEventListener('keydown',e=>{
+    if(done||ov.style.display==='none')return;
+    if(e.key>='0'&&e.key<='9'&&buf.length<5){buf+=e.key;dots();if(buf.length===5)submit();}
+    else if(e.key==='Backspace'&&buf.length>0){buf=buf.slice(0,-1);dots();}
+  });
+})();
 /* ════ CONFIGURATION APP SCRIPT ════ */
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx8qVAaxyAJyYM1SNmufGlh3oc36YS_e0S_nLbcbZVug_DHIf_SYwV3QYlNPlurerU/exec';
 
@@ -199,13 +299,13 @@ const mLbl=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mShrt=k=>{const[y,m]=k.split('-');return MFR[+m-1]+' '+y;};
 const mStep=(k,d)=>{let[y,m]=k.split('-').map(Number);const n=m+d;return n>12?mKey(y+1,n-12):n<1?mKey(y-1,n+12):mKey(y,n);};
 
-const START_KEY='2025-08', OBS_END='2025-10';
+const START_KEY='2025-09', OBS_END='2025-10';
 const FORM_START='2026-05', FORM_END='2030-12';
 const PERSONS=['anas','hicham','saad'];
 
-const P_COLOR={anas:'#ffb347',hicham:'#7ed9a0',saad:'#93c5fd'};
-const P_BG={anas:'rgba(255,179,71,.1)',hicham:'rgba(126,217,160,.1)',saad:'rgba(147,197,253,.1)'};
-const P_BORD={anas:'rgba(255,179,71,.3)',hicham:'rgba(126,217,160,.3)',saad:'rgba(147,197,253,.3)'};
+const P_COLOR={anas:'#FF9F5A',hicham:'#5DE0A4',saad:'#6CBEFF'};
+const P_BG={anas:'rgba(255,159,90,.1)',hicham:'rgba(93,224,164,.1)',saad:'rgba(108,190,255,.1)'};
+const P_BORD={anas:'rgba(255,159,90,.25)',hicham:'rgba(93,224,164,.25)',saad:'rgba(108,190,255,.25)'};
 
 const FORM_MONTHS=(()=>{
   const a=[]; let k = FORM_START;
@@ -213,29 +313,30 @@ const FORM_MONTHS=(()=>{
   return a;
 })();
 
+const STATIC_END = '2026-04';
+const STATIC_HISTORY = {
+  '2025-09':{anas:{kg:86.4,kcal:771,amount:20},hicham:{kg:112.0,kcal:760,amount:20},saad:{kg:null,kcal:null,amount:20}},
+  '2025-10':{anas:{kg:86.2,kcal:674,amount:20},hicham:{kg:109.5,kcal:780,amount:20},saad:{kg:91.55,kcal:877,amount:20}},
+  '2025-11':{anas:{kg:null,kcal:699,amount:20},hicham:{kg:109.8,kcal:859,amount:20},saad:{kg:90.45,kcal:714,amount:100}},
+  '2025-12':{anas:{kg:89.0,kcal:574,amount:100},hicham:{kg:111.6,kcal:769,amount:100},saad:{kg:93.55,kcal:486,amount:100}},
+  '2026-01':{anas:{kg:null,kcal:631,amount:100},hicham:{kg:109.2,kcal:847,amount:20},saad:{kg:92.15,kcal:542,amount:100}},
+  '2026-02':{anas:{kg:null,kcal:648,amount:100},hicham:{kg:111.3,kcal:786,amount:100},saad:{kg:null,kcal:849,amount:20}},
+  '2026-03':{anas:{kg:null,kcal:null,amount:100},hicham:{kg:112.9,kcal:769,amount:100},saad:{kg:null,kcal:777,amount:100}},
+  '2026-04':{anas:{kg:89.3,kcal:656,amount:100},hicham:{kg:112.9,kcal:891,amount:100},saad:{kg:null,kcal:796,amount:100}},
+};
+
 /* ════ DONNÉES PAR DÉFAUT ════ */
 const DEF_CFG={
   stakes:{success:20,failure:100},
   persons:{
-    anas:{name:'Anas',startKg:89.0,targetLoss:1.5,kcalMin:630,mandat:'kg'},
-    hicham:{name:'Hicham',startKg:115.1,targetLoss:1.5,kcalMin:840,mandat:'kg'},
-    saad:{name:'Saad',startKg:94.5,targetLoss:1.5,kcalMin:830,mandat:'kcal'},
+    anas:{name:'Anas',startKg:88.5,targetLoss:1.5,kcalMin:630,mandat:'kg'},
+    hicham:{name:'Hicham',startKg:114.9,targetLoss:1.5,kcalMin:840,mandat:'kg'},
+    saad:{name:'Saad',startKg:94.9,targetLoss:1.5,kcalMin:830,mandat:'kcal'},
   }
 };
 
-const DEF_DATA={
-  '2025-08':{anas:{kg:89.0,kcal:null},hicham:{kg:115.1,kcal:null},saad:{kg:94.5,kcal:null}},
-  '2025-09':{anas:{kg:86.4,kcal:771},hicham:{kg:112.0,kcal:760},saad:{kg:null,kcal:null}},
-  '2025-10':{anas:{kg:86.2,kcal:674},hicham:{kg:109.5,kcal:780},saad:{kg:91.55,kcal:877}},
-  '2025-11':{anas:{kg:null,kcal:699},hicham:{kg:109.8,kcal:859},saad:{kg:90.45,kcal:714}},
-  '2025-12':{anas:{kg:89.0,kcal:574},hicham:{kg:111.6,kcal:769},saad:{kg:93.55,kcal:486}},
-  '2026-01':{anas:{kg:null,kcal:631},hicham:{kg:109.2,kcal:847},saad:{kg:92.15,kcal:542}},
-  '2026-02':{anas:{kg:null,kcal:648},hicham:{kg:111.3,kcal:786},saad:{kg:null,kcal:849}},
-  '2026-03':{anas:{kg:null,kcal:null},hicham:{kg:112.9,kcal:769},saad:{kg:null,kcal:777}},
-  '2026-04':{anas:{kg:89.3,kcal:656},hicham:{kg:112.9,kcal:891},saad:{kg:null,kcal:796}},
-};
-
-const DEF_MANUAL={'2026-01':{saad:20}};
+const DEF_DATA={};
+const DEF_MANUAL={};
 const DEF_TRIPS=[];
 
 /* ════ ETAT GLOBAL ════ */
@@ -259,22 +360,19 @@ let S={
   formPerson:'anas', formMonth:FORM_START, pickerOpen:false, fKg:'', fKcal:'',
   fTripTitle:'', fTripDates:'', fTripCost:'',
   pin: localStorage.getItem('getfit_pin') || '',
-  pinEntry: '',
-  pinLoading: false,
-  authenticated: localStorage.getItem('getfit_auth') === 'true',
-  openYears: new Set(),
+  openYears: new Set([new Date().getFullYear().toString()]),
+  userSelectedMonth: false,
 };
 
-if (!S.data['2025-08'] || !S.data['2025-08'].anas || S.data['2025-08'].anas.kg == null) {
-  S.data['2025-08'] = {
-    anas:{kg:89.0,kcal:null},
-    hicham:{kg:115.1,kcal:null},
-    saad:{kg:94.5,kcal:null}
-  };
-  persist();
-}
-
 S.formMonth = getTargetMonth(S.data);
+
+// Migration: purge pre-May data now handled by STATIC_HISTORY
+(function migrateToStatic(){
+  let changed = false;
+  Object.keys(S.data).forEach(k=>{if(k<=STATIC_END){delete S.data[k];changed=true;}});
+  Object.keys(S.manual).forEach(k=>{if(k<=STATIC_END){delete S.manual[k];changed=true;}});
+  if(changed) persist();
+})();
 
 function persist(){try{localStorage.setItem(LS,JSON.stringify({config:S.config,data:S.data,manual:S.manual,trips:S.trips}));}catch(e){}}
 
@@ -299,62 +397,32 @@ function updateDots() {
 }
 
 async function syncLoad(){
-  if (!S.pin) { S.authenticated = false; render(); return; }
+  if (!S.pin) return;
   setSyncStatus('Syncing', '#888', 'var(--gold)');
   try{
     const resp = await fetch(SCRIPT_URL + '?pin=' + encodeURIComponent(S.pin), {cache:'no-store'});
     const remote = await resp.json();
-    
+
     if (remote && remote.status === 'error') {
-      S.pin = ''; S.authenticated = false; S.pinLoading = false;
-      localStorage.removeItem('getfit_pin'); localStorage.removeItem('getfit_auth');
-      S.pinEntry = ''; render();
-      const dots = document.getElementById('pin-dots');
-      if (dots) {
-        dots.classList.add('shake');
-        document.querySelectorAll('.pin-dot').forEach(d => d.classList.add('error'));
-        setTimeout(() => {
-          dots.classList.remove('shake');
-          document.querySelectorAll('.pin-dot').forEach(d => d.classList.remove('error'));
-        }, 600);
-      }
+      setSyncStatus('Sync failed', '#888', 'var(--loss)');
       return;
     }
-    
+
     if(remote && remote.data && Object.keys(remote.data).length > 0){
-      S.config = remote.config || S.config; 
-      S.data = remote.data; 
+      S.config = remote.config || S.config;
+      S.data = remote.data;
       S.manual = remote.manual || S.manual;
       S.trips = remote.trips || S.trips;
-      
-      if (!S.data['2025-08'] || !S.data['2025-08'].anas || S.data['2025-08'].anas.kg == null) {
-         S.data['2025-08'] = {
-           anas: {kg: 89.0, kcal: null},
-           hicham: {kg: 115.1, kcal: null},
-           saad: {kg: 94.5, kcal: null}
-         };
-         scheduleSave([]);
-      }
-
-      S.formMonth = getTargetMonth(S.data);
+      if(!S.userSelectedMonth) S.formMonth = getTargetMonth(S.data);
+      Object.keys(S.data).filter(k=>k>=FORM_START).forEach(k=>S.openYears.add(k.split('-')[0]));
       persist();
     }
-    
-    S.authenticated = true; S.pinLoading = false; localStorage.setItem('getfit_auth', 'true');
+
     setSyncStatus('Synced', '#888', 'var(--win)');
     render();
   }catch(e){
-    S.pinLoading = false;
-    if (localStorage.getItem('getfit_auth') === 'true') {
-      S.authenticated = true; render(); setSyncStatus('Sync failed', '#888', 'var(--loss)');
-    } else {
-      S.authenticated = false; S.pinEntry = ''; render();
-      const dots = document.getElementById('pin-dots');
-      if (dots) {
-        dots.classList.add('shake');
-        setTimeout(() => { dots.classList.remove('shake'); }, 600);
-      }
-    }
+    setSyncStatus('Sync failed', '#888', 'var(--loss)');
+    render();
   }
 }
 
@@ -376,14 +444,16 @@ function makeChange(person,monthKey,kg,kcal,note){
   const lk=kg!=null?+(prevKg2-kg).toFixed(2):null;
   const wOk=lk!=null&&lk>=pc.targetLoss; const kOk=kcal!=null&&kcal>=pc.kcalMin;
   
-  let pass;
+  let pass, amount;
   if (person === 'saad') {
-    pass = kOk; 
+    if (kcal == null) { pass=null; amount=0; }
+    else { pass=kOk; amount=pass?S.config.stakes.success:S.config.stakes.failure; }
   } else {
-    pass = (monthKey < '2025-12') ? (wOk || kOk) : wOk;
+    if (kg == null) { pass=null; amount=0; }
+    else { pass=wOk; amount=pass?S.config.stakes.success:S.config.stakes.failure; }
   }
-  
-  return{month:monthKey,person,kg:kg??null,kcal:kcal??null,pass,amount:pass?S.config.stakes.success:S.config.stakes.failure,note:note||'entry'};
+
+  return{month:monthKey,person,kg:kg??null,kcal:kcal??null,pass,amount,note:note||'entry'};
 }
 
 function scheduleSave(changes){persist();clearTimeout(syncTimer);syncTimer=setTimeout(()=>syncSave(changes),800);}
@@ -393,8 +463,10 @@ function prevKgFor(person,key){
   let k=mStep(key,-1);
   for(let i=0;i<80;i++){
     if(k<START_KEY)break;
-    const d=S.data[k]&&S.data[k][person];
-    if(d&&d.kg!=null)return d.kg;
+    const dyn=S.data[k]&&S.data[k][person];
+    if(dyn&&dyn.kg!=null)return dyn.kg;
+    const sta=STATIC_HISTORY[k]&&STATIC_HISTORY[k][person];
+    if(sta&&sta.kg!=null)return sta.kg;
     k=mStep(k,-1);
   }
   return S.config.persons[person].startKg;
@@ -403,30 +475,24 @@ function prevKgFor(person,key){
 function computeEntry(person,key){
   const pc = S.config.persons[person];
   if(key <= OBS_END) return {pass:true, amount:S.config.stakes.success, reason:'obs'};
-  
+
   const d = (S.data[key] && S.data[key][person]) || {};
   const prevKg = prevKgFor(person,key);
-  
-  const lossKg = d.kg != null ? +(prevKg - d.kg).toFixed(2) : null; 
+  const lossKg = d.kg != null ? +(prevKg - d.kg).toFixed(2) : null;
   const wOk = lossKg != null && lossKg >= pc.targetLoss;
   const kOk = d.kcal != null && d.kcal >= pc.kcalMin;
-  
-  let pass, reason;
 
   if (person === 'saad') {
-    pass = kOk;
-    reason = pass ? (d.kcal + ' kcal ✓') : ((d.kcal != null ? d.kcal : '—') + ' kcal < ' + pc.kcalMin);
+    if (d.kcal == null) return {pass:null, amount:0, reason:'pending'};
+    const pass = kOk;
+    return {pass, amount: pass ? S.config.stakes.success : S.config.stakes.failure,
+            reason: pass ? (d.kcal+' kcal ✓') : (d.kcal+' kcal < '+pc.kcalMin)};
   } else {
-    if (key < '2025-12') {
-      pass = wOk || kOk;
-      reason = pass ? (wOk ? '−'+lossKg+' kg ✓' : d.kcal+' kcal ✓') : 'Failed';
-    } else {
-      pass = wOk;
-      reason = pass ? '−'+lossKg+' kg ✓' : (lossKg != null ? '−'+lossKg+' kg < '+pc.targetLoss : 'Weight missing');
-    }
+    if (d.kg == null) return {pass:null, amount:0, reason:'pending'};
+    const pass = wOk;
+    return {pass, amount: pass ? S.config.stakes.success : S.config.stakes.failure,
+            reason: pass ? '−'+lossKg+' kg ✓' : '−'+lossKg+' kg < '+pc.targetLoss};
   }
-
-  return {pass, amount: pass ? S.config.stakes.success : S.config.stakes.failure, reason};
 }
 
 function amountFor(person,key){
@@ -448,23 +514,84 @@ const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'
 
 function badge(e,key,p){
   if(!e)return '';
-  if(key <= OBS_END) return '<span style="font-size:10px;color:#555;font-family:var(--sans);font-weight:600;padding:2px 4px;">OBS</span>';
-  
+  if(key <= OBS_END) return '<span style="font-size:10px;color:rgba(242,242,247,.3);font-family:var(--sans);font-weight:600;padding:2px 4px;">OBS</span>';
+
+  const d=(S.data[key]&&S.data[key][p])||{};
+  if(d.kg==null&&d.kcal==null)return '';
+  if(e.pass===null)return '';
+
   const c=e.pass?'var(--win)':'var(--loss)';
-  const bg=e.pass?'rgba(61,220,132,.08)':'rgba(255,69,69,.08)';
-  const bd=e.pass?'rgba(61,220,132,.2)':'rgba(255,69,69,.2)';
-  return '<span class="mono" data-act="toggle" data-month="'+esc(key)+'" data-person="'+p+'" '+
-    'style="font-size:12px;font-weight:600;cursor:pointer;user-select:none;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+e.amount+'€</span>';
+  const bg=e.pass?'rgba(76,211,126,.1)':'rgba(255,107,107,.1)';
+  const bd=e.pass?'rgba(76,211,126,.25)':'rgba(255,107,107,.25)';
+  return '<span class="mono" style="font-size:12px;font-weight:600;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+e.amount+'€</span>';
 }
 
 function editCell(key,person,field,value){
   const isKcal=field==='kcal';
   const lbl=value!=null?esc(value)+(isKcal?' kcal':' kg'):'—';
-  const col=value!=null?(isKcal?'#777':'#e8e8e8'):'#2a2a2a';
+  const col=value!=null?(isKcal?'rgba(242,242,247,.4)':'#F2F2F7'):'rgba(242,242,247,.18)';
   return '<span class="edt" data-act="editcell" data-month="'+esc(key)+'" data-person="'+person+'" data-field="'+field+'" data-val="'+(value!=null?esc(value):'')+'" style="color:'+col+';font-size:11px;font-weight:500;">'+lbl+'</span>';
 }
 
 /* ════ RENDU HTML ════ */
+function renderStaticHistory(){
+  let h='<div class="sectitle">Archive</div>';
+  const byYear={};
+  Object.keys(STATIC_HISTORY).sort().reverse().forEach(k=>{const y=k.split('-')[0];if(!byYear[y])byYear[y]=[];byYear[y].push(k);});
+  Object.keys(byYear).sort().reverse().forEach(yr=>{
+    const yKeys=byYear[yr];
+    const open=S.openYears.has('arch-'+yr);
+    let yTot=0,wCount=0,lCount=0;
+    yKeys.forEach(k=>PERSONS.forEach(p=>{
+      const d=STATIC_HISTORY[k][p];yTot+=d.amount;
+      if(d.amount===S.config.stakes.success)wCount++;else lCount++;
+    }));
+    h+='<div style="margin-bottom:6px">';
+    h+='<div data-act="toggle-year" data-year="arch-'+yr+'" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;border-radius:8px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);'+(open?'border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom-color:transparent;':'')+'">';
+    h+='<div style="display:flex;align-items:center;gap:10px">';
+    h+='<span class="mono" style="font-size:13px;font-weight:700;color:rgba(242,242,247,.3);letter-spacing:.08em">'+yr+'</span>';
+    h+='<span class="mono" style="font-size:8px;font-weight:600;color:rgba(242,242,247,.2);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:2px 5px;letter-spacing:.05em">ARCH</span>';
+    if(lCount>0)h+='<span class="mono" style="font-size:9px;color:var(--loss)">'+lCount+'✗</span>';
+    if(wCount>0)h+='<span class="mono" style="font-size:9px;color:var(--win)">'+wCount+'✓</span>';
+    h+='</div><div style="display:flex;align-items:center;gap:12px">';
+    if(yTot>0)h+='<span class="mono" style="font-size:12px;font-weight:600;color:rgba(242,242,247,.25)">'+yTot+'€</span>';
+    h+='<span style="color:rgba(242,242,247,.2);font-size:11px;transform:'+(open?'rotate(180deg)':'rotate(0deg)')+';display:inline-block;transition:transform .2s">▼</span>';
+    h+='</div></div>';
+    if(open){
+      h+='<div style="border:1px solid rgba(255,255,255,.05);border-top:none;border-bottom-left-radius:8px;border-bottom-right-radius:8px;overflow:hidden">';
+      yKeys.forEach((key,idx)=>{
+        let mTot=0;PERSONS.forEach(p=>{mTot+=STATIC_HISTORY[key][p].amount;});
+        const last=idx===yKeys.length-1;
+        h+='<div style="padding:12px;background:rgba(255,255,255,.02);'+(last?'':'border-bottom:1px solid rgba(255,255,255,.04)')+'">';
+        h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
+           '<span class="mono" style="font-size:11px;font-weight:600;color:rgba(242,242,247,.28);letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
+           '<span class="mono" style="font-size:13px;font-weight:500;color:rgba(242,242,247,.28)">'+mTot+'€</span></div>';
+        h+='<div style="display:flex;flex-direction:column;gap:10px">';
+        PERSONS.forEach(p=>{
+          const d=STATIC_HISTORY[key][p];
+          const kgLbl=d.kg!=null?d.kg+' kg':'—';
+          const kcLbl=d.kcal!=null?d.kcal+' kcal':'—';
+          const win=d.amount===S.config.stakes.success;
+          const c=win?'var(--win)':'var(--loss)';
+          const bg=win?'rgba(76,211,126,.08)':'rgba(255,107,107,.08)';
+          const bd=win?'rgba(76,211,126,.2)':'rgba(255,107,107,.2)';
+          const badgeHtml='<span class="mono" style="font-size:12px;font-weight:600;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+d.amount+'€</span>';
+          h+='<div style="display:flex;align-items:center;gap:8px">'+
+             '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase;opacity:.6">'+S.config.persons[p].name+'</span>'+
+             '<div style="flex:1;display:flex;gap:14px;font-family:var(--sans);align-items:center">'+
+             '<span style="color:'+(d.kg!=null?'rgba(242,242,247,.35)':'rgba(242,242,247,.12)')+';font-size:11px;font-weight:500;">'+kgLbl+'</span>'+
+             '<span style="color:'+(d.kcal!=null?'rgba(242,242,247,.28)':'rgba(242,242,247,.1)')+';font-size:11px;font-weight:500;">'+kcLbl+'</span>'+
+             '</div>'+badgeHtml+'</div>';
+        });
+        h+='</div></div>';
+      });
+      h+='</div>';
+    }
+    h+='</div>';
+  });
+  return h;
+}
+
 function renderSuivi(){
   let h = '';
   const curP = S.formPerson;
@@ -488,10 +615,10 @@ function renderSuivi(){
   h+='<button class="saisie-input-bg" data-act="picker" style="width:100%;padding:11px 10px;text-align:left;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:11px;white-space:nowrap;"><span style="white-space:nowrap;">'+mLbl(S.formMonth).toUpperCase()+'</span><span style="font-size:9px;color:rgba(255,255,255,.3);flex-shrink:0;margin-left:4px;">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
   if(S.pickerOpen){
     h+='<div data-act="picker-bg" style="position:fixed;inset:0;z-index:98"></div>';
-    h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#141414;border:1px solid #2a2a2a;border-radius:12px;max-height:220px;overflow-y:auto;box-shadow:0 8px 28px rgba(0,0,0,.8)">';
+    h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#1C1C1F;border:1px solid rgba(255,255,255,.08);border-radius:16px;max-height:220px;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,.7)">';
     FORM_MONTHS.forEach(m=>{
       const on=m===S.formMonth;
-      h+='<div data-act="pick" data-val="'+m+'"'+(on?' data-sel="1"':'')+' style="padding:10px 12px;cursor:pointer;font-family:var(--sans);font-weight:500;font-size:11px;white-space:nowrap;border-bottom:1px solid #1a1a1a;background:'+(on?'rgba(255,255,255,.05)':'transparent')+';color:'+(on?'#fff':'#888')+'">'+mLbl(m).toUpperCase()+'</div>';
+      h+='<div data-act="pick" data-val="'+m+'"'+(on?' data-sel="1"':'')+' style="padding:10px 14px;cursor:pointer;font-family:var(--sans);font-weight:500;font-size:11px;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.04);background:'+(on?'rgba(255,255,255,.06)':'transparent')+';color:'+(on?'#F2F2F7':'rgba(242,242,247,.4)')+'">'+mLbl(m).toUpperCase()+'</div>';
     });
     h+='</div>';
   }
@@ -508,7 +635,14 @@ function renderSuivi(){
   const keys=displayKeys();
   let grossTotal=0;
   const per={};PERSONS.forEach(p=>per[p]={total:0,w:0,l:0});
-  keys.filter(k => k > '2025-08').forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(!e)return;per[p].total+=e.amount;grossTotal+=e.amount;e.pass?per[p].w++:per[p].l++;}));
+  // Archive (Aug 2025 – Apr 2026) : montants figés
+  Object.keys(STATIC_HISTORY).forEach(k=>PERSONS.forEach(p=>{
+    const d=STATIC_HISTORY[k][p];
+    per[p].total+=d.amount; grossTotal+=d.amount;
+    if(d.amount===S.config.stakes.success)per[p].w++; else per[p].l++;
+  }));
+  // Dynamique (mai 2026+) : calcul en temps réel
+  keys.forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(!e||e.pass===null)return;per[p].total+=e.amount;grossTotal+=e.amount;if(e.pass===true)per[p].w++;else per[p].l++;}));
   
   let tripsTotal = 0;
   if (S.trips) S.trips.forEach(t => { if(t.cost) tripsTotal += t.cost; });
@@ -518,25 +652,25 @@ function renderSuivi(){
   grossTotal = Math.round(grossTotal * 100) / 100;
   tripsTotal = Math.round(tripsTotal * 100) / 100;
 
-  h+='<div style="background:rgba(240,192,64,.05);border:1px solid rgba(240,192,64,.15);border-radius:12px;padding:16px;margin-bottom:24px">';
-  h+='<div class="mono" style="font-size:9px;font-weight:600;letter-spacing:.2em;color:rgba(240,192,64,.5);text-transform:uppercase;margin-bottom:6px">Common Pool</div>';
+  h+='<div style="background:rgba(255,208,96,.05);border:1px solid rgba(255,208,96,.18);border-radius:16px;padding:16px;margin-bottom:24px">';
+  h+='<div class="mono" style="font-size:9px;font-weight:600;letter-spacing:.2em;color:rgba(255,208,96,.5);text-transform:uppercase;margin-bottom:6px">Common Pool</div>';
   h+='<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px">';
   h+='<div class="mono" style="font-size:42px;font-weight:700;color:var(--gold);line-height:1">'+netTotal+'€</div>';
   h+='<div id="preview" style="font-family:var(--sans);font-weight:700;font-size:42px;line-height:1;text-align:right;pointer-events:none;"></div>';
   h+='</div>';
   
   if(tripsTotal > 0) {
-      h+='<div class="mono" style="font-size:10px;font-weight:500;color:#888;margin-bottom:16px">Contributions: '+grossTotal+'€ — Trips: '+tripsTotal+'€</div>';
+      h+='<div class="mono" style="font-size:10px;font-weight:500;color:rgba(242,242,247,.45);margin-bottom:16px">Contributions: '+grossTotal+'€ — Trips: '+tripsTotal+'€</div>';
   } else {
       h+='<div style="margin-bottom:16px"></div>';
   }
   
   h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
-  PERSONS.forEach(p=>{
-    h+='<div style="background:'+P_BG[p]+';border-radius:8px;padding:10px;border:1px solid '+P_BORD[p]+'">'+
+  ['saad','anas','hicham'].forEach(p=>{
+    h+='<div style="background:'+P_BG[p]+';border-radius:12px;padding:10px;border:1px solid '+P_BORD[p]+'">'+
        '<div class="mono" style="font-size:10px;font-weight:600;color:'+P_COLOR[p]+';margin-bottom:4px;text-transform:uppercase">'+S.config.persons[p].name+'</div>'+
        '<div class="mono" style="font-size:18px;font-weight:500;color:'+P_COLOR[p]+'">'+per[p].total+'€</div>'+
-       '<div class="mono" style="font-size:9px;color:#666;margin-top:4px"><span>'+per[p].w+'×20</span> · <span>'+per[p].l+'×100</span></div></div>';
+       '<div class="mono" style="font-size:9px;color:rgba(242,242,247,.3);margin-top:4px"><span>'+per[p].w+'×20</span> · <span>'+per[p].l+'×100</span></div></div>';
   });
   h+='</div></div>';
 
@@ -549,7 +683,7 @@ function renderSuivi(){
   h+='<input id="f-trip-dates" class="saisie-input-bg" type="text" placeholder="Dates" value="'+esc(S.fTripDates)+'" style="flex:1; min-width:0; padding:14px 16px;">';
   h+='<input id="f-trip-cost" class="saisie-input-bg" type="number" inputmode="decimal" placeholder="€ (Cost)" value="'+esc(S.fTripCost)+'" style="flex:1; min-width:0; padding:14px 16px;">';
   h+='<button data-act="add-trip" style="width:48px; height:48px; flex-shrink:0; background:transparent; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center;">';
-  h+='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#e8e8e8" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
+  h+='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#F2F2F7" stroke-width="3" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>';
   h+='</button>';
   h+='</div>';
   h+='</div>';
@@ -559,13 +693,13 @@ function renderSuivi(){
     S.trips.forEach((trip, idx) => {
       h+='<div class="card" style="padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">';
       h+='<div style="display:flex; align-items:center; gap:8px;">';
-      h+='<span style="font-family:var(--sans); font-weight:600; font-size:13px; color:#e8e8e8;">'+esc(trip.title)+'</span>';
-      h+='<span style="color:#444;">—</span>';
-      h+='<span style="font-family:var(--sans); font-weight:500; font-size:12px; color:#888;">'+esc(trip.dates)+'</span>';
+      h+='<span style="font-family:var(--sans); font-weight:600; font-size:13px; color:#F2F2F7;">'+esc(trip.title)+'</span>';
+      h+='<span style="color:rgba(242,242,247,.25);">—</span>';
+      h+='<span style="font-family:var(--sans); font-weight:500; font-size:12px; color:rgba(242,242,247,.4);">'+esc(trip.dates)+'</span>';
       h+='</div>';
       h+='<div style="display:flex; align-items:center; gap:16px;">';
       h+='<span class="mono" style="font-weight:600; font-size:14px; color:var(--loss);">−'+trip.cost+'€</span>';
-      h+='<button data-act="del-trip" data-idx="'+idx+'" style="color:#555; font-size:14px; padding:2px 4px;">✕</button>';
+      h+='<button data-act="del-trip" data-idx="'+idx+'" style="color:rgba(242,242,247,.3); font-size:14px; padding:2px 4px;">✕</button>';
       h+='</div>';
       h+='</div>';
     });
@@ -573,51 +707,37 @@ function renderSuivi(){
   }
   h+='</div>';
 
-  h+='<div class="sectitle">Monthly history</div>';
-  if(keys.length===0){h+='<div style="text-align:center;color:#333;font-family:var(--sans);font-weight:500;font-size:11px;padding:30px 0">No entries yet — get moving!</div>';}
+  h+='<div class="sectitle">Monthly History</div>';
+  if(keys.length===0){h+='<div style="text-align:center;color:rgba(242,242,247,.2);font-family:var(--sans);font-weight:500;font-size:11px;padding:30px 0">No entries yet — add your first month above.</div>';}
 
-  // Group keys by year
   const byYear={};
   keys.forEach(k=>{const y=k.split('-')[0];if(!byYear[y])byYear[y]=[];byYear[y].push(k);});
-  const years=Object.keys(byYear).sort().reverse();
-
-
-
-  years.forEach(yr=>{
+  Object.keys(byYear).sort().reverse().forEach(yr=>{
     const yKeys=byYear[yr];
     const open=S.openYears.has(yr);
-    // year total
-    let yTot=0;yKeys.forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(e&&k>'2025-08')yTot+=e.amount;}));
-    const wCount=yKeys.reduce((n,k)=>{PERSONS.forEach(p=>{const e=amountFor(p,k);if(e&&k>'2025-08'&&e.pass)n++;});return n;},0);
-    const lCount=yKeys.reduce((n,k)=>{PERSONS.forEach(p=>{const e=amountFor(p,k);if(e&&k>'2025-08'&&!e.pass)n++;});return n;},0);
-
+    let yTot=0;yKeys.forEach(k=>PERSONS.forEach(p=>{const e=amountFor(p,k);if(e&&e.pass!==null)yTot+=e.amount;}));
+    const wCount=yKeys.reduce((n,k)=>{PERSONS.forEach(p=>{const e=amountFor(p,k);if(e&&e.pass===true)n++;});return n;},0);
+    const lCount=yKeys.reduce((n,k)=>{PERSONS.forEach(p=>{const e=amountFor(p,k);if(e&&e.pass===false)n++;});return n;},0);
     h+='<div style="margin-bottom:6px">';
-    // Year header row (accordion toggle)
-    h+='<div data-act="toggle-year" data-year="'+yr+'" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;border-radius:8px;background:#111;border:1px solid #1c1c1c;'+(open?'border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom-color:transparent;':'')+'">';
+    h+='<div data-act="toggle-year" data-year="'+yr+'" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);'+(open?'border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom-color:transparent;':'')+'">';
     h+='<div style="display:flex;align-items:center;gap:10px">';
-    h+='<span class="mono" style="font-size:13px;font-weight:700;color:#888;letter-spacing:.08em">'+yr+'</span>';
-    h+='<span class="mono" style="font-size:9px;color:#555">'+yKeys.length+' month'+(yKeys.length>1?'s':'')+'</span>';
-    if(lCount>0) h+='<span class="mono" style="font-size:9px;color:var(--loss)">'+lCount+'✗</span>';
-    if(wCount>0) h+='<span class="mono" style="font-size:9px;color:var(--win)">'+wCount+'✓</span>';
-    h+='</div>';
-    h+='<div style="display:flex;align-items:center;gap:12px">';
-    if(yTot>0) h+='<span class="mono" style="font-size:12px;font-weight:600;color:#666">'+yTot+'€</span>';
-    h+='<span style="color:#444;font-size:11px;transform:'+(open?'rotate(180deg)':'rotate(0deg)')+';display:inline-block;transition:transform .2s">▼</span>';
+    h+='<span class="mono" style="font-size:13px;font-weight:700;color:rgba(242,242,247,.5);letter-spacing:.08em">'+yr+'</span>';
+    h+='<span class="mono" style="font-size:9px;color:rgba(242,242,247,.3)">'+yKeys.length+' month'+(yKeys.length>1?'s':'')+'</span>';
+    if(lCount>0)h+='<span class="mono" style="font-size:9px;color:var(--loss)">'+lCount+'✗</span>';
+    if(wCount>0)h+='<span class="mono" style="font-size:9px;color:var(--win)">'+wCount+'✓</span>';
+    h+='</div><div style="display:flex;align-items:center;gap:12px">';
+    if(yTot>0)h+='<span class="mono" style="font-size:12px;font-weight:600;color:rgba(242,242,247,.35)">'+yTot+'€</span>';
+    h+='<span style="color:rgba(242,242,247,.25);font-size:11px;transform:'+(open?'rotate(180deg)':'rotate(0deg)')+';display:inline-block;transition:transform .2s">▼</span>';
     h+='</div></div>';
-
-    // Months inside accordion
     if(open){
-      h+='<div style="border:1px solid #1c1c1c;border-top:none;border-bottom-left-radius:8px;border-bottom-right-radius:8px;overflow:hidden">';
+      h+='<div style="border:1px solid rgba(255,255,255,.07);border-top:none;border-bottom-left-radius:8px;border-bottom-right-radius:8px;overflow:hidden">';
       yKeys.forEach((key,idx)=>{
-        const isObs=key<=OBS_END;
-        let mTot=0;PERSONS.forEach(p=>{const e=amountFor(p,key);if(e&&key>'2025-08')mTot+=e.amount;});
+        let mTot=0;PERSONS.forEach(p=>{const e=amountFor(p,key);if(e&&e.pass!==null)mTot+=e.amount;});
         const last=idx===yKeys.length-1;
-        h+='<div style="padding:12px;background:#141414;'+(last?'':'border-bottom:1px solid #1a1a1a')+'">';
+        h+='<div style="padding:12px;background:rgba(255,255,255,.025);'+(last?'':'border-bottom:1px solid rgba(255,255,255,.04)')+'">';
         h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
-           '<div style="display:flex;align-items:center;gap:8px">'+
-           '<span class="mono" style="font-size:11px;font-weight:600;color:'+(isObs?'#484848':'#666')+';letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
-           (isObs?'<span class="mono" style="font-size:8px;font-weight:600;color:#333;border:1px solid #1f1f1f;border-radius:4px;padding:2px 4px">obs</span>':'')+
-           '</div><span class="mono" style="font-size:13px;font-weight:500;color:#555">'+(key==='2025-08'?'—':mTot+'€')+'</span></div>';
+           '<span class="mono" style="font-size:11px;font-weight:600;color:rgba(242,242,247,.35);letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
+           '<span class="mono" style="font-size:13px;font-weight:500;color:rgba(242,242,247,.3)">'+mTot+'€</span></div>';
         h+='<div style="display:flex;flex-direction:column;gap:10px">';
         PERSONS.forEach(p=>{
           const d=(S.data[key]&&S.data[key][p])||{};
@@ -627,7 +747,7 @@ function renderSuivi(){
              '<div style="flex:1;display:flex;gap:14px;font-family:var(--sans);align-items:center">'+
              editCell(key,p,'kg',d.kg!=null?d.kg:null)+
              editCell(key,p,'kcal',d.kcal!=null?d.kcal:null)+
-             '</div>'+(key==='2025-08'?'<span style="font-size:10px;color:#444;font-family:var(--sans);font-weight:500;">START</span>':badge(e,key,p))+'</div>';
+             '</div>'+badge(e,key,p)+'</div>';
         });
         h+='</div></div>';
       });
@@ -635,6 +755,8 @@ function renderSuivi(){
     }
     h+='</div>';
   });
+
+  h += renderStaticHistory();
   return h;
 }
 
@@ -649,14 +771,17 @@ function renderLegend(){
 }
 
 function renderChart(field){
-  const keys=Object.keys(S.data).filter(k=>PERSONS.some(p=>{const d=S.data[k]&&S.data[k][p];return d&&d[field]!=null;})).sort();
-  if(!keys.length)return '<div style="text-align:center;padding:24px;font-family:var(--sans);font-weight:500;font-size:11px;color:#333">No data</div>';
+  const chartData={};
+  Object.keys(STATIC_HISTORY).forEach(k=>{chartData[k]=STATIC_HISTORY[k];});
+  Object.keys(S.data).forEach(k=>{chartData[k]=Object.assign({},chartData[k]||{},S.data[k]);});
+  const keys=Object.keys(chartData).filter(k=>PERSONS.some(p=>{const d=chartData[k]&&chartData[k][p];return d&&d[field]!=null;})).sort();
+  if(!keys.length)return '<div style="text-align:center;padding:24px;font-family:var(--sans);font-weight:500;font-size:11px;color:rgba(242,242,247,.2)">No data</div>';
 
   const W=350,H=180,ml=42,mr=32,mt=16,mb=24;
   const cW=W-ml-mr,cH=H-mt-mb;
   const n=keys.length;
   const allV=[];
-  PERSONS.forEach(p=>keys.forEach(k=>{const d=S.data[k]&&S.data[k][p];if(d&&d[field]!=null)allV.push(d[field]);}));
+  PERSONS.forEach(p=>keys.forEach(k=>{const d=chartData[k]&&chartData[k][p];if(d&&d[field]!=null)allV.push(d[field]);}));
   const vMin=Math.min(...allV),vMax=Math.max(...allV);
   const pad=(vMax-vMin)*0.15||2;
   const yLo=vMin-pad, yHi=vMax+pad;
@@ -664,12 +789,12 @@ function renderChart(field){
   const yOf=v=>mt+cH-((v-yLo)/(yHi-yLo))*cH;
 
   let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">';
-  s+='<rect x="'+ml+'" y="'+mt+'" width="'+cW+'" height="'+cH+'" fill="#0e0e0e" rx="4"/>';
+  s+='<rect x="'+ml+'" y="'+mt+'" width="'+cW+'" height="'+cH+'" fill="#0C0C0F" rx="4"/>';
 
   for(let i=0;i<=4;i++){
     const v=yLo+(yHi-yLo)*i/4, y=yOf(v);
-    s+='<line x1="'+ml+'" y1="'+y.toFixed(1)+'" x2="'+(ml+cW)+'" y2="'+y.toFixed(1)+'" stroke="#1d1d1d" stroke-width="1"/>';
-    s+='<text x="'+(ml-6)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="#444">'+Math.round(v)+'</text>';
+    s+='<line x1="'+ml+'" y1="'+y.toFixed(1)+'" x2="'+(ml+cW)+'" y2="'+y.toFixed(1)+'" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
+    s+='<text x="'+(ml-6)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="rgba(242,242,247,.28)">'+Math.round(v)+'</text>';
   }
 
   /* — Labels X : premier et dernier mois uniquement — */
@@ -678,14 +803,14 @@ function renderChart(field){
     const x = xOf(i).toFixed(1);
     const yL = (mt + cH + 14).toFixed(1);
     const anchor = i === 0 ? 'start' : 'end';
-    s+='<text x="'+x+'" y="'+yL+'" text-anchor="'+anchor+'" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="#555">'+mShrt(k)+'</text>';
+    s+='<text x="'+x+'" y="'+yL+'" text-anchor="'+anchor+'" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="rgba(242,242,247,.3)">'+mShrt(k)+'</text>';
   });
 
   const labelsToDraw = [];
 
   PERSONS.forEach(p=>{
     const col=P_COLOR[p];
-    const pts=keys.map((k,i)=>{const d=S.data[k]&&S.data[k][p];const v=d&&d[field]!=null?d[field]:null;return{x:xOf(i),y:v!=null?yOf(v):null,v,i};});
+    const pts=keys.map((k,i)=>{const d=chartData[k]&&chartData[k][p];const v=d&&d[field]!=null?d[field]:null;return{x:xOf(i),y:v!=null?yOf(v):null,v,i};});
     
     let path='',pr=false;
     pts.forEach(pt=>{if(pt.y!=null){path+=(pr?'L':'M')+pt.x.toFixed(1)+' '+pt.y.toFixed(1)+' ';pr=true;}else pr=false;});
@@ -753,7 +878,7 @@ function renderObjectifs(){
   [['Goal reached','var(--win)','stakes.success',S.config.stakes.success],
    ['Goal missed','var(--loss)','stakes.failure',S.config.stakes.failure]].forEach(([lbl,c,path,val]) => {
     h+='<div class="card" style="padding:16px">';
-    h+='<div class="mono" style="font-size:10px;font-weight:600;color:#777;text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+lbl+'</div>';
+    h+='<div class="mono" style="font-size:10px;font-weight:600;color:rgba(242,242,247,.4);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+lbl+'</div>';
     h+='<div class="mono" style="font-size:24px;font-weight:500;color:'+c+';display:flex;align-items:baseline;gap:2px">+';
     h+='<span class="edt" data-act="editnum" data-path="'+path+'" data-dec="0">'+val+'</span><span style="font-size:14px;font-weight:600;">€</span></div></div>';
   });
@@ -770,7 +895,7 @@ function renderObjectifs(){
       { path:'persons.'+p+'.targetLoss', val:pc.targetLoss, dec:1, unit:'kg / month', pre:'−', primary:!isSaad },
     ];
 
-    h+='<div style="background:'+P_BG[p]+';border:1px solid '+P_BORD[p]+';border-radius:12px;padding:20px">';
+    h+='<div style="background:'+P_BG[p]+';border:1px solid '+P_BORD[p]+';border-radius:16px;padding:20px">';
     h+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px">';
     h+='<div class="mono" style="font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:'+P_COLOR[p]+'">'+pc.name+'</div>';
     h+='<div class="mono" style="font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:'+P_COLOR[p]+';opacity:0.4;">'+(isSaad?'kcal-first':'weight-first')+'</div>';
@@ -792,43 +917,13 @@ function renderObjectifs(){
 }
 
 function render(){
-  if (!S.authenticated) {
-    let h = '<div style="position:fixed;inset:0;background:var(--bg-dark);z-index:999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3rem;">';
-
-    if (S.pinLoading) {
-      h += '<div id="pin-dots" style="display:flex;gap:14px;">';
-      for(let i=0; i<5; i++) h += '<div class="pin-dot loading"></div>';
-      h += '</div>';
-      h += '<div class="connecting-label" style="font-family:var(--sans);font-weight:600;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:#555;">Connecting...</div>';
-    } else {
-      h += '<div class="pin-dots" id="pin-dots" style="display:flex;gap:14px;">';
-      for(let i=0; i<5; i++) {
-        const filled = (S.pinEntry && i < S.pinEntry.length) ? ' filled' : '';
-        h += '<div class="pin-dot'+filled+'" id="d'+i+'"></div>';
-      }
-      h += '</div>';
-      h += '<div class="pin-pad" style="display:grid;grid-template-columns:repeat(3,72px);gap:16px;">';
-      [1,2,3,4,5,6,7,8,9].forEach(n => {
-        h += '<div class="pin-key" data-act="pin-key" data-val="'+n+'">'+n+'</div>';
-      });
-      h += '<div class="pin-key empty" style="border:none;background:transparent;cursor:default;"></div>';
-      h += '<div class="pin-key" data-act="pin-key" data-val="0">0</div>';
-      h += '<div class="pin-key del" data-act="pin-del">⌫</div>';
-      h += '</div>';
-    }
-
-    h += '</div>';
-    document.getElementById('root').innerHTML = h;
-    return;
-  }
-
   let h='<div class="header-container">';
   h+='<header>';
-  h+='<h1 style="font-size:26px;letter-spacing:-.03em;line-height:1;">S.A.H Challenge</h1>';
-  h+='<div style="font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-top:6px;">Siblings Avoiding Heart-attacks Challenge</div>';
+  h+='<h1 style="font-size:26px;letter-spacing:-.03em;line-height:1;color:var(--gold);">S.A.H Challenge</h1>';
+  h+='<div style="font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-top:6px;color:var(--gold);">Siblings Avoiding Heart-attacks Challenge</div>';
   h+='</header>';
   h+='<button class="sync-badge" onclick="syncLoad()" style="flex-shrink:0;display:flex;align-items:center;gap:5px;">'
-    +'<span id="sync-text" style="font-size:7px;letter-spacing:.1em;color:#444;">'+(localStorage.getItem('getfit_auth')==='true'?'Synced':'Offline')+'</span>'
+    +'<span id="sync-text" style="font-size:7px;letter-spacing:.1em;color:rgba(242,242,247,.3);">'+(localStorage.getItem('getfit_auth')==='true'?'Synced':'Offline')+'</span>'
     +'<div id="sync-dot" class="sync-dot" style="background:'+(localStorage.getItem('getfit_auth')==='true'?'var(--win)':'var(--loss)')+'"></div>'
     +'</button>';
   h+='</div>';
@@ -841,7 +936,7 @@ function render(){
 
   h+=(S.tab==='suivi')?renderSuivi():(S.tab==='evolution')?renderEvolution():renderObjectifs();
   
-  h+='<footer style="margin-top:24px;text-align:center;font-family:var(--sans);font-weight:600;font-size:10px;color:#444;letter-spacing:.15em;text-transform:uppercase">S.A.H · 2025–2030</footer>';
+  h+='<footer style="margin-top:24px;text-align:center;font-family:var(--sans);font-weight:600;font-size:10px;color:var(--text-tertiary);letter-spacing:.15em;text-transform:uppercase">S.A.H · 2025–2030</footer>';
   document.getElementById('root').innerHTML=h;
   
   bindForm();
@@ -865,6 +960,7 @@ function bindForm(){
     S.data[S.formMonth]=Object.assign({},bak,{[S.formPerson]:{kg:kgN,kcal:kcN}});
     const e=computeEntry(S.formPerson,S.formMonth);
     S.data[S.formMonth]=bak;
+    if(e.pass===null){el.innerHTML='';return;}
     el.innerHTML='<span style="color:'+(e.pass?'var(--win)':'var(--loss)')+'">+'+(e.amount)+'€</span>';
   }
   if(kg)kg.addEventListener('input',upd);
@@ -902,30 +998,6 @@ document.addEventListener('click',ev=>{
   if(!t)return;
   const act=t.getAttribute('data-act');
 
-  if(act === 'pin-key') {
-    if(!S.pinEntry) S.pinEntry = '';
-    if(S.pinEntry.length < 5) {
-      S.pinEntry += t.getAttribute('data-val');
-      updateDots();
-      if(S.pinEntry.length === 5) {
-        S.pin = S.pinEntry;
-        localStorage.setItem('getfit_pin', S.pin);
-        S.pinLoading = true;
-        render();
-        syncLoad();
-      }
-    }
-    return;
-  }
-  
-  if(act === 'pin-del') {
-    if(S.pinEntry && S.pinEntry.length > 0) {
-      S.pinEntry = S.pinEntry.slice(0, -1);
-      updateDots();
-    }
-    return;
-  }
-
   if(act==='toggle-year'){
     const yr=t.getAttribute('data-year');
     if(S.openYears.has(yr)) S.openYears.delete(yr); else S.openYears.add(yr);
@@ -937,7 +1009,7 @@ document.addEventListener('click',ev=>{
   
   if(act==='picker'){S.pickerOpen=!S.pickerOpen;render();return;}
   if(act==='picker-bg'){S.pickerOpen=false;render();return;}
-  if(act==='pick'){S.formMonth=t.getAttribute('data-val');S.pickerOpen=false;render();return;}
+  if(act==='pick'){S.formMonth=t.getAttribute('data-val');S.userSelectedMonth=true;S.pickerOpen=false;render();return;}
 
   if(act==='add'){
     const kgEl=document.getElementById('f-kg'),kcEl=document.getElementById('f-kcal');
