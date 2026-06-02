@@ -33,7 +33,7 @@
     min-height: 100vh;
     max-width: 390px;
     margin: 0 auto;
-    padding: 20px 16px 120px;
+    padding: 20px 16px 160px;
   }
 
   ::-webkit-scrollbar { width: 4px; height: 4px; }
@@ -85,19 +85,26 @@
 
   #tab-bar {
     position: fixed;
-    bottom: 40px;
+    bottom: 24px;
     left: 50%;
     transform: translateX(-50%);
     width: min(358px, calc(100vw - 32px));
     display: flex;
-    align-items: center;
-    background: rgba(14,14,18,0.80);
+    flex-direction: column;
+    align-items: stretch;
+    background: rgba(14,14,18,0.85);
     backdrop-filter: blur(32px) saturate(180%);
     -webkit-backdrop-filter: blur(32px) saturate(180%);
     border-radius: 28px;
-    padding: 5px;
+    padding: 0;
     z-index: 1000;
-    box-shadow: 0 12px 40px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.07);
+    box-shadow: 0 12px 40px rgba(0,0,0,.65), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  #tab-row {
+    display: flex;
+    align-items: center;
+    padding: 5px;
+    position: relative;
   }
   #tab-highlight {
     position: absolute;
@@ -115,7 +122,7 @@
     flex: 1;
     position: relative;
     z-index: 1;
-    padding: 13.5px 0;
+    padding: 13px 0;
     border-radius: 22px;
     color: var(--text-secondary);
     font-size: 11px;
@@ -126,6 +133,30 @@
     transition: color 0.2s ease;
   }
   #tab-bar .tab.on { color: var(--anas); font-weight: 600; }
+  #tab-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 18px 13px;
+    border-top: 1px solid rgba(255,255,255,.055);
+  }
+  #tab-title-main {
+    font-family: var(--sans);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -.025em;
+    color: var(--text-secondary);
+    line-height: 1.1;
+  }
+  #tab-title-sub {
+    font-family: var(--sans);
+    font-size: 7.5px;
+    font-weight: 500;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--text-tertiary);
+    margin-top: 3px;
+  }
 
   .saisie-wrapper { width: 100%; margin-bottom: 16px; margin-top: 8px; }
 
@@ -291,10 +322,22 @@
   </div>
 </div>
 <nav id="tab-bar">
-  <div id="tab-highlight"></div>
-  <button class="tab" data-act="tab" data-val="suivi">Tracking</button>
-  <button class="tab" data-act="tab" data-val="evolution">Progress</button>
-  <button class="tab" data-act="tab" data-val="objectifs">Trips</button>
+  <div id="tab-row">
+    <div id="tab-highlight"></div>
+    <button class="tab" data-act="tab" data-val="suivi">Tracking</button>
+    <button class="tab" data-act="tab" data-val="evolution">Progress</button>
+    <button class="tab" data-act="tab" data-val="objectifs">Trips</button>
+  </div>
+  <div id="tab-info">
+    <div>
+      <div id="tab-title-main">S.A.H Challenge</div>
+      <div id="tab-title-sub">Siblings Avoiding Heart-attacks Challenge</div>
+    </div>
+    <button class="sync-badge" onclick="syncLoad()" style="flex-shrink:0;display:flex;align-items:center;gap:5px;">
+      <span id="sync-text" style="font-size:7px;letter-spacing:.1em;color:rgba(242,242,247,.3);">Offline</span>
+      <div id="sync-dot" class="sync-dot" style="background:var(--loss);box-shadow:0 0 0 3px rgba(255,107,107,.18),0 0 10px rgba(255,107,107,.45)"></div>
+    </button>
+  </div>
 </nav>
 <div id="root"></div>
 
@@ -581,8 +624,8 @@ function badge(e,key,p){
   if(e.pass===null)return '';
 
   const c=e.pass?'var(--win)':'var(--loss)';
-  const bg=e.pass?'rgba(76,211,126,.1)':'rgba(255,107,107,.1)';
-  const bd=e.pass?'rgba(76,211,126,.25)':'rgba(255,107,107,.25)';
+  const bg=e.pass?'rgba(76,211,126,.22)':'rgba(255,107,107,.22)';
+  const bd=e.pass?'rgba(76,211,126,.5)':'rgba(255,107,107,.5)';
   return '<span class="mono" style="font-size:12px;font-weight:600;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+e.amount+'€</span>';
 }
 
@@ -633,8 +676,8 @@ function renderStaticHistory(){
           const kcLbl=d.kcal!=null?d.kcal+' kcal':'—';
           const win=d.amount===S.config.stakes.success;
           const c=win?'var(--win)':'var(--loss)';
-          const bg=win?'rgba(76,211,126,.08)':'rgba(255,107,107,.08)';
-          const bd=win?'rgba(76,211,126,.2)':'rgba(255,107,107,.2)';
+          const bg=win?'rgba(76,211,126,.22)':'rgba(255,107,107,.22)';
+          const bd=win?'rgba(76,211,126,.5)':'rgba(255,107,107,.5)';
           const badgeHtml='<span class="mono" style="font-size:12px;font-weight:600;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+d.amount+'€</span>';
           h+='<div style="display:flex;align-items:center;gap:8px">'+
              '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase;opacity:.6">'+S.config.persons[p].name+'</span>'+
@@ -699,8 +742,8 @@ function renderSuivi(){
 
   // ── Entry Form (inputs on top, name tabs at bottom) ──
   let blocRadius = '16px 16px 16px 16px';
-  if (curP === 'saad')   blocRadius = '16px 16px 0 16px';
-  if (curP === 'hicham') blocRadius = '16px 16px 16px 0';
+  if (curP === 'saad')   blocRadius = '16px 16px 16px 0';
+  if (curP === 'hicham') blocRadius = '16px 16px 0 16px';
 
   h+='<div class="saisie-wrapper" style="--tab-bg:'+P_BG[curP]+'; --tab-color:'+P_COLOR[curP]+'; margin-bottom:24px;">';
   h+='<div class="saisie-bloc" style="border-radius:'+blocRadius+';padding:14px 16px;">';
@@ -958,7 +1001,7 @@ function renderEvolution(){
 
 function renderTrips(){
   let h='';
-  h+='<div class="sectitle" style="margin-bottom:12px;">The Guilt Trips</div>';
+  h+='<div style="font-size:22px;font-weight:800;letter-spacing:-.03em;color:var(--text-secondary);margin-bottom:16px;">The Guilt Trips</div>';
   h+='<div class="saisie-bloc" style="border-radius:12px; background:rgba(255,255,255,.04); padding:16px; gap:8px;">';
   h+='<input id="f-trip-title" class="saisie-input-bg" type="text" placeholder="Trip name" value="'+esc(S.fTripTitle)+'" style="padding:14px 16px; width:100%;">';
   h+='<div style="display:flex; gap:12px; align-items:center;">';
@@ -1037,8 +1080,9 @@ function renderObjectifs(){
 let _lastTab = null;
 
 function updateTabHighlight(){
-  const bar = document.getElementById('tab-bar');
-  const hl  = document.getElementById('tab-highlight');
+  const bar    = document.getElementById('tab-bar');
+  const tabRow = document.getElementById('tab-row');
+  const hl     = document.getElementById('tab-highlight');
   if(!bar || !hl) return;
 
   bar.querySelectorAll('.tab').forEach(btn=>{
@@ -1047,10 +1091,11 @@ function updateTabHighlight(){
 
   const tabs  = Array.from(bar.querySelectorAll('.tab'));
   const idx   = tabs.findIndex(t=>t.getAttribute('data-val')===S.tab);
-  if(idx<0 || bar.clientWidth===0) return;
+  const rowEl = tabRow || bar;
+  if(idx<0 || rowEl.clientWidth===0) return;
 
   const pad   = 5;
-  const innerW = bar.clientWidth - pad*2;
+  const innerW = rowEl.clientWidth - pad*2;
   const tabW  = innerW / tabs.length;
   const tx    = idx * tabW;
 
@@ -1069,24 +1114,10 @@ function updateTabHighlight(){
 }
 
 function render(){
-  let h='<div class="header-container">';
-  h+='<header>';
-  h+='<h1 style="font-size:26px;letter-spacing:-.03em;line-height:1;color:var(--text-secondary);">S.A.H Challenge</h1>';
-  h+='<div style="font-size:10px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;margin-top:6px;color:var(--text-tertiary);">Siblings Avoiding Heart-attacks Challenge</div>';
-  h+='</header>';
-  const _dotBg = _syncOk ? 'var(--win)' : 'var(--loss)';
-  const _dotGlow = _syncOk
-    ? '0 0 0 3px rgba(76,211,126,.18), 0 0 10px rgba(76,211,126,.45)'
-    : '0 0 0 3px rgba(255,107,107,.18), 0 0 10px rgba(255,107,107,.45)';
-  h+='<button class="sync-badge" onclick="syncLoad()" style="flex-shrink:0;display:flex;align-items:center;gap:5px;">'
-    +'<span id="sync-text" style="font-size:7px;letter-spacing:.1em;color:rgba(242,242,247,.3);">'+(_syncOk?'Synced':'Offline')+'</span>'
-    +'<div id="sync-dot" class="sync-dot" style="background:'+_dotBg+';box-shadow:'+_dotGlow+'"></div>'
-    +'</button>';
-  h+='</div>';
+  let h='';
 
   h+=(S.tab==='suivi')?renderSuivi():(S.tab==='evolution')?renderEvolution():renderTrips();
 
-  h+='<footer style="margin-top:24px;text-align:center;font-family:var(--sans);font-weight:600;font-size:10px;color:var(--text-tertiary);letter-spacing:.15em;text-transform:uppercase">S.A.H · 2025–2030</footer>';
   document.getElementById('root').innerHTML=h;
 
   updateTabHighlight();
