@@ -373,6 +373,26 @@ if (!S.data['2025-08'] || !S.data['2025-08'].anas || S.data['2025-08'].anas.kg =
 
 S.formMonth = getTargetMonth(S.data);
 
+// Gel des montants historiques (règles en cours de mise en place au démarrage)
+(function freezeHistory(){
+  const FROZEN = {
+    '2025-11': {anas:20, hicham:20, saad:100},
+    '2025-12': {anas:100, hicham:100, saad:100},
+    '2026-01': {anas:100, hicham:20, saad:20},
+    '2026-02': {anas:100, hicham:100, saad:20},
+    '2026-03': {hicham:100, saad:100},
+    '2026-04': {anas:100, hicham:100, saad:100},
+  };
+  let changed = false;
+  Object.keys(FROZEN).forEach(m => {
+    if (!S.manual[m]) S.manual[m] = {};
+    Object.entries(FROZEN[m]).forEach(([p, v]) => {
+      if (S.manual[m][p] === undefined) { S.manual[m][p] = v; changed = true; }
+    });
+  });
+  if (changed) persist();
+})();
+
 function persist(){try{localStorage.setItem(LS,JSON.stringify({config:S.config,data:S.data,manual:S.manual,trips:S.trips}));}catch(e){}}
 
 /* ════ SYNCHRONISATION ════ */
