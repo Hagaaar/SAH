@@ -215,22 +215,73 @@
   }
   .saisie-input-bg::placeholder { color: rgba(242,242,247,.62); font-weight: 500; }
 
-  .pin-dot { width:12px; height:12px; border-radius:50%; border:1.5px solid rgba(255,255,255,.22); background:transparent; transition:background 0.12s, border-color 0.12s; }
-  .pin-dot.filled { background:var(--text-primary); border-color:var(--text-primary); }
+  /* ── PIN DOTS ── */
+  .pin-dot {
+    width:14px; height:14px; border-radius:50%;
+    border:1.5px solid rgba(255,255,255,.28); background:transparent;
+    transition: border-color 0.15s;
+  }
+  @keyframes dot-pop {
+    0%   { transform:scale(0);   opacity:0 }
+    55%  { transform:scale(1.4); opacity:1 }
+    100% { transform:scale(1);   opacity:1 }
+  }
+  @keyframes dot-success {
+    0%   { transform:scale(1) }
+    40%  { transform:scale(1.55) }
+    100% { transform:scale(1) }
+  }
+  .pin-dot.filled {
+    background:var(--text-primary); border-color:var(--text-primary);
+    animation: dot-pop 0.32s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+  .pin-dot.success {
+    background:var(--win); border-color:var(--win);
+    animation: dot-success 0.4s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  .pin-dot.success:nth-child(1){animation-delay:.00s}
+  .pin-dot.success:nth-child(2){animation-delay:.06s}
+  .pin-dot.success:nth-child(3){animation-delay:.12s}
+  .pin-dot.success:nth-child(4){animation-delay:.18s}
+  .pin-dot.success:nth-child(5){animation-delay:.24s}
   .pin-dot.error { background:var(--loss); border-color:var(--loss); }
 
-  .pin-key { width:76px; height:76px; border-radius:50%; border:1px solid rgba(255,255,255,.1); background:rgba(255,255,255,.08); color:var(--text-primary); font-size:26px; font-family:var(--sans); font-weight:400; cursor:pointer; display:flex; align-items:center; justify-content:center; -webkit-tap-highlight-color:transparent; user-select:none; transition:background 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease; }
-  .pin-key:not(.del):not(.ghost):active { background:rgba(255,159,90,.32); box-shadow:0 0 28px rgba(255,159,90,.45), inset 0 0 12px rgba(255,159,90,.18); border-color:rgba(255,159,90,.55); transition:none; }
-  .pin-key.del:active { background:rgba(255,255,255,.14); transition:none; }
+  /* ── PIN KEYS ── */
+  .pin-key {
+    width:76px; height:76px; border-radius:50%;
+    border:1px solid rgba(255,255,255,.12); background:rgba(255,255,255,.07);
+    color:var(--text-primary); font-size:26px; font-family:var(--sans); font-weight:300;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    -webkit-tap-highlight-color:transparent; user-select:none;
+    transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+    will-change: transform;
+  }
+  @keyframes key-tap {
+    0%   { transform:scale(1) }
+    30%  { transform:scale(0.82); background:rgba(255,159,90,.28); box-shadow:0 0 24px rgba(255,159,90,.5), inset 0 0 10px rgba(255,159,90,.2); border-color:rgba(255,159,90,.6); }
+    100% { transform:scale(1) }
+  }
+  .pin-key.tapped { animation: key-tap 0.28s cubic-bezier(0.34,1.3,0.64,1) forwards; }
   .pin-key.del { font-size:20px; color:var(--text-secondary); border:none; background:transparent; }
+  @keyframes del-tap { 0%{transform:scale(1)} 35%{transform:scale(0.78)} 100%{transform:scale(1)} }
+  .pin-key.del.tapped { animation: del-tap 0.22s cubic-bezier(0.34,1.4,0.64,1) forwards; background:transparent; box-shadow:none; }
 
-  @keyframes shake { 0%,100%{transform:translateX(0)} 20%,60%{transform:translateX(-8px)} 40%,80%{transform:translateX(8px)} }
-  .shake { animation:shake 0.35s ease; }
+  /* ── SHAKE / ERROR ── */
+  @keyframes shake {
+    0%,100%{ transform:translateX(0)   scale(1)   }
+    15%     { transform:translateX(-11px) scale(1.04) }
+    35%     { transform:translateX(11px)  scale(1.04) }
+    55%     { transform:translateX(-8px)  scale(1.02) }
+    75%     { transform:translateX(8px)   scale(1.02) }
+  }
+  .shake { animation:shake 0.42s cubic-bezier(0.36,0.07,0.19,0.97) both; }
+  @keyframes error-flash { 0%,100%{background:transparent} 45%{background:rgba(255,80,80,.07)} }
+  .error-flash { animation: error-flash 0.5s ease; }
 
+  /* ── MISC ── */
   @keyframes pin-pulse { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.5);opacity:0.4} }
   .pin-dot.loading {
-    background: var(--text-primary);
-    border-color: var(--text-primary);
+    background: var(--text-primary); border-color: var(--text-primary);
     animation: pin-pulse 1.1s ease-in-out infinite;
   }
   .pin-dot.loading:nth-child(1){animation-delay:0s}
@@ -243,37 +294,51 @@
   .connecting-label { animation: fade-in 0.4s ease forwards; }
 
   /* ── AUTH OVERLAY ── */
-  @keyframes auth-fade-out { to { opacity:0; pointer-events:none; } }
+  @keyframes overlay-in  { from{opacity:0} to{opacity:1} }
+  @keyframes auth-fade-out { to { opacity:0; transform:scale(1.07); filter:blur(12px); pointer-events:none; } }
+  @keyframes card-enter  { from{opacity:0;transform:translateY(36px) scale(0.93)} to{opacity:1;transform:translateY(0) scale(1)} }
+  @keyframes label-enter { from{opacity:0;letter-spacing:.6em} to{opacity:1;letter-spacing:.28em} }
+  @keyframes dots-enter  { from{opacity:0;transform:translateY(-10px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes key-enter   { from{opacity:0;transform:scale(0.5)} to{opacity:1;transform:scale(1)} }
+
   #auth-overlay {
-    position: fixed;
-    inset: 0;
-    background: var(--bg-dark);
-    z-index: 9999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999;
+    display: flex; align-items: center; justify-content: center;
+    animation: overlay-in 0.5s ease both;
   }
-  #auth-overlay.out { animation: auth-fade-out 0.35s ease forwards; }
+  #auth-overlay.out { animation: auth-fade-out 0.5s cubic-bezier(0.4,0,0.2,1) forwards; }
+
   #auth-card {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 44px;
+    display: flex; flex-direction: column; align-items: center; gap: 44px;
+    animation: card-enter 0.7s cubic-bezier(0.22,1,0.36,1) 0.05s both;
   }
   #auth-label {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: .28em;
-    text-transform: uppercase;
+    font-size: 12px; font-weight: 600; letter-spacing: .28em; text-transform: uppercase;
     color: var(--text-tertiary);
+    animation: label-enter 1s ease 0.15s both;
   }
-  #auth-dots { display: flex; gap: 16px; }
+  #auth-dots {
+    display: flex; gap: 16px;
+    animation: dots-enter 0.6s ease 0.25s both;
+  }
   #auth-pad {
-    display: grid;
-    grid-template-columns: repeat(3, 76px);
-    gap: 16px;
+    display: grid; grid-template-columns: repeat(3, 76px); gap: 16px;
   }
-  #auth-pad .pin-key.ghost { border: none; background: transparent; cursor: default; pointer-events: none; }
+  #auth-pad .pin-key:not(.ghost) {
+    animation: key-enter 0.55s cubic-bezier(0.34,1.56,0.64,1) both;
+  }
+  #auth-pad .pin-key:nth-child(1){animation-delay:.18s}
+  #auth-pad .pin-key:nth-child(2){animation-delay:.22s}
+  #auth-pad .pin-key:nth-child(3){animation-delay:.26s}
+  #auth-pad .pin-key:nth-child(4){animation-delay:.30s}
+  #auth-pad .pin-key:nth-child(5){animation-delay:.34s}
+  #auth-pad .pin-key:nth-child(6){animation-delay:.38s}
+  #auth-pad .pin-key:nth-child(7){animation-delay:.42s}
+  #auth-pad .pin-key:nth-child(8){animation-delay:.46s}
+  #auth-pad .pin-key:nth-child(9){animation-delay:.50s}
+  #auth-pad .pin-key:nth-child(11){animation-delay:.54s}
+  #auth-pad .pin-key:nth-child(12){animation-delay:.58s}
+  #auth-pad .pin-key.ghost { border:none; background:transparent; cursor:default; pointer-events:none; }
 </style>
 </head>
 <body>
@@ -337,25 +402,50 @@
     const b=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(s));
     return Array.from(new Uint8Array(b)).map(x=>x.toString(16).padStart(2,'0')).join('');
   }
-  function dots(){for(let i=0;i<5;i++){const d=document.getElementById('ad'+i);if(d)d.className='pin-dot'+(i<buf.length?' filled':'');}}
+  function dots(){
+    for(let i=0;i<5;i++){
+      const d=document.getElementById('ad'+i);
+      if(!d)continue;
+      const shouldFill=i<buf.length;
+      const wasFilled=d.classList.contains('filled');
+      if(shouldFill&&!wasFilled){
+        d.className='pin-dot'; void d.offsetWidth; d.className='pin-dot filled';
+      } else if(!shouldFill){
+        d.className='pin-dot';
+      }
+    }
+  }
+  function tapKey(el){
+    if(!el||el.classList.contains('ghost'))return;
+    el.classList.remove('tapped'); void el.offsetWidth; el.classList.add('tapped');
+    el.addEventListener('animationend',()=>el.classList.remove('tapped'),{once:true});
+  }
   async function submit(){
     if(await digest(buf)===HASH){
       done=true;
       sessionStorage.setItem(SK,'1');
-      ov.classList.add('out');
-      setTimeout(()=>{ov.style.display='none';},350);
+      document.querySelectorAll('#auth-dots .pin-dot').forEach((d,i)=>{
+        setTimeout(()=>{d.className='pin-dot'; void d.offsetWidth; d.className='pin-dot success';},i*60);
+      });
+      setTimeout(()=>{ov.classList.add('out'); setTimeout(()=>{ov.style.display='none';},500);},520);
     } else {
       const w=document.getElementById('auth-dots');
+      const card=document.getElementById('auth-card');
       document.querySelectorAll('#auth-dots .pin-dot').forEach(d=>d.classList.add('error'));
       w.classList.add('shake');
-      setTimeout(()=>{w.classList.remove('shake');document.querySelectorAll('#auth-dots .pin-dot').forEach(d=>d.classList.remove('error'));buf='';dots();},500);
+      card.classList.add('error-flash');
+      setTimeout(()=>{
+        w.classList.remove('shake'); card.classList.remove('error-flash');
+        document.querySelectorAll('#auth-dots .pin-dot').forEach(d=>d.classList.remove('error'));
+        buf=''; dots();
+      },500);
     }
   }
   document.getElementById('auth-pad').addEventListener('click',e=>{
     if(done)return;
     const k=e.target.closest('[data-k]'),dl=e.target.closest('#auth-del');
-    if(k&&buf.length<5){buf+=k.dataset.k;dots();if(buf.length===5)submit();}
-    else if(dl&&buf.length>0){buf=buf.slice(0,-1);dots();}
+    if(k&&buf.length<5){tapKey(k);buf+=k.dataset.k;dots();if(buf.length===5)submit();}
+    else if(dl&&buf.length>0){tapKey(dl);buf=buf.slice(0,-1);dots();}
   });
   document.addEventListener('keydown',e=>{
     if(done||ov.style.display==='none')return;
