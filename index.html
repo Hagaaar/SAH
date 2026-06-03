@@ -19,8 +19,8 @@
     --card-bg: #1C1C1F;
     --card-border: rgba(255,255,255,0.07);
     --text-primary: #F2F2F7;
-    --text-secondary: rgba(242,242,247,0.55);
-    --text-tertiary: rgba(242,242,247,0.28);
+    --text-secondary: rgba(242,242,247,0.80);
+    --text-tertiary: rgba(242,242,247,0.55);
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -43,7 +43,7 @@
   button { font-family: var(--sans); cursor: pointer; border: none; background: none; color: inherit; }
 
   .mono { font-family: var(--sans); }
-  .sectitle { font-family: var(--sans); font-size: 9px; font-weight: 600; letter-spacing: .18em; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,.06); }
+  .sectitle { font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: .18em; color: var(--text-tertiary); text-transform: uppercase; margin-bottom: 10px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,.06); }
   .card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; }
 
   .edt { cursor: pointer; border-bottom: 1px dotted rgba(255,255,255,.15); user-select: none; display: inline-block; min-width: 18px; }
@@ -128,7 +128,7 @@
     padding: 13px 0;
     border-radius: 26px;
     color: var(--text-secondary);
-    font-size: 10.5px;
+    font-size: 12px;
     font-weight: 500;
     letter-spacing: .03em;
     background: none;
@@ -213,7 +213,7 @@
     outline: none;
     box-sizing: border-box;
   }
-  .saisie-input-bg::placeholder { color: rgba(242,242,247,.25); font-weight: 500; }
+  .saisie-input-bg::placeholder { color: rgba(242,242,247,.62); font-weight: 500; }
 
   .pin-dot { width:12px; height:12px; border-radius:50%; border:1.5px solid rgba(255,255,255,.22); background:transparent; transition:background 0.12s, border-color 0.12s; }
   .pin-dot.filled { background:var(--text-primary); border-color:var(--text-primary); }
@@ -261,7 +261,7 @@
     gap: 44px;
   }
   #auth-label {
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 600;
     letter-spacing: .28em;
     text-transform: uppercase;
@@ -309,7 +309,7 @@
     S.A.H - Siblings Avoiding Heart-attacks Challenge
   </div>
   <button class="sync-badge" onclick="syncLoad(true)" style="flex-shrink:0; display:flex; align-items:center; gap:5px; padding:0;">
-    <span id="sync-text" style="font-size:7px;letter-spacing:.1em;color:rgba(242,242,247,.3);">Offline</span>
+    <span id="sync-text" style="font-size:7px;letter-spacing:.1em;color:rgba(242,242,247,.68);">Offline</span>
     <div id="sync-dot" class="sync-dot" style="background:var(--loss);box-shadow:0 0 0 3px rgba(255,107,107,.18),0 0 10px rgba(255,107,107,.45)"></div>
   </button>
 </header>
@@ -603,7 +603,7 @@ const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'
 
 function badge(e,key,p){
   if(!e)return '';
-  if(key <= OBS_END) return '<span style="font-size:10px;color:rgba(242,242,247,.3);font-family:var(--sans);font-weight:600;padding:2px 4px;">OBS</span>';
+  if(key <= OBS_END) return '<span style="font-size:10px;color:rgba(242,242,247,.68);font-family:var(--sans);font-weight:600;padding:2px 4px;">OBS</span>';
 
   const d=(S.data[key]&&S.data[key][p])||{};
   if(d.kg==null&&d.kcal==null)return '';
@@ -618,7 +618,7 @@ function badge(e,key,p){
 function editCell(key,person,field,value){
   const isKcal=field==='kcal';
   const lbl=value!=null?esc(value)+(isKcal?' kcal':' kg'):'—';
-  const col=value!=null?(isKcal?'rgba(242,242,247,.4)':'#F2F2F7'):'rgba(242,242,247,.18)';
+  const col=value!=null?(isKcal?'rgba(242,242,247,.78)':'#F2F2F7'):'rgba(242,242,247,.50)';
   return '<span class="edt" data-act="editcell" data-month="'+esc(key)+'" data-person="'+person+'" data-field="'+field+'" data-val="'+(value!=null?esc(value):'')+'" style="color:'+col+';font-size:11px;font-weight:500;">'+lbl+'</span>';
 }
 
@@ -638,13 +638,13 @@ function renderStaticHistory(){
     h+='<div style="margin-bottom:6px">';
     h+='<div data-act="toggle-year" data-year="arch-'+yr+'" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;border-radius:8px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);'+(open?'border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom-color:transparent;':'')+'">';
     h+='<div style="display:flex;align-items:center;gap:10px">';
-    h+='<span class="mono" style="font-size:13px;font-weight:700;color:rgba(242,242,247,.3);letter-spacing:.08em">'+yr+'</span>';
-    h+='<span class="mono" style="font-size:8px;font-weight:600;color:rgba(242,242,247,.2);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:2px 5px;letter-spacing:.05em">ARCH</span>';
+    h+='<span class="mono" style="font-size:13px;font-weight:700;color:rgba(242,242,247,.68);letter-spacing:.08em">'+yr+'</span>';
+    h+='<span class="mono" style="font-size:8px;font-weight:600;color:rgba(242,242,247,.58);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:2px 5px;letter-spacing:.05em">ARCH</span>';
     if(lCount>0)h+='<span class="mono" style="font-size:9px;color:var(--loss)">'+lCount+'✗</span>';
     if(wCount>0)h+='<span class="mono" style="font-size:9px;color:var(--win)">'+wCount+'✓</span>';
     h+='</div><div style="display:flex;align-items:center;gap:12px">';
-    if(yTot>0)h+='<span class="mono" style="font-size:12px;font-weight:600;color:rgba(242,242,247,.25)">'+yTot+'€</span>';
-    h+='<span style="color:rgba(242,242,247,.2);font-size:11px;transform:'+(open?'rotate(180deg)':'rotate(0deg)')+';display:inline-block;transition:transform .2s">▼</span>';
+    if(yTot>0)h+='<span class="mono" style="font-size:12px;font-weight:600;color:rgba(242,242,247,.62)">'+yTot+'€</span>';
+    h+='<span style="color:rgba(242,242,247,.58);font-size:11px;transform:'+(open?'rotate(180deg)':'rotate(0deg)')+';display:inline-block;transition:transform .2s">▼</span>';
     h+='</div></div>';
     if(open){
       h+='<div style="border:1px solid rgba(255,255,255,.05);border-top:none;border-bottom-left-radius:8px;border-bottom-right-radius:8px;overflow:hidden">';
@@ -653,8 +653,8 @@ function renderStaticHistory(){
         const last=idx===yKeys.length-1;
         h+='<div style="padding:12px;background:rgba(255,255,255,.02);'+(last?'':'border-bottom:1px solid rgba(255,255,255,.04)')+'">';
         h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
-           '<span class="mono" style="font-size:11px;font-weight:600;color:rgba(242,242,247,.28);letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
-           '<span class="mono" style="font-size:13px;font-weight:500;color:rgba(242,242,247,.28)">'+mTot+'€</span></div>';
+           '<span class="mono" style="font-size:11px;font-weight:600;color:rgba(242,242,247,.65);letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
+           '<span class="mono" style="font-size:13px;font-weight:500;color:rgba(242,242,247,.65)">'+mTot+'€</span></div>';
         h+='<div style="display:flex;flex-direction:column;gap:10px">';
         PERSONS.forEach(p=>{
           const d=STATIC_HISTORY[key][p];
@@ -666,10 +666,10 @@ function renderStaticHistory(){
           const bd=win?'rgba(76,211,126,.5)':'rgba(255,107,107,.5)';
           const badgeHtml='<span class="mono" style="font-size:12px;font-weight:600;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+d.amount+'€</span>';
           h+='<div style="display:flex;align-items:center;gap:8px">'+
-             '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase;opacity:.6">'+S.config.persons[p].name+'</span>'+
+             '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase;opacity:.88">'+S.config.persons[p].name+'</span>'+
              '<div style="flex:1;display:flex;gap:14px;font-family:var(--sans);align-items:center">'+
-             '<span style="color:'+(d.kg!=null?'rgba(242,242,247,.35)':'rgba(242,242,247,.12)')+';font-size:11px;font-weight:500;">'+kgLbl+'</span>'+
-             '<span style="color:'+(d.kcal!=null?'rgba(242,242,247,.28)':'rgba(242,242,247,.1)')+';font-size:11px;font-weight:500;">'+kcLbl+'</span>'+
+             '<span style="color:'+(d.kg!=null?'rgba(242,242,247,.72)':'rgba(242,242,247,.42)')+';font-size:11px;font-weight:500;">'+kgLbl+'</span>'+
+             '<span style="color:'+(d.kcal!=null?'rgba(242,242,247,.65)':'rgba(242,242,247,.38)')+';font-size:11px;font-weight:500;">'+kcLbl+'</span>'+
              '</div>'+badgeHtml+'</div>';
         });
         h+='</div></div>';
@@ -712,7 +712,7 @@ function renderSuivi(){
   h+='</div>';
 
   if(tripsTotal > 0) {
-      h+='<div class="mono" style="font-size:10px;font-weight:500;color:rgba(242,242,247,.45);margin-bottom:16px">Contributions: '+grossTotal+'€ — Trips: '+tripsTotal+'€</div>';
+      h+='<div class="mono" style="font-size:10px;font-weight:500;color:rgba(242,242,247,.80);margin-bottom:16px">Contributions: '+grossTotal+'€ — Trips: '+tripsTotal+'€</div>';
   } else {
       h+='<div style="margin-bottom:16px"></div>';
   }
@@ -722,7 +722,7 @@ function renderSuivi(){
     h+='<div style="background:'+P_BG[p]+';border-radius:12px;padding:10px;border:1px solid '+P_BORD[p]+'">'+
        '<div class="mono" style="font-size:10px;font-weight:600;color:'+P_COLOR[p]+';margin-bottom:4px;text-transform:uppercase">'+S.config.persons[p].name+'</div>'+
        '<div class="mono" style="font-size:18px;font-weight:500;color:'+P_COLOR[p]+'">'+per[p].total+'€</div>'+
-       '<div class="mono" style="font-size:9px;color:rgba(242,242,247,.3);margin-top:4px"><span>'+per[p].w+'×20</span> · <span>'+per[p].l+'×100</span></div></div>';
+       '<div class="mono" style="font-size:9px;color:rgba(242,242,247,.68);margin-top:4px"><span>'+per[p].w+'×20</span> · <span>'+per[p].l+'×100</span></div></div>';
   });
   h+='</div></div>';
 
@@ -741,7 +741,7 @@ function renderSuivi(){
     h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#1C1C1F;border:1px solid rgba(255,255,255,.08);border-radius:16px;max-height:220px;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,.7)">';
     FORM_MONTHS.forEach(m=>{
       const on=m===S.formMonth;
-      h+='<div data-act="pick" data-val="'+m+'"'+(on?' data-sel="1"':'')+' style="padding:10px 14px;cursor:pointer;font-family:var(--sans);font-weight:500;font-size:11px;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.04);background:'+(on?'rgba(255,255,255,.06)':'transparent')+';color:'+(on?'#F2F2F7':'rgba(242,242,247,.4)')+'">'+mLbl(m).toUpperCase()+'</div>';
+      h+='<div data-act="pick" data-val="'+m+'"'+(on?' data-sel="1"':'')+' style="padding:10px 14px;cursor:pointer;font-family:var(--sans);font-weight:500;font-size:11px;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.04);background:'+(on?'rgba(255,255,255,.06)':'transparent')+';color:'+(on?'#F2F2F7':'rgba(242,242,247,.78)')+'">'+mLbl(m).toUpperCase()+'</div>';
     });
     h+='</div>';
   }
@@ -766,7 +766,7 @@ function renderSuivi(){
 
   const allMonthKeys = new Set([...Object.keys(STATIC_HISTORY), ...keys]);
   const sortedAllKeys = Array.from(allMonthKeys).sort().reverse();
-  if(sortedAllKeys.length===0){h+='<div style="text-align:center;color:rgba(242,242,247,.2);font-family:var(--sans);font-weight:500;font-size:11px;padding:30px 0">No entries yet — add your first month above.</div>';}
+  if(sortedAllKeys.length===0){h+='<div style="text-align:center;color:rgba(242,242,247,.58);font-family:var(--sans);font-weight:500;font-size:11px;padding:30px 0">No entries yet — add your first month above.</div>';}
 
   const byYear={};
   sortedAllKeys.forEach(k=>{const y=k.split('-')[0];if(!byYear[y])byYear[y]=[];byYear[y].push(k);});
@@ -783,18 +783,18 @@ function renderSuivi(){
       }
     });
     const allStatic = yKeys.every(k=>!!STATIC_HISTORY[k]);
-    const yearOpacity = allStatic ? '.35' : '.5';
+    const yearOpacity = allStatic ? '.65' : '.82';
     h+='<div style="margin-bottom:6px">';
     h+='<div data-act="toggle-year" data-year="'+yr+'" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;border-radius:8px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);'+(open?'border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom-color:transparent;':'')+'">';
     h+='<div style="display:flex;align-items:center;gap:10px">';
     h+='<span class="mono" style="font-size:13px;font-weight:700;color:rgba(242,242,247,'+yearOpacity+');letter-spacing:.08em">'+yr+'</span>';
-    h+='<span class="mono" style="font-size:9px;color:rgba(242,242,247,.3)">'+yKeys.length+' month'+(yKeys.length>1?'s':'')+'</span>';
-    if(hasStatic)h+='<span class="mono" style="font-size:8px;font-weight:600;color:rgba(242,242,247,.2);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:2px 5px;letter-spacing:.05em">ARCH</span>';
+    h+='<span class="mono" style="font-size:9px;color:rgba(242,242,247,.68)">'+yKeys.length+' month'+(yKeys.length>1?'s':'')+'</span>';
+    if(hasStatic)h+='<span class="mono" style="font-size:8px;font-weight:600;color:rgba(242,242,247,.58);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:2px 5px;letter-spacing:.05em">ARCH</span>';
     if(lCount>0)h+='<span class="mono" style="font-size:9px;color:var(--loss)">'+lCount+'✗</span>';
     if(wCount>0)h+='<span class="mono" style="font-size:9px;color:var(--win)">'+wCount+'✓</span>';
     h+='</div><div style="display:flex;align-items:center;gap:12px">';
-    if(yTot>0)h+='<span class="mono" style="font-size:12px;font-weight:600;color:rgba(242,242,247,.35)">'+yTot+'€</span>';
-    h+='<span style="color:rgba(242,242,247,.25);font-size:11px;transform:'+(open?'rotate(180deg)':'rotate(0deg)')+';display:inline-block;transition:transform .2s">▼</span>';
+    if(yTot>0)h+='<span class="mono" style="font-size:12px;font-weight:600;color:rgba(242,242,247,.72)">'+yTot+'€</span>';
+    h+='<span style="color:rgba(242,242,247,.62);font-size:11px;transform:'+(open?'rotate(180deg)':'rotate(0deg)')+';display:inline-block;transition:transform .2s">▼</span>';
     h+='</div></div>';
     if(open){
       h+='<div style="border:1px solid rgba(255,255,255,.07);border-top:none;border-bottom-left-radius:8px;border-bottom-right-radius:8px;overflow:hidden">';
@@ -806,10 +806,10 @@ function renderSuivi(){
           h+='<div style="padding:12px;background:rgba(255,255,255,.018);'+(last?'':'border-bottom:1px solid rgba(255,255,255,.04)')+'">';
           h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
              '<div style="display:flex;align-items:center;gap:8px">'+
-             '<span class="mono" style="font-size:11px;font-weight:600;color:rgba(242,242,247,.28);letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
-             '<span class="mono" style="font-size:8px;font-weight:600;color:rgba(242,242,247,.2);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:2px 5px;letter-spacing:.05em">ARCH</span>'+
+             '<span class="mono" style="font-size:11px;font-weight:600;color:rgba(242,242,247,.65);letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
+             '<span class="mono" style="font-size:8px;font-weight:600;color:rgba(242,242,247,.58);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:2px 5px;letter-spacing:.05em">ARCH</span>'+
              '</div>'+
-             '<span class="mono" style="font-size:13px;font-weight:500;color:rgba(242,242,247,.28)">'+mTot+'€</span></div>';
+             '<span class="mono" style="font-size:13px;font-weight:500;color:rgba(242,242,247,.65)">'+mTot+'€</span></div>';
           h+='<div style="display:flex;flex-direction:column;gap:10px">';
           PERSONS.forEach(p=>{
             const d=STATIC_HISTORY[key][p];
@@ -821,10 +821,10 @@ function renderSuivi(){
             const bd=win?'rgba(76,211,126,.2)':'rgba(255,107,107,.2)';
             const badgeHtml='<span class="mono" style="font-size:12px;font-weight:600;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+d.amount+'€</span>';
             h+='<div style="display:flex;align-items:center;gap:8px">'+
-               '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase;opacity:.6">'+S.config.persons[p].name+'</span>'+
+               '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase;opacity:.88">'+S.config.persons[p].name+'</span>'+
                '<div style="flex:1;display:flex;gap:14px;font-family:var(--sans);align-items:center">'+
-               '<span style="color:'+(d.kg!=null?'rgba(242,242,247,.35)':'rgba(242,242,247,.12)')+';font-size:11px;font-weight:500;">'+kgLbl+'</span>'+
-               '<span style="color:'+(d.kcal!=null?'rgba(242,242,247,.28)':'rgba(242,242,247,.1)')+';font-size:11px;font-weight:500;">'+kcLbl+'</span>'+
+               '<span style="color:'+(d.kg!=null?'rgba(242,242,247,.72)':'rgba(242,242,247,.42)')+';font-size:11px;font-weight:500;">'+kgLbl+'</span>'+
+               '<span style="color:'+(d.kcal!=null?'rgba(242,242,247,.65)':'rgba(242,242,247,.38)')+';font-size:11px;font-weight:500;">'+kcLbl+'</span>'+
                '</div>'+badgeHtml+'</div>';
           });
           h+='</div></div>';
@@ -832,8 +832,8 @@ function renderSuivi(){
           let mTot=0;PERSONS.forEach(p=>{const e=amountFor(p,key);if(e&&e.pass!==null)mTot+=e.amount;});
           h+='<div style="padding:12px;background:rgba(255,255,255,.025);'+(last?'':'border-bottom:1px solid rgba(255,255,255,.04)')+'">';
           h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
-             '<span class="mono" style="font-size:11px;font-weight:600;color:rgba(242,242,247,.35);letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
-             '<span class="mono" style="font-size:13px;font-weight:500;color:rgba(242,242,247,.3)">'+mTot+'€</span></div>';
+             '<span class="mono" style="font-size:11px;font-weight:600;color:rgba(242,242,247,.72);letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
+             '<span class="mono" style="font-size:13px;font-weight:500;color:rgba(242,242,247,.68)">'+mTot+'€</span></div>';
           h+='<div style="display:flex;flex-direction:column;gap:10px">';
           PERSONS.forEach(p=>{
             const d=(S.data[key]&&S.data[key][p])||{};
@@ -871,7 +871,7 @@ function renderChart(field){
   Object.keys(STATIC_HISTORY).forEach(k=>{chartData[k]=STATIC_HISTORY[k];});
   Object.keys(S.data).forEach(k=>{chartData[k]=Object.assign({},chartData[k]||{},S.data[k]);});
   const keys=Object.keys(chartData).filter(k=>PERSONS.some(p=>{const d=chartData[k]&&chartData[k][p];return d&&d[field]!=null;})).sort();
-  if(!keys.length)return '<div style="text-align:center;padding:24px;font-family:var(--sans);font-weight:500;font-size:11px;color:rgba(242,242,247,.2)">No data</div>';
+  if(!keys.length)return '<div style="text-align:center;padding:24px;font-family:var(--sans);font-weight:500;font-size:11px;color:rgba(242,242,247,.58)">No data</div>';
 
   const W=350,H=180,ml=42,mr=32,mt=16,mb=24;
   const cW=W-ml-mr,cH=H-mt-mb;
@@ -898,7 +898,7 @@ function renderChart(field){
   for(let i=0;i<=4;i++){
     const v=yLo+(yHi-yLo)*i/4, y=yOf(v);
     s+='<line x1="'+ml+'" y1="'+y.toFixed(1)+'" x2="'+(ml+cW)+'" y2="'+y.toFixed(1)+'" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
-    s+='<text x="'+(ml-6)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="rgba(242,242,247,.28)">'+Math.round(v)+'</text>';
+    s+='<text x="'+(ml-6)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="rgba(242,242,247,.72)">'+Math.round(v)+'</text>';
   }
 
   keys.forEach((k,i)=>{
@@ -906,7 +906,7 @@ function renderChart(field){
     const x = xOf(i).toFixed(1);
     const yL = (mt + cH + 14).toFixed(1);
     const anchor = i === 0 ? 'start' : 'end';
-    s+='<text x="'+x+'" y="'+yL+'" text-anchor="'+anchor+'" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="rgba(242,242,247,.3)">'+mShrt(k)+'</text>';
+    s+='<text x="'+x+'" y="'+yL+'" text-anchor="'+anchor+'" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="rgba(242,242,247,.72)">'+mShrt(k)+'</text>';
   });
 
   const labelsToDraw = [];
@@ -1005,12 +1005,12 @@ function renderTrips(){
       h+='<div class="card" style="padding:12px 16px; display:flex; justify-content:space-between; align-items:center;">';
       h+='<div style="display:flex; align-items:center; gap:8px;">';
       h+='<span style="font-family:var(--sans); font-weight:600; font-size:13px; color:#F2F2F7;">'+esc(trip.title)+'</span>';
-      h+='<span style="color:rgba(242,242,247,.25);">—</span>';
-      h+='<span style="font-family:var(--sans); font-weight:500; font-size:12px; color:rgba(242,242,247,.4);">'+esc(trip.dates)+'</span>';
+      h+='<span style="color:rgba(242,242,247,.62);">—</span>';
+      h+='<span style="font-family:var(--sans); font-weight:500; font-size:12px; color:rgba(242,242,247,.78);">'+esc(trip.dates)+'</span>';
       h+='</div>';
       h+='<div style="display:flex; align-items:center; gap:16px;">';
       h+='<span class="mono" style="font-weight:600; font-size:14px; color:var(--loss);">−'+trip.cost+'€</span>';
-      h+='<button data-act="del-trip" data-idx="'+idx+'" style="color:rgba(242,242,247,.3); font-size:14px; padding:2px 4px;">✕</button>';
+      h+='<button data-act="del-trip" data-idx="'+idx+'" style="color:rgba(242,242,247,.68); font-size:14px; padding:2px 4px;">✕</button>';
       h+='</div>';
       h+='</div>';
     });
@@ -1026,7 +1026,7 @@ function renderObjectifs(){
   [['Goal reached','var(--win)','stakes.success',S.config.stakes.success],
    ['Goal missed','var(--loss)','stakes.failure',S.config.stakes.failure]].forEach(([lbl,c,path,val]) => {
     h+='<div class="card" style="padding:16px">';
-    h+='<div class="mono" style="font-size:10px;font-weight:600;color:rgba(242,242,247,.4);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+lbl+'</div>';
+    h+='<div class="mono" style="font-size:10px;font-weight:600;color:rgba(242,242,247,.78);text-transform:uppercase;letter-spacing:.05em;margin-bottom:10px">'+lbl+'</div>';
     h+='<div class="mono" style="font-size:24px;font-weight:500;color:'+c+';display:flex;align-items:baseline;gap:2px">+';
     h+='<span class="edt" data-act="editnum" data-path="'+path+'" data-dec="0">'+val+'</span><span style="font-size:14px;font-weight:600;">€</span></div></div>';
   });
@@ -1045,7 +1045,7 @@ function renderObjectifs(){
     h+='<div style="background:'+P_BG[p]+';border:1px solid '+P_BORD[p]+';border-radius:16px;padding:20px">';
     h+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px">';
     h+='<div class="mono" style="font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:.14em;color:'+P_COLOR[p]+'">'+pc.name+'</div>';
-    h+='<div class="mono" style="font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:'+P_COLOR[p]+';opacity:0.4;">'+(isSaad?'kcal-first':'weight-first')+'</div>';
+    h+='<div class="mono" style="font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:'+P_COLOR[p]+';opacity:0.72;">'+(isSaad?'kcal-first':'weight-first')+'</div>';
     h+='</div>';
     h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">';
     stats.forEach(({path,val,dec,unit,pre,primary})=>{
