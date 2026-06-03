@@ -9,12 +9,12 @@
 
   :root {
     --sans: 'Inter', -apple-system, system-ui, sans-serif;
-    --anas: #FF9F5A;
-    --hicham: #5DE0A4;
-    --saad: #6CBEFF;
-    --win: #4CD37E;
-    --loss: #FF6B6B;
-    --gold: #FFD060;
+    --anas: #FFB87A;
+    --hicham: #78EDB9;
+    --saad: #8DD4FF;
+    --win: #62E892;
+    --loss: #FF8585;
+    --gold: #FFE07A;
     --bg-dark: #0C0C0F;
     --card-bg: #1C1C1F;
     --card-border: rgba(255,255,255,0.07);
@@ -258,7 +258,7 @@
   }
   @keyframes key-tap {
     0%   { transform:scale(1) }
-    30%  { transform:scale(0.82); background:rgba(255,159,90,.28); box-shadow:0 0 24px rgba(255,159,90,.5), inset 0 0 10px rgba(255,159,90,.2); border-color:rgba(255,159,90,.6); }
+    30%  { transform:scale(0.82); background:rgba(255,184,122,.28); box-shadow:0 0 24px rgba(255,184,122,.5), inset 0 0 10px rgba(255,184,122,.2); border-color:rgba(255,184,122,.6); }
     100% { transform:scale(1) }
   }
   .pin-key.tapped { animation: key-tap 0.28s cubic-bezier(0.34,1.3,0.64,1) forwards; }
@@ -375,7 +375,7 @@
   </div>
   <button class="sync-badge" onclick="syncLoad(true)" style="flex-shrink:0; display:flex; align-items:center; gap:5px; padding:0;">
     <span id="sync-text" style="font-size:7px;letter-spacing:.1em;color:rgba(242,242,247,.68);">Offline</span>
-    <div id="sync-dot" class="sync-dot" style="background:var(--loss);box-shadow:0 0 0 3px rgba(255,107,107,.18),0 0 10px rgba(255,107,107,.45)"></div>
+    <div id="sync-dot" class="sync-dot" style="background:var(--loss);box-shadow:0 0 0 3px rgba(255,133,133,.18),0 0 10px rgba(255,133,133,.45)"></div>
   </button>
 </header>
 
@@ -467,9 +467,9 @@ const START_KEY='2025-09', OBS_END='2025-10';
 const FORM_START='2026-05', FORM_END='2030-12';
 const PERSONS=['anas','hicham','saad'];
 
-const P_COLOR={anas:'#FF9F5A',hicham:'#5DE0A4',saad:'#6CBEFF'};
-const P_BG={anas:'rgba(255,159,90,.1)',hicham:'rgba(93,224,164,.1)',saad:'rgba(108,190,255,.1)'};
-const P_BORD={anas:'rgba(255,159,90,.25)',hicham:'rgba(93,224,164,.25)',saad:'rgba(108,190,255,.25)'};
+const P_COLOR={anas:'#FFB87A',hicham:'#78EDB9',saad:'#8DD4FF'};
+const P_BG={anas:'rgba(255,184,122,.1)',hicham:'rgba(120,237,185,.1)',saad:'rgba(141,212,255,.1)'};
+const P_BORD={anas:'rgba(255,184,122,.25)',hicham:'rgba(120,237,185,.25)',saad:'rgba(141,212,255,.25)'};
 
 const FORM_MONTHS=(()=>{
   const a=[]; let k = FORM_START;
@@ -554,9 +554,9 @@ function setSyncStatus(msg, color, dotColor) {
   if (elDot) {
     elDot.style.background = dotColor;
     const glowMap = {
-      'var(--win)':  '0 0 0 3px rgba(76,211,126,.18), 0 0 10px rgba(76,211,126,.45)',
-      'var(--loss)': '0 0 0 3px rgba(255,107,107,.18), 0 0 10px rgba(255,107,107,.45)',
-      'var(--gold)': '0 0 0 3px rgba(255,208,96,.18),  0 0 10px rgba(255,208,96,.45)',
+      'var(--win)':  '0 0 0 3px rgba(98,232,146,.18), 0 0 10px rgba(98,232,146,.45)',
+      'var(--loss)': '0 0 0 3px rgba(255,133,133,.18), 0 0 10px rgba(255,133,133,.45)',
+      'var(--gold)': '0 0 0 3px rgba(255,224,122,.18),  0 0 10px rgba(255,224,122,.45)',
     };
     elDot.style.boxShadow = glowMap[dotColor] || 'none';
   }
@@ -700,8 +700,8 @@ function badge(e,key,p){
   if(e.pass===null)return '';
 
   const c=e.pass?'var(--win)':'var(--loss)';
-  const bg=e.pass?'rgba(76,211,126,.22)':'rgba(255,107,107,.22)';
-  const bd=e.pass?'rgba(76,211,126,.5)':'rgba(255,107,107,.5)';
+  const bg=e.pass?'rgba(98,232,146,.22)':'rgba(255,133,133,.22)';
+  const bd=e.pass?'rgba(98,232,146,.5)':'rgba(255,133,133,.5)';
   return '<span class="mono" style="font-size:12px;font-weight:600;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+e.amount+'€</span>';
 }
 
@@ -752,8 +752,8 @@ function renderStaticHistory(){
           const kcLbl=d.kcal!=null?d.kcal+' kcal':'—';
           const win=d.amount===S.config.stakes.success;
           const c=win?'var(--win)':'var(--loss)';
-          const bg=win?'rgba(76,211,126,.22)':'rgba(255,107,107,.22)';
-          const bd=win?'rgba(76,211,126,.5)':'rgba(255,107,107,.5)';
+          const bg=win?'rgba(98,232,146,.22)':'rgba(255,133,133,.22)';
+          const bd=win?'rgba(98,232,146,.5)':'rgba(255,133,133,.5)';
           const badgeHtml='<span class="mono" style="font-size:12px;font-weight:600;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+d.amount+'€</span>';
           h+='<div style="display:flex;align-items:center;gap:8px">'+
              '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase;opacity:.88">'+S.config.persons[p].name+'</span>'+
@@ -795,7 +795,7 @@ function renderSuivi(){
 
   // ── Common Pool (top) ──
   h+='<div style="background:rgba(255,220,80,.07);border-radius:16px;padding:16px;margin-bottom:24px">';
-  h+='<div class="mono" style="font-size:9px;font-weight:600;letter-spacing:.2em;color:rgba(255,208,96,.5);text-transform:uppercase;margin-bottom:6px">Common Pool</div>';
+  h+='<div class="mono" style="font-size:9px;font-weight:600;letter-spacing:.2em;color:rgba(255,224,122,.5);text-transform:uppercase;margin-bottom:6px">Common Pool</div>';
   h+='<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px">';
   h+='<div class="mono" style="font-size:42px;font-weight:700;color:var(--gold);line-height:1">'+netTotal+'€</div>';
   h+='<div id="preview" style="font-family:var(--sans);font-weight:700;font-size:42px;line-height:1;text-align:right;pointer-events:none;"></div>';
@@ -907,8 +907,8 @@ function renderSuivi(){
             const kcLbl=d.kcal!=null?d.kcal+' kcal':'—';
             const win=d.amount===S.config.stakes.success;
             const c=win?'var(--win)':'var(--loss)';
-            const bg=win?'rgba(76,211,126,.08)':'rgba(255,107,107,.08)';
-            const bd=win?'rgba(76,211,126,.2)':'rgba(255,107,107,.2)';
+            const bg=win?'rgba(98,232,146,.08)':'rgba(255,133,133,.08)';
+            const bd=win?'rgba(98,232,146,.2)':'rgba(255,133,133,.2)';
             const badgeHtml='<span class="mono" style="font-size:12px;font-weight:600;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+d.amount+'€</span>';
             h+='<div style="display:flex;align-items:center;gap:8px">'+
                '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase;opacity:.88">'+S.config.persons[p].name+'</span>'+
