@@ -669,7 +669,7 @@ async function syncSave(changes){
   setSyncStatus('Syncing', '#888', 'var(--gold)');
   try{
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
-      body:JSON.stringify({state:{config:S.config,data:S.data,manual:S.manual,trips:S.trips},changes:changes||[]})});
+      body: JSON.stringify({pin: '48960', state: {config: S.config, data: S.data, manual: S.manual, trips: S.trips}, changes: changes || []})
     _syncOk=true;
     setSyncStatus('Synced', '#888', 'var(--win)');
   }catch(e){
