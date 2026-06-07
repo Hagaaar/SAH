@@ -1044,10 +1044,15 @@ function renderChart(field){
   const chartData={};
   Object.keys(STATIC_HISTORY).forEach(k=>{chartData[k]=STATIC_HISTORY[k];});
   Object.keys(S.data).forEach(k=>{chartData[k]=Object.assign({},chartData[k]||{},S.data[k]);});
+  if(field==='kg'){
+    const aug={};
+    PERSONS.forEach(p=>{const sk=S.config.persons[p]&&S.config.persons[p].startKg;if(sk!=null)aug[p]={kg:sk};});
+    if(Object.keys(aug).length)chartData['2025-08']=Object.assign({},chartData['2025-08']||{},aug);
+  }
   const keys=Object.keys(chartData).filter(k=>PERSONS.some(p=>{const d=chartData[k]&&chartData[k][p];return d&&d[field]!=null;})).sort();
   if(!keys.length)return '<div style="text-align:center;padding:24px;font-family:var(--sans);font-weight:500;font-size:11px;color:rgba(242,242,247,.58)">No data</div>';
 
-  const W=350,H=180,ml=42,mr=32,mt=16,mb=24;
+  const W=350,H=180,ml=16,mr=32,mt=16,mb=24;
   const cW=W-ml-mr,cH=H-mt-mb;
   const n=keys.length;
   const allV=[];
@@ -1072,7 +1077,6 @@ function renderChart(field){
   for(let i=0;i<=4;i++){
     const v=yLo+(yHi-yLo)*i/4, y=yOf(v);
     s+='<line x1="'+ml+'" y1="'+y.toFixed(1)+'" x2="'+(ml+cW)+'" y2="'+y.toFixed(1)+'" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
-    s+='<text x="'+(ml-6)+'" y="'+(y+3).toFixed(1)+'" text-anchor="end" font-family="Inter,sans-serif" font-weight="500" font-size="9" fill="rgba(242,242,247,.72)">'+Math.round(v)+'</text>';
   }
 
   keys.forEach((k,i)=>{
