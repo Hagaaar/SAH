@@ -1261,6 +1261,9 @@ function updateTabHighlight(){
 }
 
 function render(){
+  // Clean up any previously teleported picker elements to avoid orphans
+  document.querySelectorAll('body > [data-act="picker-bg"], body > #picker-list').forEach(el=>el.remove());
+
   let h='';
 
   if(S.tab === 'suivi') h+=renderSuivi();
@@ -1275,7 +1278,16 @@ function render(){
 
   if(S.pickerOpen){
     const list=document.getElementById('picker-list');
-    if(list){const sel=list.querySelector('[data-sel="1"]');if(sel)list.scrollTop=sel.offsetTop-list.clientHeight/2+sel.clientHeight/2;}
+    const btn=document.querySelector('[data-act="picker"]');
+    const bg=document.querySelector('[data-act="picker-bg"]');
+    if(list&&btn){
+      const r=btn.getBoundingClientRect();
+      list.style.cssText='position:fixed;top:'+(r.bottom+4)+'px;left:'+r.left+'px;width:'+r.width+'px;z-index:9999;background:#1C1C1F;border:1px solid rgba(255,255,255,.18);border-radius:16px;max-height:260px;overflow-y:auto;box-shadow:0 16px 40px rgba(0,0,0,.9)';
+      document.body.appendChild(list);
+      const sel=list.querySelector('[data-sel="1"]');
+      if(sel)list.scrollTop=sel.offsetTop-list.clientHeight/2+sel.clientHeight/2;
+    }
+    if(bg){bg.style.zIndex='9998';document.body.appendChild(bg);}
   }
 }
 
