@@ -339,6 +339,8 @@
   #auth-pad .pin-key:nth-child(11){animation-delay:.54s}
   #auth-pad .pin-key:nth-child(12){animation-delay:.58s}
   #auth-pad .pin-key.ghost { border:none; background:transparent; cursor:default; pointer-events:none; }
+  #auth-pad .pin-key.tapped { animation: key-tap 0.28s cubic-bezier(0.34,1.3,0.64,1) forwards; }
+  #auth-pad .pin-key.del.tapped { animation: del-tap 0.22s cubic-bezier(0.34,1.4,0.64,1) forwards; background:transparent; box-shadow:none; }
 
   #trust-toggle {
     display: flex; align-items: center; gap: 7px;
@@ -440,7 +442,7 @@
   if(deviceId&&getTrusted().includes(deviceId)){sessionStorage.setItem(SK,'1');ov.style.display='none';return;}
   if(sessionStorage.getItem(SK)==='1'){ov.style.display='none';return;}
 
-  let buf='',done=false,trustThis=false;
+  let buf='',done=false,trustThis=false,submitting=false;
 
   window.authToggleTrust=function(){
     if(done)return;
@@ -479,6 +481,7 @@
     el.addEventListener('animationend',()=>el.classList.remove('tapped'),{once:true});
   }
   async function submit(){
+    submitting=true;
     if(await digest(buf)===HASH){
       done=true;
       sessionStorage.setItem(SK,'1');
@@ -503,18 +506,18 @@
       setTimeout(()=>{
         w.classList.remove('shake'); card.classList.remove('error-flash');
         document.querySelectorAll('#auth-dots .pin-dot').forEach(d=>d.classList.remove('error'));
-        buf=''; dots();
+        buf=''; dots(); submitting=false;
       },500);
     }
   }
   document.getElementById('auth-pad').addEventListener('click',e=>{
-    if(done)return;
+    if(done||submitting)return;
     const k=e.target.closest('[data-k]'),dl=e.target.closest('#auth-del');
     if(k&&buf.length<5){tapKey(k);buf+=k.dataset.k;dots();if(buf.length===5)submit();}
     else if(dl&&buf.length>0){tapKey(dl);buf=buf.slice(0,-1);dots();}
   });
   document.addEventListener('keydown',e=>{
-    if(done||ov.style.display==='none')return;
+    if(done||submitting||ov.style.display==='none')return;
     if(e.key>='0'&&e.key<='9'&&buf.length<5){buf+=e.key;dots();if(buf.length===5)submit();}
     else if(e.key==='Backspace'&&buf.length>0){buf=buf.slice(0,-1);dots();}
   });
