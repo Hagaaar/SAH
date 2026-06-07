@@ -421,20 +421,23 @@
   const MAX  = 3;
   const ov   = document.getElementById('auth-overlay');
 
+  function ls(op,key,val){
+    try{return op==='get'?localStorage.getItem(key):localStorage.setItem(key,val);}catch(e){return null;}
+  }
   function getDeviceId(){
-    let id=localStorage.getItem(DK);
+    let id=ls('get',DK);
     if(!id){
       id=crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+Math.random().toString(36).slice(2);
-      localStorage.setItem(DK,id);
+      ls('set',DK,id);
     }
-    return id;
+    return id||'';
   }
   function getTrusted(){
-    try{return JSON.parse(localStorage.getItem(TK))||[];}catch(e){return[];}
+    try{return JSON.parse(ls('get',TK))||[];}catch(e){return[];}
   }
 
   const deviceId=getDeviceId();
-  if(getTrusted().includes(deviceId)){sessionStorage.setItem(SK,'1');ov.style.display='none';return;}
+  if(deviceId&&getTrusted().includes(deviceId)){sessionStorage.setItem(SK,'1');ov.style.display='none';return;}
   if(sessionStorage.getItem(SK)==='1'){ov.style.display='none';return;}
 
   let buf='',done=false,trustThis=false;
@@ -484,7 +487,7 @@
         if(!trusted.includes(deviceId)){
           if(trusted.length>=MAX)trusted.shift();
           trusted.push(deviceId);
-          localStorage.setItem(TK,JSON.stringify(trusted));
+          ls('set',TK,JSON.stringify(trusted));
         }
       }
       document.querySelectorAll('#auth-dots .pin-dot').forEach((d,i)=>{
