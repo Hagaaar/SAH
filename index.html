@@ -302,7 +302,9 @@
   @keyframes key-enter   { from{opacity:0;transform:scale(0.5)} to{opacity:1;transform:scale(1)} }
 
   #auth-overlay {
-    position: fixed; inset: 0; background: var(--bg-dark); z-index: 9999;
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    width: 100%; height: 100%;
+    background: var(--bg-dark); z-index: 9999;
     display: flex; align-items: center; justify-content: center;
     animation: overlay-in 0.5s ease both;
   }
@@ -515,12 +517,14 @@
       buf=''; dots(); submitting=false;
     }
   }
-  document.getElementById('auth-pad').addEventListener('click',e=>{
+  function handlePinInput(e){
     if(done||submitting)return;
     const k=e.target.closest('[data-k]'),dl=e.target.closest('#auth-del');
+    if(!k&&!dl)return;
     if(k&&buf.length<5){tapKey(k);buf+=k.dataset.k;dots();if(buf.length===5)submit();}
     else if(dl&&buf.length>0){tapKey(dl);buf=buf.slice(0,-1);dots();}
-  });
+  }
+  document.addEventListener('click',handlePinInput);
   document.addEventListener('keydown',e=>{
     if(done||submitting||ov.style.display==='none')return;
     if(e.key>='0'&&e.key<='9'&&buf.length<5){buf+=e.key;dots();if(buf.length===5)submit();}
