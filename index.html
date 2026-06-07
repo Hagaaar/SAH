@@ -326,7 +326,7 @@
   #auth-pad {
     display: grid; grid-template-columns: repeat(3, 76px); gap: 16px;
   }
-  #auth-pad .pin-key:not(.ghost) {
+  #auth-pad .pin-key.entering {
     animation: key-enter 0.55s cubic-bezier(0.34,1.56,0.64,1) both;
   }
   #auth-pad .pin-key:nth-child(1){animation-delay:.18s}
@@ -371,18 +371,18 @@
       <div class="pin-dot" id="ad4"></div>
     </div>
     <div id="auth-pad">
-      <button class="pin-key" data-k="1">1</button>
-      <button class="pin-key" data-k="2">2</button>
-      <button class="pin-key" data-k="3">3</button>
-      <button class="pin-key" data-k="4">4</button>
-      <button class="pin-key" data-k="5">5</button>
-      <button class="pin-key" data-k="6">6</button>
-      <button class="pin-key" data-k="7">7</button>
-      <button class="pin-key" data-k="8">8</button>
-      <button class="pin-key" data-k="9">9</button>
+      <button class="pin-key entering" data-k="1">1</button>
+      <button class="pin-key entering" data-k="2">2</button>
+      <button class="pin-key entering" data-k="3">3</button>
+      <button class="pin-key entering" data-k="4">4</button>
+      <button class="pin-key entering" data-k="5">5</button>
+      <button class="pin-key entering" data-k="6">6</button>
+      <button class="pin-key entering" data-k="7">7</button>
+      <button class="pin-key entering" data-k="8">8</button>
+      <button class="pin-key entering" data-k="9">9</button>
       <button class="pin-key ghost"></button>
-      <button class="pin-key" data-k="0">0</button>
-      <button class="pin-key del" id="auth-del">⌫</button>
+      <button class="pin-key entering" data-k="0">0</button>
+      <button class="pin-key del entering" id="auth-del">⌫</button>
     </div>
     <div id="trust-toggle" onclick="authToggleTrust()">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -517,6 +517,11 @@
       buf=''; dots(); submitting=false;
     }
   }
+  document.querySelectorAll('#auth-pad .pin-key.entering').forEach(btn=>{
+    btn.addEventListener('animationend',function h(e){
+      if(e.animationName==='key-enter'){btn.classList.remove('entering');btn.removeEventListener('animationend',h);}
+    });
+  });
   function handlePinInput(e){
     if(done||submitting)return;
     const k=e.target.closest('[data-k]'),dl=e.target.closest('#auth-del');
@@ -1449,6 +1454,10 @@ if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js')
     .then(reg => reg.update())
     .catch(() => {});
+  let reloading = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!reloading) { reloading = true; window.location.reload(); }
+  });
 }
 </script>
 </body>
