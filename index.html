@@ -908,20 +908,20 @@ function renderSuivi(){
   h+='<div class="saisie-wrapper" style="--tab-bg:'+P_BG[curP]+'; --tab-color:'+P_COLOR[curP]+'; margin-bottom:24px;">';
   h+='<div class="saisie-bloc" style="border-radius:'+blocRadius+';padding:14px 16px;">';
   h+='<div style="position:relative;display:flex;gap:8px;align-items:center;">';
-  h+='<div style="position:relative;flex:1.4;min-width:0;">';
-  h+='<button class="saisie-input-bg" data-act="picker" style="width:100%;padding:11px 10px;text-align:left;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:11px;white-space:nowrap;"><span style="white-space:nowrap;">'+mLbl(S.formMonth).toUpperCase()+'</span><span style="font-size:9px;color:rgba(255,255,255,.3);flex-shrink:0;margin-left:4px;">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
+  h+='<div style="position:relative;flex:2;min-width:0;">';
+  h+='<button class="saisie-input-bg" data-act="picker" style="width:100%;padding:13px 12px;text-align:left;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:12px;white-space:nowrap;background:rgba(255,255,255,.14);"><span style="white-space:nowrap;">'+mLbl(S.formMonth).toUpperCase()+'</span><span style="font-size:10px;color:rgba(255,255,255,.5);flex-shrink:0;margin-left:6px;">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
   if(S.pickerOpen){
-    h+='<div data-act="picker-bg" style="position:fixed;inset:0;z-index:98"></div>';
-    h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#1C1C1F;border:1px solid rgba(255,255,255,.08);border-radius:16px;max-height:220px;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,.7)">';
+    h+='<div data-act="picker-bg" style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:98"></div>';
+    h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#1C1C1F;border:1px solid rgba(255,255,255,.12);border-radius:16px;max-height:260px;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,.85)">';
     FORM_MONTHS.forEach(m=>{
       const on=m===S.formMonth;
-      h+='<div data-act="pick" data-val="'+m+'"'+(on?' data-sel="1"':'')+' style="padding:10px 14px;cursor:pointer;font-family:var(--sans);font-weight:500;font-size:11px;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.04);background:'+(on?'rgba(255,255,255,.06)':'transparent')+';color:'+(on?'#F2F2F7':'rgba(242,242,247,.78)')+'">'+mLbl(m).toUpperCase()+'</div>';
+      h+='<div data-act="pick" data-val="'+m+'"'+(on?' data-sel="1"':'')+' style="padding:14px 16px;cursor:pointer;font-family:var(--sans);font-weight:600;font-size:12px;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.05);background:'+(on?'rgba(255,255,255,.10)':'rgba(28,28,31,1)')+';color:'+(on?'#F2F2F7':'rgba(242,242,247,.85)')+'">'+mLbl(m).toUpperCase()+'</div>';
     });
     h+='</div>';
   }
   h+='</div>';
-  h+='<input id="f-kg" class="saisie-input-bg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:11px 8px;font-size:11px;">';
-  h+='<input id="f-kcal" class="saisie-input-bg" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;min-width:0;padding:11px 8px;font-size:11px;">';
+  h+='<input id="f-kg" class="saisie-input-bg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:13px 8px;font-size:11px;">';
+  h+='<input id="f-kcal" class="saisie-input-bg" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;min-width:0;padding:13px 8px;font-size:11px;">';
   h+='<button data-act="add" style="width:38px;height:38px;flex-shrink:0;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">';
   h+='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--tab-color)" stroke-width="3" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>';
   h+='</button>';
@@ -1052,7 +1052,7 @@ function renderChart(field){
   const keys=Object.keys(chartData).filter(k=>PERSONS.some(p=>{const d=chartData[k]&&chartData[k][p];return d&&d[field]!=null;})).sort();
   if(!keys.length)return '<div style="text-align:center;padding:24px;font-family:var(--sans);font-weight:500;font-size:11px;color:rgba(242,242,247,.58)">No data</div>';
 
-  const W=350,H=180,ml=16,mr=32,mt=16,mb=24;
+  const W=350,H=180,ml=32,mr=32,mt=16,mb=24;
   const cW=W-ml-mr,cH=H-mt-mb;
   const n=keys.length;
   const allV=[];
@@ -1065,14 +1065,6 @@ function renderChart(field){
 
   let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">';
 
-  s+='<defs>';
-  PERSONS.forEach(p=>{
-    s+='<linearGradient id="ag-'+p+'-'+field+'" x1="0" y1="0" x2="0" y2="1">';
-    s+='<stop offset="0%" stop-color="'+P_COLOR[p]+'" stop-opacity="0.18"/>';
-    s+='<stop offset="100%" stop-color="'+P_COLOR[p]+'" stop-opacity="0"/>';
-    s+='</linearGradient>';
-  });
-  s+='</defs>';
 
   for(let i=0;i<=4;i++){
     const v=yLo+(yHi-yLo)*i/4, y=yOf(v);
@@ -1092,17 +1084,6 @@ function renderChart(field){
   PERSONS.forEach(p=>{
     const col=P_COLOR[p];
     const pts=keys.map((k,i)=>{const d=chartData[k]&&chartData[k][p];const v=d&&d[field]!=null?d[field]:null;return{x:xOf(i),y:v!=null?yOf(v):null,v,i};});
-
-    const segs=[];let cur=[];
-    pts.forEach(pt=>{if(pt.y!=null){cur.push(pt);}else{if(cur.length>1)segs.push([...cur]);cur=[];}});
-    if(cur.length>1)segs.push(cur);
-    segs.forEach(seg=>{
-      let ap='M'+seg[0].x.toFixed(1)+' '+seg[0].y.toFixed(1);
-      seg.slice(1).forEach(pt=>{ap+=' L'+pt.x.toFixed(1)+' '+pt.y.toFixed(1);});
-      ap+=' L'+seg[seg.length-1].x.toFixed(1)+' '+(mt+cH).toFixed(1);
-      ap+=' L'+seg[0].x.toFixed(1)+' '+(mt+cH).toFixed(1)+' Z';
-      s+='<path d="'+ap+'" fill="url(#ag-'+p+'-'+field+')" />';
-    });
 
     let path='',pr=false;
     pts.forEach(pt=>{if(pt.y!=null){path+=(pr?'L':'M')+pt.x.toFixed(1)+' '+pt.y.toFixed(1)+' ';pr=true;}else pr=false;});
