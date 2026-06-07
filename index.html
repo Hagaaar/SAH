@@ -908,8 +908,8 @@ function renderSuivi(){
   h+='<div class="saisie-wrapper" style="--tab-bg:'+P_BG[curP]+'; --tab-color:'+P_COLOR[curP]+'; margin-bottom:24px;">';
   h+='<div class="saisie-bloc" style="border-radius:'+blocRadius+';padding:14px 16px;">';
   h+='<div style="position:relative;display:flex;gap:8px;align-items:center;">';
-  h+='<div style="position:relative;flex:2;min-width:0;">';
-  h+='<button class="saisie-input-bg" data-act="picker" style="width:100%;padding:13px 12px;text-align:left;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:12px;white-space:nowrap;background:rgba(255,255,255,.14);"><span style="white-space:nowrap;">'+mLbl(S.formMonth).toUpperCase()+'</span><span style="font-size:10px;color:rgba(255,255,255,.5);flex-shrink:0;margin-left:6px;">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
+  h+='<div style="position:relative;flex:3;min-width:0;">';
+  h+='<button class="saisie-input-bg" data-act="picker" style="width:100%;padding:13px 12px;text-align:left;display:flex;justify-content:space-between;align-items:center;cursor:pointer;font-size:12px;white-space:nowrap;background:#2C2C2E;"><span style="white-space:nowrap;">'+mLbl(S.formMonth).toUpperCase()+'</span><span style="font-size:10px;color:rgba(255,255,255,.5);flex-shrink:0;margin-left:6px;">'+(S.pickerOpen?'▲':'▼')+'</span></button>';
   if(S.pickerOpen){
     h+='<div data-act="picker-bg" style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:98"></div>';
     h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#1C1C1F;border:1px solid rgba(255,255,255,.12);border-radius:16px;max-height:260px;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,.85)">';
@@ -920,8 +920,8 @@ function renderSuivi(){
     h+='</div>';
   }
   h+='</div>';
-  h+='<input id="f-kg" class="saisie-input-bg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:13px 8px;font-size:11px;">';
-  h+='<input id="f-kcal" class="saisie-input-bg" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;min-width:0;padding:13px 8px;font-size:11px;">';
+  h+='<input id="f-kg" class="saisie-input-bg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:0.7;min-width:0;padding:13px 6px;font-size:11px;text-align:center;">';
+  h+='<input id="f-kcal" class="saisie-input-bg" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:0.7;min-width:0;padding:13px 6px;font-size:11px;text-align:center;">';
   h+='<button data-act="add" style="width:38px;height:38px;flex-shrink:0;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">';
   h+='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--tab-color)" stroke-width="3" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>';
   h+='</button>';
@@ -1066,9 +1066,10 @@ function renderChart(field){
   let s='<svg viewBox="0 0 '+W+' '+H+'" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;overflow:visible">';
 
 
-  for(let i=0;i<=4;i++){
-    const v=yLo+(yHi-yLo)*i/4, y=yOf(v);
-    s+='<line x1="'+ml+'" y1="'+y.toFixed(1)+'" x2="'+(ml+cW)+'" y2="'+y.toFixed(1)+'" stroke="rgba(255,255,255,.06)" stroke-width="1"/>';
+  for(let i=0;i<=8;i++){
+    const v=yLo+(yHi-yLo)*i/8, y=yOf(v);
+    const isMain=i%2===0;
+    s+='<line x1="'+ml+'" y1="'+y.toFixed(1)+'" x2="'+(ml+cW)+'" y2="'+y.toFixed(1)+'" stroke="rgba(255,255,255,'+(isMain?'.13':'.07')+')" stroke-width="1"/>';
   }
 
   keys.forEach((k,i)=>{
@@ -1133,8 +1134,9 @@ function renderChart(field){
 
 function renderEvolution(){
   let h='<div style="display:flex;flex-direction:column;gap:32px">';
+  h+=renderLegend();
   [['kg','Weight (kg)'],['kcal','Calories (kcal/d)']].forEach(([f,t])=>{
-    h+='<div><div class="sectitle">'+t+'</div>'+renderLegend()+renderChart(f)+'</div>';
+    h+='<div><div style="font-family:var(--sans);font-size:13px;font-weight:800;letter-spacing:.12em;color:rgba(242,242,247,.88);text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);">'+t+'</div>'+renderChart(f)+'</div>';
   });
   return h+'</div>';
 }
