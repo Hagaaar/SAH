@@ -438,9 +438,10 @@
     try{return JSON.parse(ls('get',TK))||[];}catch(e){return[];}
   }
 
+  function ss(op,key,val){try{return op==='get'?sessionStorage.getItem(key):sessionStorage.setItem(key,val);}catch(e){return null;}}
   const deviceId=getDeviceId();
-  if(deviceId&&getTrusted().includes(deviceId)){sessionStorage.setItem(SK,'1');ov.style.display='none';return;}
-  if(sessionStorage.getItem(SK)==='1'){ov.style.display='none';return;}
+  if(deviceId&&getTrusted().includes(deviceId)){ss('set',SK,'1');ov.style.display='none';return;}
+  if(ss('get',SK)==='1'){ov.style.display='none';return;}
 
   let buf='',done=false,trustThis=false,submitting=false;
 
@@ -482,32 +483,36 @@
   }
   async function submit(){
     submitting=true;
-    if(await digest(buf)===HASH){
-      done=true;
-      sessionStorage.setItem(SK,'1');
-      if(trustThis){
-        const trusted=getTrusted();
-        if(!trusted.includes(deviceId)){
-          if(trusted.length>=MAX)trusted.shift();
-          trusted.push(deviceId);
-          ls('set',TK,JSON.stringify(trusted));
+    try {
+      if(await digest(buf)===HASH){
+        done=true;
+        ss('set',SK,'1');
+        if(trustThis){
+          const trusted=getTrusted();
+          if(!trusted.includes(deviceId)){
+            if(trusted.length>=MAX)trusted.shift();
+            trusted.push(deviceId);
+            ls('set',TK,JSON.stringify(trusted));
+          }
         }
+        document.querySelectorAll('#auth-dots .pin-dot').forEach((d,i)=>{
+          setTimeout(()=>{d.className='pin-dot'; void d.offsetWidth; d.className='pin-dot success';},i*60);
+        });
+        setTimeout(()=>{ov.classList.add('out'); setTimeout(()=>{ov.style.display='none';},500);},520);
+      } else {
+        const w=document.getElementById('auth-dots');
+        const card=document.getElementById('auth-card');
+        document.querySelectorAll('#auth-dots .pin-dot').forEach(d=>d.classList.add('error'));
+        w.classList.add('shake');
+        card.classList.add('error-flash');
+        setTimeout(()=>{
+          w.classList.remove('shake'); card.classList.remove('error-flash');
+          document.querySelectorAll('#auth-dots .pin-dot').forEach(d=>d.classList.remove('error'));
+          buf=''; dots(); submitting=false;
+        },500);
       }
-      document.querySelectorAll('#auth-dots .pin-dot').forEach((d,i)=>{
-        setTimeout(()=>{d.className='pin-dot'; void d.offsetWidth; d.className='pin-dot success';},i*60);
-      });
-      setTimeout(()=>{ov.classList.add('out'); setTimeout(()=>{ov.style.display='none';},500);},520);
-    } else {
-      const w=document.getElementById('auth-dots');
-      const card=document.getElementById('auth-card');
-      document.querySelectorAll('#auth-dots .pin-dot').forEach(d=>d.classList.add('error'));
-      w.classList.add('shake');
-      card.classList.add('error-flash');
-      setTimeout(()=>{
-        w.classList.remove('shake'); card.classList.remove('error-flash');
-        document.querySelectorAll('#auth-dots .pin-dot').forEach(d=>d.classList.remove('error'));
-        buf=''; dots(); submitting=false;
-      },500);
+    } catch(_) {
+      buf=''; dots(); submitting=false;
     }
   }
   document.getElementById('auth-pad').addEventListener('click',e=>{
