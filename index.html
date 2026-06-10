@@ -921,7 +921,7 @@ function renderSuivi(){
     h+='</div>';
   }
   h+='</div>';
-  h+='<input id="f-kg" class="saisie-input-bg" type="number" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:13px 6px;font-size:11px;text-align:center;">';
+  h+='<input id="f-kg" class="saisie-input-bg" type="text" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:13px 6px;font-size:11px;text-align:center;">';
   h+='<input id="f-kcal" class="saisie-input-bg" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;min-width:0;padding:13px 6px;font-size:11px;text-align:center;">';
   h+='<button data-act="add" style="width:38px;height:38px;flex-shrink:0;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">';
   h+='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--tab-color)" stroke-width="3" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>';
@@ -1365,10 +1365,12 @@ document.addEventListener('click',ev=>{
 
     const key=S.formMonth,p=S.formPerson;
     if(!S.data[key])S.data[key]={};
-    S.data[key]=Object.assign({},S.data[key],{[p]:{kg:kgN,kcal:kcN}});
+    const existing=(S.data[key][p])||{};
+    const merged={kg:kgN!=null?kgN:(existing.kg!=null?existing.kg:null),kcal:kcN!=null?kcN:(existing.kcal!=null?existing.kcal:null)};
+    S.data[key]=Object.assign({},S.data[key],{[p]:merged});
     if(S.manual[key]&&S.manual[key][p]!==undefined){delete S.manual[key][p];}
     S.fKg='';S.fKcal='';
-    const ch=makeChange(p,key,kgN,kcN,'form entry');
+    const ch=makeChange(p,key,merged.kg,merged.kcal,'form entry');
     S.openYears.add(key.split('-')[0]);
     scheduleSave([ch]);
     render();return;
