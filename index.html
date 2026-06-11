@@ -1036,7 +1036,7 @@ function renderSuivi(){
 
 function renderLegend(){
   let h='<div style="display:flex;flex-direction:row;gap:14px;align-items:center;justify-content:flex-end;margin-bottom:4px">';
-  PERSONS.forEach(p=>{
+  ['saad','anas','hicham'].forEach(p=>{
     h+='<div style="display:flex;align-items:center;gap:5px">'+
        '<svg width="18" height="4" style="flex-shrink:0;overflow:visible"><line x1="0" y1="2" x2="18" y2="2" stroke="'+P_COLOR[p]+'" stroke-width="2.5"/><circle cx="9" cy="2" r="2.5" fill="'+P_COLOR[p]+'"/></svg>'+
        '<span style="font-family:var(--sans);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:'+P_COLOR[p]+'">'+P_LABEL[p]+'</span>'+
@@ -1209,9 +1209,8 @@ function renderObjectifs(){
     ];
 
     h+='<div style="background:'+P_BG_SOFT[p]+';border:1px solid '+P_BORD_SOFT[p]+';border-radius:16px;padding:16px 20px">';
-    h+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">';
+    h+='<div style="margin-bottom:10px">';
     h+='<div class="mono" style="font-size:40px;font-weight:800;line-height:1;text-transform:uppercase;letter-spacing:.04em;color:'+P_COLOR[p]+'">'+P_LABEL[p]+'</div>';
-    h+='<div class="mono" style="font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:'+P_COLOR[p]+';opacity:0.72;">'+(isSaad?'kcal-first':'weight-first')+'</div>';
     h+='</div>';
     h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">';
     stats.forEach(({path,val,dec,unit,pre,primary})=>{
