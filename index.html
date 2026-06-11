@@ -554,6 +554,8 @@ const PERSONS=['anas','hicham','saad'];
 const P_COLOR={anas:'#FF8020',hicham:'#1CD988',saad:'#38AAFF'};
 const P_BG={anas:'rgba(255,128,32,.28)',hicham:'rgba(28,217,136,.28)',saad:'rgba(56,170,255,.28)'};
 const P_BORD={anas:'rgba(255,128,32,.65)',hicham:'rgba(28,217,136,.65)',saad:'rgba(56,170,255,.65)'};
+const P_BG_SOFT={anas:'rgba(255,128,32,.12)',hicham:'rgba(28,217,136,.12)',saad:'rgba(56,170,255,.12)'};
+const P_BORD_SOFT={anas:'rgba(255,128,32,.32)',hicham:'rgba(28,217,136,.32)',saad:'rgba(56,170,255,.32)'};
 const P_LABEL={anas:'A',hicham:'H',saad:'S'};
 
 const FORM_MONTHS=(()=>{
@@ -1136,7 +1138,7 @@ function renderChart(field){
 }
 
 function renderEvolution(){
-  let h='<div style="display:flex;flex-direction:column;gap:32px">';
+  let h='<div style="display:flex;flex-direction:column;gap:20px">';
   h+=renderLegend();
   [['kg','Weight (kg)'],['kcal','Calories (kcal/d)']].forEach(([f,t])=>{
     h+='<div><div style="font-family:var(--sans);font-size:13px;font-weight:800;letter-spacing:.12em;color:rgba(242,242,247,.88);text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);">'+t+'</div>'+renderChart(f)+'</div>';
@@ -1197,7 +1199,7 @@ function renderObjectifs(){
   h+='</div>';
 
   h+='<div style="display:flex;flex-direction:column;gap:8px">';
-  PERSONS.forEach(p=>{
+  ['saad','anas','hicham'].forEach(p=>{
     const pc=S.config.persons[p];
     const isSaad = p==='saad';
     const stats = [
@@ -1206,9 +1208,9 @@ function renderObjectifs(){
       { path:'persons.'+p+'.targetLoss', val:pc.targetLoss, dec:1, unit:'kg / month', pre:'−', primary:!isSaad },
     ];
 
-    h+='<div style="background:'+P_BG[p]+';border:1px solid '+P_BORD[p]+';border-radius:16px;padding:20px">';
-    h+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px">';
-    h+='<div class="mono" style="font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:'+P_COLOR[p]+'">'+P_LABEL[p]+'</div>';
+    h+='<div style="background:'+P_BG_SOFT[p]+';border:1px solid '+P_BORD_SOFT[p]+';border-radius:16px;padding:16px 20px">';
+    h+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">';
+    h+='<div class="mono" style="font-size:40px;font-weight:800;line-height:1;text-transform:uppercase;letter-spacing:.04em;color:'+P_COLOR[p]+'">'+P_LABEL[p]+'</div>';
     h+='<div class="mono" style="font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:'+P_COLOR[p]+';opacity:0.72;">'+(isSaad?'kcal-first':'weight-first')+'</div>';
     h+='</div>';
     h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">';
