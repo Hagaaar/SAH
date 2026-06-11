@@ -554,6 +554,7 @@ const PERSONS=['anas','hicham','saad'];
 const P_COLOR={anas:'#FF8020',hicham:'#1CD988',saad:'#38AAFF'};
 const P_BG={anas:'rgba(255,128,32,.1)',hicham:'rgba(28,217,136,.1)',saad:'rgba(56,170,255,.1)'};
 const P_BORD={anas:'rgba(255,128,32,.25)',hicham:'rgba(28,217,136,.25)',saad:'rgba(56,170,255,.25)'};
+const P_LABEL={anas:'A',hicham:'H',saad:'S'};
 
 const FORM_MONTHS=(()=>{
   const a=[]; let k = FORM_START;
@@ -841,7 +842,7 @@ function renderStaticHistory(){
           const bd=win?'rgba(26,204,102,.5)':'rgba(255,63,63,.5)';
           const badgeHtml='<span class="mono" style="font-size:12px;font-weight:600;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+d.amount+'€</span>';
           h+='<div style="display:flex;align-items:center;gap:8px">'+
-             '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase;opacity:.88">'+S.config.persons[p].name+'</span>'+
+             '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:16px;flex-shrink:0;text-transform:uppercase;opacity:.88">'+P_LABEL[p]+'</span>'+
              '<div style="flex:1;display:flex;gap:14px;font-family:var(--sans);align-items:center">'+
              '<span style="color:'+(d.kg!=null?'rgba(242,242,247,.72)':'rgba(242,242,247,.42)')+';font-size:11px;font-weight:500;">'+kgLbl+'</span>'+
              '<span style="color:'+(d.kcal!=null?'rgba(242,242,247,.65)':'rgba(242,242,247,.38)')+';font-size:11px;font-weight:500;">'+kcLbl+'</span>'+
@@ -895,7 +896,7 @@ function renderSuivi(){
   h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
   ['saad','anas','hicham'].forEach(p=>{
     h+='<div style="background:'+P_BG[p]+';border-radius:12px;padding:10px;border:1px solid '+P_BORD[p]+'">'+
-       '<div class="mono" style="font-size:10px;font-weight:600;color:'+P_COLOR[p]+';margin-bottom:4px;text-transform:uppercase">'+S.config.persons[p].name+'</div>'+
+       '<div class="mono" style="font-size:10px;font-weight:600;color:'+P_COLOR[p]+';margin-bottom:4px;text-transform:uppercase">'+P_LABEL[p]+'</div>'+
        '<div class="mono" style="font-size:18px;font-weight:500;color:'+P_COLOR[p]+'">'+per[p].total+'€</div>'+
        '<div class="mono" style="font-size:9px;color:rgba(242,242,247,.68);margin-top:4px"><span>'+per[p].w+'×20</span> · <span>'+per[p].l+'×100</span></div></div>';
   });
@@ -931,7 +932,7 @@ function renderSuivi(){
   h+='<div class="saisie-onglets">';
   SAISIE_ORDER.forEach(p=>{
     const sel=p===curP;
-    h+='<button data-act="fperson" data-val="'+p+'" '+(sel?'class="active-tab"':'')+'>'+S.config.persons[p].name+'</button>';
+    h+='<button data-act="fperson" data-val="'+p+'" '+(sel?'class="active-tab"':'')+'>'+P_LABEL[p]+'</button>';
   });
   h+='</div>';
   h+='</div>';
@@ -996,7 +997,7 @@ function renderSuivi(){
             const bd=win?'rgba(26,204,102,.2)':'rgba(255,63,63,.2)';
             const badgeHtml='<span class="mono" style="font-size:12px;font-weight:600;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+d.amount+'€</span>';
             h+='<div style="display:flex;align-items:center;gap:8px">'+
-               '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase;opacity:.88">'+S.config.persons[p].name+'</span>'+
+               '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:16px;flex-shrink:0;text-transform:uppercase;opacity:.88">'+P_LABEL[p]+'</span>'+
                '<div style="flex:1;display:flex;gap:14px;font-family:var(--sans);align-items:center">'+
                '<span style="color:'+(d.kg!=null?'rgba(242,242,247,.72)':'rgba(242,242,247,.42)')+';font-size:11px;font-weight:500;">'+kgLbl+'</span>'+
                '<span style="color:'+(d.kcal!=null?'rgba(242,242,247,.65)':'rgba(242,242,247,.38)')+';font-size:11px;font-weight:500;">'+kcLbl+'</span>'+
@@ -1014,7 +1015,7 @@ function renderSuivi(){
             const d=(S.data[key]&&S.data[key][p])||{};
             const e=amountFor(p,key);
             h+='<div style="display:flex;align-items:center;gap:8px">'+
-               '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:52px;flex-shrink:0;text-transform:uppercase">'+S.config.persons[p].name+'</span>'+
+               '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:16px;flex-shrink:0;text-transform:uppercase">'+P_LABEL[p]+'</span>'+
                '<div style="flex:1;display:flex;gap:14px;font-family:var(--sans);align-items:center">'+
                editCell(key,p,'kg',d.kg!=null?d.kg:null)+
                editCell(key,p,'kcal',d.kcal!=null?d.kcal:null)+
@@ -1032,11 +1033,11 @@ function renderSuivi(){
 }
 
 function renderLegend(){
-  let h='<div style="display:flex;flex-direction:column;gap:10px;align-items:flex-end;margin-top:8px">';
+  let h='<div style="display:flex;flex-direction:row;gap:14px;align-items:center;margin-bottom:4px">';
   PERSONS.forEach(p=>{
-    h+='<div style="display:flex;align-items:center;gap:8px">'+
-       '<span style="font-family:var(--sans);font-weight:700;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:'+P_COLOR[p]+'">'+S.config.persons[p].name+'</span>'+
-       '<svg width="24" height="4" style="flex-shrink:0;overflow:visible"><line x1="0" y1="2" x2="24" y2="2" stroke="'+P_COLOR[p]+'" stroke-width="2.5"/><circle cx="12" cy="2" r="3" fill="'+P_COLOR[p]+'"/></svg>'+
+    h+='<div style="display:flex;align-items:center;gap:5px">'+
+       '<svg width="18" height="4" style="flex-shrink:0;overflow:visible"><line x1="0" y1="2" x2="18" y2="2" stroke="'+P_COLOR[p]+'" stroke-width="2.5"/><circle cx="9" cy="2" r="2.5" fill="'+P_COLOR[p]+'"/></svg>'+
+       '<span style="font-family:var(--sans);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:'+P_COLOR[p]+'">'+P_LABEL[p]+'</span>'+
        '</div>';
   });
   return h+'</div>';
@@ -1136,10 +1137,10 @@ function renderChart(field){
 
 function renderEvolution(){
   let h='<div style="display:flex;flex-direction:column;gap:32px">';
+  h+=renderLegend();
   [['kg','Weight (kg)'],['kcal','Calories (kcal/d)']].forEach(([f,t])=>{
     h+='<div><div style="font-family:var(--sans);font-size:13px;font-weight:800;letter-spacing:.12em;color:rgba(242,242,247,.88);text-transform:uppercase;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.08);">'+t+'</div>'+renderChart(f)+'</div>';
   });
-  h+=renderLegend();
   return h+'</div>';
 }
 
@@ -1207,7 +1208,7 @@ function renderObjectifs(){
 
     h+='<div style="background:'+P_BG[p]+';border:1px solid '+P_BORD[p]+';border-radius:16px;padding:20px">';
     h+='<div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:20px">';
-    h+='<div class="mono" style="font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:'+P_COLOR[p]+'">'+pc.name+'</div>';
+    h+='<div class="mono" style="font-size:22px;font-weight:800;text-transform:uppercase;letter-spacing:.08em;color:'+P_COLOR[p]+'">'+P_LABEL[p]+'</div>';
     h+='<div class="mono" style="font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:'+P_COLOR[p]+';opacity:0.72;">'+(isSaad?'kcal-first':'weight-first')+'</div>';
     h+='</div>';
     h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">';
