@@ -539,6 +539,8 @@
 })();
 /* ════ CONFIGURATION APP SCRIPT ════ */
 const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx8qVAaxyAJyYM1SNmufGlh3oc36YS_e0S_nLbcbZVug_DHIf_SYwV3QYlNPlurerU/exec';
+// ⚠️ SECURITY — ne pas commiter en production
+const SYNC_PIN = '48960';
 
 /* ════ CONSTANTES & UTILITAIRES ════ */
 const MFR=['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -608,7 +610,7 @@ let S={
   data:saved?saved.data:JSON.parse(JSON.stringify(DEF_DATA)),
   manual:saved?saved.manual:JSON.parse(JSON.stringify(DEF_MANUAL)),
   trips:saved&&saved.trips?saved.trips:JSON.parse(JSON.stringify(DEF_TRIPS)),
-  formPerson:'saad', formMonth:FORM_START, pickerOpen:false, fKg:'', fKcal:'',
+  formPerson:'saad', formMonth:FORM_START, pickerOpen:false, pickerExpanded:false, fKg:'', fKcal:'',
   fTripTitle:'', fTripDates:'', fTripCost:'',
   openYears: new Set(),
   userSelectedMonth: false,
@@ -693,7 +695,7 @@ async function syncSave(changes){
   setSyncStatus('Syncing', '#888', 'var(--gold)');
   try{
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
-      body: JSON.stringify({pin: '48960', state: {config: S.config, data: S.data, manual: S.manual, trips: S.trips}, changes: changes || []})
+      body: JSON.stringify({pin: SYNC_PIN, state: {config: S.config, data: S.data, manual: S.manual, trips: S.trips}, changes: changes || []})
     });
     _syncOk=true;
     setSyncStatus('Synced', '#888', 'var(--win)');
@@ -801,63 +803,6 @@ function editCell(key,person,field,value){
 }
 
 /* ════ RENDU HTML ════ */
-function renderStaticHistory(){
-  let h='<div class="sectitle">Archive</div>';
-  const byYear={};
-  Object.keys(STATIC_HISTORY).sort().reverse().forEach(k=>{const y=k.split('-')[0];if(!byYear[y])byYear[y]=[];byYear[y].push(k);});
-  Object.keys(byYear).sort().reverse().forEach(yr=>{
-    const yKeys=byYear[yr];
-    const open=S.openYears.has('arch-'+yr);
-    let yTot=0,wCount=0,lCount=0;
-    yKeys.forEach(k=>PERSONS.forEach(p=>{
-      const d=STATIC_HISTORY[k][p];yTot+=d.amount;
-      if(d.amount===S.config.stakes.success)wCount++;else lCount++;
-    }));
-    h+='<div style="margin-bottom:6px">';
-    h+='<div data-act="toggle-year" data-year="arch-'+yr+'" style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;cursor:pointer;border-radius:8px;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.05);'+(open?'border-bottom-left-radius:0;border-bottom-right-radius:0;border-bottom-color:transparent;':'')+'">';
-    h+='<div style="display:flex;align-items:center;gap:10px">';
-    h+='<span class="mono" style="font-size:13px;font-weight:700;color:rgba(242,242,247,.68);letter-spacing:.08em">'+yr+'</span>';
-    h+='<span class="mono" style="font-size:8px;font-weight:600;color:rgba(242,242,247,.58);border:1px solid rgba(255,255,255,.08);border-radius:4px;padding:2px 5px;letter-spacing:.05em">ARCH</span>';
-    if(lCount>0)h+='<span class="mono" style="font-size:9px;color:var(--loss)">'+lCount+'✗</span>';
-    if(wCount>0)h+='<span class="mono" style="font-size:9px;color:var(--win)">'+wCount+'✓</span>';
-    h+='</div><div style="display:flex;align-items:center;gap:12px">';
-    if(yTot>0)h+='<span class="mono" style="font-size:12px;font-weight:600;color:rgba(242,242,247,.62)">'+yTot+'€</span>';
-    h+='<span style="color:rgba(242,242,247,.58);font-size:11px;transform:'+(open?'rotate(180deg)':'rotate(0deg)')+';display:inline-block;transition:transform .2s">▼</span>';
-    h+='</div></div>';
-    if(open){
-      h+='<div style="border:1px solid rgba(255,255,255,.05);border-top:none;border-bottom-left-radius:8px;border-bottom-right-radius:8px;overflow:hidden">';
-      yKeys.forEach((key,idx)=>{
-        let mTot=0;PERSONS.forEach(p=>{mTot+=STATIC_HISTORY[key][p].amount;});
-        const last=idx===yKeys.length-1;
-        h+='<div style="padding:12px;background:rgba(255,255,255,.02);'+(last?'':'border-bottom:1px solid rgba(255,255,255,.04)')+'">';
-        h+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">'+
-           '<span class="mono" style="font-size:11px;font-weight:600;color:rgba(242,242,247,.65);letter-spacing:.1em;text-transform:uppercase">'+mShrt(key)+'</span>'+
-           '<span class="mono" style="font-size:13px;font-weight:500;color:rgba(242,242,247,.65)">'+mTot+'€</span></div>';
-        h+='<div style="display:flex;flex-direction:column;gap:10px">';
-        PERSONS.forEach(p=>{
-          const d=STATIC_HISTORY[key][p];
-          const kgLbl=d.kg!=null?d.kg+' kg':'—';
-          const kcLbl=d.kcal!=null?d.kcal+' kcal':'—';
-          const win=d.amount===S.config.stakes.success;
-          const c=win?'var(--win)':'var(--loss)';
-          const bg=win?'rgba(26,204,102,.22)':'rgba(255,63,63,.22)';
-          const bd=win?'rgba(26,204,102,.5)':'rgba(255,63,63,.5)';
-          const badgeHtml='<span class="mono" style="font-size:12px;font-weight:600;flex-shrink:0;color:'+c+';padding:2px 7px;border-radius:4px;background:'+bg+';border:1px solid '+bd+';">'+d.amount+'€</span>';
-          h+='<div style="display:flex;align-items:center;gap:8px">'+
-             '<span class="mono" style="font-size:11px;font-weight:600;color:'+P_COLOR[p]+';width:16px;flex-shrink:0;text-transform:uppercase;opacity:.88">'+P_LABEL[p]+'</span>'+
-             '<div style="flex:1;display:flex;gap:14px;font-family:var(--sans);align-items:center">'+
-             '<span style="color:'+(d.kg!=null?'rgba(242,242,247,.72)':'rgba(242,242,247,.42)')+';font-size:11px;font-weight:500;">'+kgLbl+'</span>'+
-             '<span style="color:'+(d.kcal!=null?'rgba(242,242,247,.65)':'rgba(242,242,247,.38)')+';font-size:11px;font-weight:500;">'+kcLbl+'</span>'+
-             '</div>'+badgeHtml+'</div>';
-        });
-        h+='</div></div>';
-      });
-      h+='</div>';
-    }
-    h+='</div>';
-  });
-  return h;
-}
 
 function renderSuivi(){
   let h = '';
@@ -886,7 +831,7 @@ function renderSuivi(){
   h+='<div class="mono" style="font-size:9px;font-weight:600;letter-spacing:.2em;color:rgba(255,184,0,.5);text-transform:uppercase;margin-bottom:6px">Common Pool</div>';
   h+='<div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:6px">';
   h+='<div class="mono" style="font-size:42px;font-weight:700;color:var(--gold);line-height:1">'+netTotal+'€</div>';
-  h+='<div id="preview" style="font-family:var(--sans);font-weight:700;font-size:42px;line-height:1;text-align:right;pointer-events:none;"></div>';
+  h+='<div id="preview" style="display:none;font-family:var(--sans);font-weight:700;font-size:42px;line-height:1;text-align:right;pointer-events:none;"></div>';
   h+='</div>';
 
   if(tripsTotal > 0) {
@@ -917,16 +862,23 @@ function renderSuivi(){
   if(S.pickerOpen){
     h+='<div data-act="picker-bg" style="position:fixed;top:0;left:0;right:0;bottom:0;z-index:98"></div>';
     h+='<div id="picker-list" style="position:absolute;top:calc(100% + 4px);left:0;right:0;z-index:99;background:#1C1C1F;border:1px solid rgba(255,255,255,.12);border-radius:16px;max-height:260px;overflow-y:auto;box-shadow:0 12px 32px rgba(0,0,0,.85)">';
-    FORM_MONTHS.forEach(m=>{
+    const _today=new Date(),_nowKey=mKey(_today.getFullYear(),_today.getMonth()+1);
+    const _pivot=_nowKey<FORM_START?FORM_START:(_nowKey>FORM_END?FORM_END:_nowKey);
+    const _winSet=new Set();
+    for(let _d=-3;_d<=2;_d++){const _k=mStep(_pivot,_d);if(_k>=FORM_START&&_k<=FORM_END)_winSet.add(_k);}
+    if(FORM_MONTHS.includes(S.formMonth))_winSet.add(S.formMonth);
+    const _vis=S.pickerExpanded?FORM_MONTHS:FORM_MONTHS.filter(m=>_winSet.has(m));
+    _vis.forEach(m=>{
       const on=m===S.formMonth;
       h+='<div data-act="pick" data-val="'+m+'"'+(on?' data-sel="1"':'')+' style="padding:14px 16px;cursor:pointer;font-family:var(--sans);font-weight:600;font-size:12px;white-space:nowrap;border-bottom:1px solid rgba(255,255,255,.05);background:'+(on?'rgba(255,255,255,.10)':'rgba(28,28,31,1)')+';color:'+(on?'#F2F2F7':'rgba(242,242,247,.85)')+'">'+mLbl(m).toUpperCase()+'</div>';
     });
+    if(!S.pickerExpanded)h+='<div data-act="expand-picker" style="padding:12px 16px;cursor:pointer;font-family:var(--sans);font-weight:600;font-size:11px;white-space:nowrap;color:rgba(242,242,247,.45);text-align:center;border-top:1px solid rgba(255,255,255,.06)">Voir tous les mois ▼</div>';
     h+='</div>';
   }
   h+='</div>';
   h+='<input id="f-kg" class="saisie-input-bg" type="text" inputmode="decimal" placeholder="KG" value="'+esc(S.fKg)+'" style="flex:1;min-width:0;padding:13px 6px;font-size:11px;text-align:center;">';
   h+='<input id="f-kcal" class="saisie-input-bg" type="number" inputmode="numeric" placeholder="KCAL" value="'+esc(S.fKcal)+'" style="flex:1;min-width:0;padding:13px 6px;font-size:11px;text-align:center;">';
-  h+='<button data-act="add" style="width:38px;height:38px;flex-shrink:0;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">';
+  h+='<button id="f-add-btn" data-act="add" style="width:38px;height:38px;flex-shrink:0;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;">';
   h+='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--tab-color)" stroke-width="3" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>';
   h+='</button>';
   h+='</div>';
@@ -1297,19 +1249,21 @@ function render(){
 
 function bindForm(){
   const kg=document.getElementById('f-kg'), kc=document.getElementById('f-kcal');
+  const _svgPlus='<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--tab-color)" stroke-width="3" stroke-linecap="round"><line x1="12" y1="4" x2="12" y2="20"></line><line x1="4" y1="12" x2="20" y2="12"></line></svg>';
   function upd(){
     S.fKg=kg?kg.value:''; S.fKcal=kc?kc.value:'';
-    const el=document.getElementById('preview');if(!el)return;
+    const btn=document.getElementById('f-add-btn');
+    if(!btn)return;
     const kgN=S.fKg?parseFloat(S.fKg.replace(',','.')):null;
     const kcN=S.fKcal?parseInt(S.fKcal):null;
-    if(kgN==null&&kcN==null){el.innerHTML='';return;}
+    if(kgN==null&&kcN==null){btn.innerHTML=_svgPlus;return;}
     const bak=S.data[S.formMonth];
     if(!S.data[S.formMonth])S.data[S.formMonth]={};
     S.data[S.formMonth]=Object.assign({},bak,{[S.formPerson]:{kg:kgN,kcal:kcN}});
     const e=computeEntry(S.formPerson,S.formMonth);
     S.data[S.formMonth]=bak;
-    if(e.pass===null){el.innerHTML='';return;}
-    el.innerHTML='<span style="color:'+(e.pass?'var(--win)':'var(--loss)')+'">+'+(e.amount)+'€</span>';
+    if(e.pass===null){btn.innerHTML=_svgPlus;return;}
+    btn.innerHTML='<span style="font-size:12px;font-weight:700;color:'+(e.pass?'var(--win)':'var(--loss)')+'">+'+(e.amount)+'€</span>';
   }
   if(kg)kg.addEventListener('input',upd);
   if(kc)kc.addEventListener('input',upd);
@@ -1352,12 +1306,13 @@ document.addEventListener('click',ev=>{
     render();return;
   }
 
-  if(act==='tab'){S.tab=t.getAttribute('data-val');S.pickerOpen=false;render();return;}
+  if(act==='tab'){S.tab=t.getAttribute('data-val');S.pickerOpen=false;S.pickerExpanded=false;render();return;}
   if(act==='fperson'){S.formPerson=t.getAttribute('data-val');render();return;}
 
-  if(act==='picker'){S.pickerOpen=!S.pickerOpen;render();return;}
-  if(act==='picker-bg'){S.pickerOpen=false;render();return;}
-  if(act==='pick'){S.formMonth=t.getAttribute('data-val');S.userSelectedMonth=true;S.pickerOpen=false;render();return;}
+  if(act==='picker'){S.pickerOpen=!S.pickerOpen;if(!S.pickerOpen)S.pickerExpanded=false;render();return;}
+  if(act==='picker-bg'){S.pickerOpen=false;S.pickerExpanded=false;render();return;}
+  if(act==='expand-picker'){S.pickerExpanded=true;render();return;}
+  if(act==='pick'){S.formMonth=t.getAttribute('data-val');S.userSelectedMonth=true;S.pickerOpen=false;S.pickerExpanded=false;render();return;}
 
   if(act==='add'){
     const kgEl=document.getElementById('f-kg'),kcEl=document.getElementById('f-kcal');
@@ -1445,11 +1400,6 @@ document.addEventListener('click',ev=>{
     });
     return;
   }
-});
-
-["2026-06"].forEach(k=>{
-  if(S.data[k]){delete S.data[k];persist();}
-  if(S.manual[k]){delete S.manual[k];persist();}
 });
 
 render();
