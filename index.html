@@ -151,11 +151,11 @@
 
   .saisie-onglets button {
     flex: 1;
-    font-size: 11px;
+    font-size: 20px;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    letter-spacing: 0.08em;
     color: var(--text-secondary);
-    font-weight: 600;
+    font-weight: 800;
     padding: 16px 0;
     background: transparent;
     border: none;
@@ -896,7 +896,7 @@ function renderSuivi(){
   h+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">';
   ['saad','anas','hicham'].forEach(p=>{
     h+='<div style="background:'+P_BG[p]+';border-radius:12px;padding:10px;border:1px solid '+P_BORD[p]+'">'+
-       '<div class="mono" style="font-size:10px;font-weight:600;color:'+P_COLOR[p]+';margin-bottom:4px;text-transform:uppercase">'+P_LABEL[p]+'</div>'+
+       '<div class="mono" style="font-size:32px;font-weight:800;line-height:1;color:'+P_COLOR[p]+';margin-bottom:6px;text-transform:uppercase">'+P_LABEL[p]+'</div>'+
        '<div class="mono" style="font-size:18px;font-weight:500;color:'+P_COLOR[p]+'">'+per[p].total+'€</div>'+
        '<div class="mono" style="font-size:9px;color:rgba(242,242,247,.68);margin-top:4px"><span>'+per[p].w+'×20</span> · <span>'+per[p].l+'×100</span></div></div>';
   });
