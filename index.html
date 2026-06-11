@@ -1033,7 +1033,7 @@ function renderSuivi(){
 }
 
 function renderLegend(){
-  let h='<div style="display:flex;flex-direction:row;gap:14px;align-items:center;margin-bottom:4px">';
+  let h='<div style="display:flex;flex-direction:row;gap:14px;align-items:center;justify-content:flex-end;margin-bottom:4px">';
   PERSONS.forEach(p=>{
     h+='<div style="display:flex;align-items:center;gap:5px">'+
        '<svg width="18" height="4" style="flex-shrink:0;overflow:visible"><line x1="0" y1="2" x2="18" y2="2" stroke="'+P_COLOR[p]+'" stroke-width="2.5"/><circle cx="9" cy="2" r="2.5" fill="'+P_COLOR[p]+'"/></svg>'+
