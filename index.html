@@ -592,6 +592,7 @@ const DEF_TRIPS=[];
 
 /* ════ ETAT GLOBAL ════ */
 const LS='getfit_v2';
+const SNAP_KEY='getfit_snaps';
 function load(){try{const r=JSON.parse(localStorage.getItem(LS));if(r&&r.config&&r.data)return r;}catch(e){}return null;}
 const saved=load();
 
@@ -626,9 +627,32 @@ S.formMonth = getTargetMonth(S.data);
 
 function persist(){try{localStorage.setItem(LS,JSON.stringify({config:S.config,data:S.data,manual:S.manual,trips:S.trips}));}catch(e){}}
 
+function saveSnapshot(){
+  try{
+    const snaps=JSON.parse(localStorage.getItem(SNAP_KEY)||'[]');
+    snaps.unshift({ts:Date.now(),s:JSON.stringify({config:S.config,data:S.data,manual:S.manual,trips:S.trips})});
+    if(snaps.length>8)snaps.length=8;
+    localStorage.setItem(SNAP_KEY,JSON.stringify(snaps));
+  }catch(e){}
+}
+
+function exportData(){
+  try{
+    const full={config:S.config,data:S.data,manual:S.manual,trips:S.trips,static:STATIC_HISTORY,exportedAt:new Date().toISOString()};
+    const blob=new Blob([JSON.stringify(full,null,2)],{type:'application/json'});
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;
+    a.download='SAH-backup-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }catch(e){alert('Export failed: '+e.message);}
+}
+
 /* ════ SYNCHRONISATION ════ */
 let syncTimer=null;
 let _syncOk=false;
+let _pendingSave=null;
 
 function isPWA(){
   return !!navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
@@ -690,16 +714,48 @@ async function syncLoad(manual=false){
 }
 
 async function syncSave(changes){
-  setSyncStatus('Syncing', '#888', 'var(--gold)');
+  saveSnapshot();
+  setSyncStatus('Syncing...', '#888', 'var(--gold)');
+
+  let stateToSave={config:S.config,data:S.data,manual:S.manual,trips:S.trips};
+
+  // Merge-before-save: load remote first so we never overwrite a concurrent edit
+  if(changes && changes.length>0){
+    try{
+      const resp=await fetch(SCRIPT_URL,{cache:'no-store'});
+      const remote=await resp.json();
+      if(remote && remote.data && Object.keys(remote.data).length>0){
+        // Remote is the authoritative base; apply only our specific changes on top
+        const mergedData=JSON.parse(JSON.stringify(remote.data));
+        changes.forEach(ch=>{
+          if(!mergedData[ch.month])mergedData[ch.month]={};
+          mergedData[ch.month][ch.person]={kg:ch.kg,kcal:ch.kcal,amount:ch.amount};
+        });
+        stateToSave={
+          config:S.config,
+          data:mergedData,
+          manual:Object.assign({},remote.manual||{},S.manual),
+          trips:S.trips
+        };
+        S.data=mergedData;
+        S.manual=stateToSave.manual;
+        persist();
+        render();
+      }
+    }catch(e){/* couldn't load remote – save local state rather than losing data */}
+  }
+
   try{
     await fetch(SCRIPT_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
-      body: JSON.stringify({pin: '48960', state: {config: S.config, data: S.data, manual: S.manual, trips: S.trips}, changes: changes || []})
+      body:JSON.stringify({pin:'48960',state:stateToSave,changes:changes||[]})
     });
+    _pendingSave=null;
     _syncOk=true;
     setSyncStatus('Synced', '#888', 'var(--win)');
   }catch(e){
     _syncOk=false;
-    setSyncStatus('Sync failed', '#888', 'var(--loss)');
+    _pendingSave=changes;
+    setSyncStatus('Hors ligne', '#888', 'var(--loss)');
   }
 }
 
@@ -1149,6 +1205,16 @@ function renderEvolution(){
 function renderGoalsPage(){
   let h='<div style="display:flex;flex-direction:column;gap:24px">';
   h+='<div><div style="font-size:22px;font-weight:800;letter-spacing:-.03em;color:var(--text-secondary);margin-bottom:16px;">Goals</div>'+renderObjectifs()+'</div>';
+  h+='<div>';
+  h+='<div class="sectitle">Data backup</div>';
+  h+='<div class="card" style="padding:14px 16px;display:flex;justify-content:space-between;align-items:center;">';
+  h+='<div>';
+  h+='<div style="font-weight:600;font-size:13px;margin-bottom:2px;">Export JSON</div>';
+  h+='<div style="font-size:11px;color:var(--text-tertiary);">Télécharger toutes les données</div>';
+  h+='</div>';
+  h+='<button onclick="exportData()" style="background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:8px;padding:8px 14px;font-family:var(--sans);font-size:12px;font-weight:600;color:var(--text-primary);cursor:pointer;">Export</button>';
+  h+='</div>';
+  h+='</div>';
   return h+'</div>';
 }
 
@@ -1454,6 +1520,22 @@ document.addEventListener('click',ev=>{
 
 render();
 syncLoad();
+
+// Retry pending save when connection is restored
+window.addEventListener('online', ()=>{
+  if(_pendingSave!==null) setTimeout(()=>syncSave(_pendingSave), 1500);
+  else setTimeout(()=>syncLoad(false), 1500);
+});
+
+// Retry when tab comes back to foreground with a pending save
+document.addEventListener('visibilitychange', ()=>{
+  if(document.visibilityState==='visible' && _pendingSave!==null) syncSave(_pendingSave);
+});
+
+// Keep all users in sync: silent auto-reload every 90s
+setInterval(()=>{
+  if(!syncTimer && _pendingSave===null) syncLoad(false);
+}, 90000);
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('./sw.js')
