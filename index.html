@@ -1538,13 +1538,21 @@ setInterval(()=>{
 }, 90000);
 
 if ('serviceWorker' in navigator) {
+  let swReg = null;
   navigator.serviceWorker.register('./sw.js')
-    .then(reg => reg.update())
+    .then(reg => { swReg = reg; reg.update(); })
     .catch(() => {});
   let reloading = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (!reloading) { reloading = true; window.location.reload(); }
   });
+  // PWA on iOS suspends in background instead of fully reloading, so this
+  // script never re-runs on its own — re-check for a new SW whenever the
+  // app comes back to the foreground, and periodically while it stays open.
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && swReg) swReg.update();
+  });
+  setInterval(() => { if (swReg) swReg.update(); }, 60000);
 }
 </script>
 </body>
