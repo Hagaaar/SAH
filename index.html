@@ -538,7 +538,7 @@
   });
 })();
 /* ════ CONFIGURATION APP SCRIPT ════ */
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbx8qVAaxyAJyYM1SNmufGlh3oc36YS_e0S_nLbcbZVug_DHIf_SYwV3QYlNPlurerU/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxpLTWnO-qTHMlWzK0B-Kqe6loWWXIiPEvPhyTtSeXLGHyZaro8hoDcVPxte8KiYyg/exec';
 
 /* ════ CONSTANTES & UTILITAIRES ════ */
 const MFR=['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
@@ -686,7 +686,7 @@ function updateDots() {
 async function syncLoad(manual=false){
   setSyncStatus('Syncing', '#888', 'var(--gold)');
   try{
-    const resp = await fetch(SCRIPT_URL, {cache:'no-store'});
+    const resp = await fetch(SCRIPT_URL+'?pin=48960', {cache:'no-store'});
     const remote = await resp.json();
 
     if (remote && remote.status === 'error') {
@@ -722,7 +722,7 @@ async function syncSave(changes){
   // Merge-before-save: load remote first so we never overwrite a concurrent edit
   if(changes && changes.length>0){
     try{
-      const resp=await fetch(SCRIPT_URL,{cache:'no-store'});
+      const resp=await fetch(SCRIPT_URL+'?pin=48960',{cache:'no-store'});
       const remote=await resp.json();
       if(remote && remote.data && Object.keys(remote.data).length>0){
         // Remote is the authoritative base; apply only our specific changes on top
