@@ -358,6 +358,68 @@
   }
   #trust-toggle.active { color: var(--anas); }
   #trust-toggle:active { opacity: 0.55; }
+
+  /* ── OFFLINE OVERLAY ── */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes offline-in { from{opacity:0;transform:translateY(24px)scale(.96)} to{opacity:1;transform:translateY(0)scale(1)} }
+  @keyframes offline-pulse { 0%,100%{transform:scale(1);opacity:.9} 50%{transform:scale(1.18);opacity:.4} }
+
+  #offline-overlay {
+    position: fixed; top:0; left:0; right:0; bottom:0;
+    background: rgba(12,12,15,.92);
+    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    z-index: 9990;
+    display: none;
+    align-items: center; justify-content: center;
+  }
+  #offline-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    padding: 36px 28px 28px;
+    width: min(320px, calc(100vw - 40px));
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+    animation: offline-in .45s cubic-bezier(.22,1,.36,1) both;
+  }
+  .offline-icon-wrap {
+    width: 56px; height: 56px; border-radius: 18px;
+    background: rgba(255,63,63,.12); border: 1px solid rgba(255,63,63,.22);
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 18px;
+  }
+  .offline-title {
+    font-size: 17px; font-weight: 700; color: var(--text-primary);
+    margin-bottom: 8px; text-align: center;
+  }
+  .offline-sub {
+    font-size: 12px; font-weight: 400; color: var(--text-tertiary);
+    text-align: center; line-height: 1.55; margin-bottom: 28px;
+  }
+  .offline-btn-primary {
+    width: 100%; padding: 15px; border-radius: 14px;
+    background: var(--anas); color: #fff;
+    font-size: 14px; font-weight: 600; font-family: var(--sans);
+    border: none; cursor: pointer; margin-bottom: 10px;
+    transition: opacity .15s;
+  }
+  .offline-btn-primary:active { opacity: .75; }
+  .offline-btn-ghost {
+    width: 100%; padding: 15px; border-radius: 14px;
+    background: transparent; color: var(--text-secondary);
+    font-size: 13px; font-weight: 500; font-family: var(--sans);
+    border: 1px solid rgba(255,255,255,.1); cursor: pointer;
+    transition: opacity .15s;
+  }
+  .offline-btn-ghost:active { opacity: .6; }
+  .connecting-dots { display: flex; gap: 10px; margin: 8px 0 28px; }
+  .connecting-dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--anas);
+    animation: offline-pulse 1.1s ease-in-out infinite;
+  }
+  .connecting-dot:nth-child(1){animation-delay:0s}
+  .connecting-dot:nth-child(2){animation-delay:.18s}
+  .connecting-dot:nth-child(3){animation-delay:.36s}
 </style>
 </head>
 <body>
@@ -399,7 +461,7 @@
   <div style="font-family:var(--sans); font-size:7.5px; font-weight:500; letter-spacing:.1em; text-transform:uppercase; color:var(--text-tertiary);">
     S.A.H - Siblings Avoiding Heart-attacks Challenge
   </div>
-  <button class="sync-badge" onclick="syncLoad(true)" style="flex-shrink:0; display:flex; align-items:center; gap:5px; padding:0;">
+  <button class="sync-badge" onclick="doReconnect()" style="flex-shrink:0; display:flex; align-items:center; gap:5px; padding:0;">
     <span id="sync-text" style="font-size:7px;letter-spacing:.1em;color:rgba(242,242,247,.68);">Offline</span>
     <div id="sync-dot" class="sync-dot" style="background:var(--loss);box-shadow:0 0 0 3px rgba(255,63,63,.18),0 0 10px rgba(255,63,63,.45)"></div>
   </button>
@@ -653,9 +715,100 @@ function exportData(){
 let syncTimer=null;
 let _syncOk=false;
 let _pendingSave=null;
+let _offlineMode=false;
+let _offlineQueue=[]; // accumulates changes made while offline
 
 function isPWA(){
   return !!navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+}
+
+function accumulateOffline(changes){
+  (changes||[]).forEach(ch=>{
+    const i=_offlineQueue.findIndex(c=>c.month===ch.month&&c.person===ch.person);
+    if(i>=0) _offlineQueue[i]=ch; else _offlineQueue.push(ch);
+  });
+}
+
+function showOfflineOverlay(reconnecting){
+  let ov=document.getElementById('offline-overlay');
+  if(!ov){
+    ov=document.createElement('div');
+    ov.id='offline-overlay';
+    document.body.appendChild(ov);
+  }
+  ov.style.display='flex';
+  if(reconnecting){
+    ov.innerHTML='<div id="offline-card">'+
+      '<div class="offline-icon-wrap"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--loss)" stroke-width="2" stroke-linecap="round"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="var(--loss)"/></svg></div>'+
+      '<div class="offline-title">Connexion en cours…</div>'+
+      '<div class="connecting-dots"><div class="connecting-dot"></div><div class="connecting-dot"></div><div class="connecting-dot"></div></div>'+
+      '</div>';
+  } else {
+    const q=_offlineQueue.length;
+    const sub='Impossible de joindre le serveur.'+(q>0?' <b style="color:var(--gold)">'+q+' saisie'+(q>1?'s':'')+' en attente.</b>':' Tes données locales sont intactes.');
+    ov.innerHTML='<div id="offline-card">'+
+      '<div class="offline-icon-wrap"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--loss)" stroke-width="2" stroke-linecap="round"><path d="M1 1l22 22"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><circle cx="12" cy="20" r="1" fill="var(--loss)"/></svg></div>'+
+      '<div class="offline-title">Connexion perdue</div>'+
+      '<div class="offline-sub">'+sub+'</div>'+
+      '<button class="offline-btn-primary" onclick="doReconnect()">Se reconnecter</button>'+
+      '<button class="offline-btn-ghost" onclick="doOfflineMode()">Travailler hors ligne</button>'+
+      '</div>';
+  }
+}
+
+function hideOfflineOverlay(){
+  const ov=document.getElementById('offline-overlay');
+  if(ov) ov.style.display='none';
+}
+
+async function doReconnect(){
+  showOfflineOverlay(true);
+  setSyncStatus('Syncing','#888','var(--gold)');
+  try{
+    const resp=await fetch(SCRIPT_URL+'?pin=48960',{cache:'no-store'});
+    const remote=await resp.json();
+    if(remote&&remote.status==='error') throw new Error('server error');
+
+    if(remote&&remote.data&&Object.keys(remote.data).length>0){
+      S.config=remote.config||S.config;
+      // Re-apply offline queue on top of remote so UI stays consistent
+      if(_offlineQueue.length>0){
+        const merged=JSON.parse(JSON.stringify(remote.data));
+        _offlineQueue.forEach(ch=>{
+          if(!merged[ch.month])merged[ch.month]={};
+          merged[ch.month][ch.person]={kg:ch.kg,kcal:ch.kcal,amount:ch.amount};
+        });
+        S.data=merged;
+      } else {
+        S.data=remote.data;
+      }
+      S.manual=remote.manual||S.manual;
+      S.trips=remote.trips||S.trips;
+      if(!S.userSelectedMonth) S.formMonth=getTargetMonth(S.data);
+      persist();
+    }
+
+    _syncOk=true; _offlineMode=false;
+    hideOfflineOverlay();
+    setSyncStatus('Synced','#888','var(--win)');
+    render();
+
+    // Flush all accumulated offline changes to the server
+    if(_offlineQueue.length>0){
+      const q=[..._offlineQueue];
+      _offlineQueue=[];
+      syncSave(q);
+    }
+  }catch(err){
+    _syncOk=false;
+    setSyncStatus('Hors ligne','#888','var(--loss)');
+    showOfflineOverlay(false);
+  }
+}
+
+function doOfflineMode(){
+  _offlineMode=true;
+  hideOfflineOverlay();
 }
 
 function setSyncStatus(msg, color, dotColor) {
@@ -690,7 +843,8 @@ async function syncLoad(manual=false){
     const remote = await resp.json();
 
     if (remote && remote.status === 'error') {
-      setSyncStatus('Sync failed', '#888', 'var(--loss)');
+      setSyncStatus('Hors ligne', '#888', 'var(--loss)');
+      if(!_offlineMode) showOfflineOverlay(false);
       return;
     }
 
@@ -708,7 +862,8 @@ async function syncLoad(manual=false){
     render();
   }catch(e){
     _syncOk=false;
-    setSyncStatus('Sync failed', '#888', 'var(--loss)');
+    setSyncStatus('Hors ligne','#888','var(--loss)');
+    if(!_offlineMode) showOfflineOverlay(false);
     render();
   }
 }
@@ -755,7 +910,9 @@ async function syncSave(changes){
   }catch(e){
     _syncOk=false;
     _pendingSave=changes;
-    setSyncStatus('Hors ligne', '#888', 'var(--loss)');
+    accumulateOffline(changes);
+    setSyncStatus('Hors ligne','#888','var(--loss)');
+    if(!_offlineMode) showOfflineOverlay(false);
   }
 }
 
@@ -1523,8 +1680,7 @@ syncLoad();
 
 // Retry pending save when connection is restored
 window.addEventListener('online', ()=>{
-  if(_pendingSave!==null) setTimeout(()=>syncSave(_pendingSave), 1500);
-  else setTimeout(()=>syncLoad(false), 1500);
+  if(!_offlineMode) setTimeout(()=>doReconnect(), 1000);
 });
 
 // Retry when tab comes back to foreground with a pending save

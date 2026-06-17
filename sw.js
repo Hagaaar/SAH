@@ -1,4 +1,4 @@
-const CACHE = 'sah-v2';
+const CACHE = 'sah-v3';
 
 self.addEventListener('install', () => self.skipWaiting());
 
