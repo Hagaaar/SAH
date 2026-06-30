@@ -366,8 +366,7 @@
 
   #offline-overlay {
     position: fixed; top:0; left:0; right:0; bottom:0;
-    background: rgba(12,12,15,.92);
-    backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px);
+    background: rgba(12,12,15,.96);
     z-index: 9990;
     display: none;
     align-items: center; justify-content: center;
@@ -864,7 +863,6 @@ async function syncLoad(manual=false){
     _syncOk=false;
     setSyncStatus('Hors ligne','#888','var(--loss)');
     if(!_offlineMode) showOfflineOverlay(false);
-    render();
   }
 }
 
