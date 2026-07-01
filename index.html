@@ -1695,12 +1695,17 @@ setInterval(()=>{
 
 if ('serviceWorker' in navigator) {
   let swReg = null;
+  // Only reload on a genuine SW update, never on the first-ever install —
+  // skipWaiting()+clients.claim() fire 'controllerchange' on first load too,
+  // which was causing the page (and any open UI state) to reset right after load.
+  const hadController = !!navigator.serviceWorker.controller;
   navigator.serviceWorker.register('./sw.js')
     .then(reg => { swReg = reg; reg.update(); })
     .catch(() => {});
   let reloading = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!reloading) { reloading = true; window.location.reload(); }
+    if (!hadController || reloading) return;
+    reloading = true; window.location.reload();
   });
   // PWA on iOS suspends in background instead of fully reloading, so this
   // script never re-runs on its own — re-check for a new SW whenever the
